@@ -23,6 +23,8 @@ channels:
     messages:
       subscribeOrderBook:
         $ref: "#/components/messages/SubscribeOrderBookCommand"
+      subscribeMarkets:
+        $ref: "#/components/messages/SubscribeMarketsCommand"
       subscribeTrades:
         $ref: "#/components/messages/SubscribeTradesCommand"
       subscribeCandles:
@@ -31,8 +33,6 @@ channels:
         $ref: "#/components/messages/SubscribePositionsCommand"
       subscribeBalance:
         $ref: "#/components/messages/SubscribeBalanceCommand"
-      subscribeMarkets:
-        $ref: "#/components/messages/SubscribeMarketsCommand"
       addOrder:
         $ref: "#/components/messages/AddOrderCommand"
       cancelOrder:
