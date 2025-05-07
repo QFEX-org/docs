@@ -15,21 +15,17 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "pages": ["docs/index", "docs/quickstart", "docs/development"]
           },
           {
             "group": "Essentials",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "docs/essentials/markdown",
+              "docs/essentials/code",
+              "docs/essentials/images",
+              "docs/essentials/settings",
+              "docs/essentials/navigation",
+              "docs/essentials/reusable-snippets"
             ]
           }
         ]
@@ -39,17 +35,19 @@
         "groups": [
           {
             "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["docs/api-reference/introduction"]
+          },
+          {
+            "group": "WebSocket",
+            "pages": ["docs/websocket/main", "docs/websocket/asyncapi"]
           },
           {
             "group": "Endpoint Examples",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "docs/api-reference/endpoint/get",
+              "docs/api-reference/endpoint/create",
+              "docs/api-reference/endpoint/delete",
+              "docs/api-reference/endpoint/webhook"
             ]
           }
         ]

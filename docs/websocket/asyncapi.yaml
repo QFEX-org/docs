@@ -1,0 +1,651 @@
+asyncapi: 3.0.0
+info:
+  title: QFEx Multiplexed WebSocket API
+  version: 1.0.0
+  description: |-
+    Single WebSocket gateway for all QFEx real‑time streams.  
+    Clients publish subscription and order commands here,  
+    and receive all updates over the same endpoint.
+defaultContentType: application/json
+servers:
+  production:
+    host: ws.pfex.io
+    protocol: wss
+    description: Production WebSocket gateway
+
+channels:
+  qfexMultiplex:
+    address: /v4/ws
+    description: Single channel for subscriptions, order commands, and all updates
+    # parameters:
+    #   apiKey:
+    #     $ref: "#/components/parameters/apiKey"
+    messages:
+      subscribeOrderBook:
+        $ref: "#/components/messages/SubscribeOrderBookCommand"
+      subscribeTrades:
+        $ref: "#/components/messages/SubscribeTradesCommand"
+      subscribeCandles:
+        $ref: "#/components/messages/SubscribeCandlesCommand"
+      subscribePositions:
+        $ref: "#/components/messages/SubscribePositionsCommand"
+      subscribeBalance:
+        $ref: "#/components/messages/SubscribeBalanceCommand"
+      subscribeMarkets:
+        $ref: "#/components/messages/SubscribeMarketsCommand"
+      addOrder:
+        $ref: "#/components/messages/AddOrderCommand"
+      cancelOrder:
+        $ref: "#/components/messages/CancelOrderCommand"
+      bboUpdate:
+        $ref: "#/components/messages/BboUpdate"
+      orderBookUpdate:
+        $ref: "#/components/messages/OrderBookUpdate"
+      tradeUpdate:
+        $ref: "#/components/messages/TradeUpdate"
+      candleUpdate:
+        $ref: "#/components/messages/CandleUpdate"
+      balanceUpdate:
+        $ref: "#/components/messages/BalanceUpdate"
+      positionUpdate:
+        $ref: "#/components/messages/PositionUpdate"
+
+operations:
+  subscribeOrderBookStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeOrderBook"
+
+  subscribeTradesStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeTrades"
+
+  subscribeCandlesStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeCandles"
+
+  subscribePositionsStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribePositions"
+
+  subscribeBalanceStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeBalance"
+
+  subscribeMarketsStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeMarkets"
+
+  placeOrder:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Place a new order
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/addOrder"
+
+  cancelOrder:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Cancel an existing order
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/cancelOrder"
+
+  receiveUpdates:
+    action: send
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Receive all update messages and events
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/bboUpdate"
+      - $ref: "#/channels/qfexMultiplex/messages/orderBookUpdate"
+      - $ref: "#/channels/qfexMultiplex/messages/tradeUpdate"
+      - $ref: "#/channels/qfexMultiplex/messages/candleUpdate"
+      - $ref: "#/channels/qfexMultiplex/messages/balanceUpdate"
+      - $ref: "#/channels/qfexMultiplex/messages/positionUpdate"
+
+components:
+  parameters:
+    apiKey:
+      description: Your QFEx API key
+
+  messageTraits:
+    commonHeaders:
+      headers:
+        type: object
+        properties:
+          x-qfex-client:
+            type: string
+            description: Client identifier
+
+  operationTraits:
+    websocket:
+      bindings:
+        ws: {}
+
+  messages:
+    SubscribeOrderBookCommand:
+      name: subscribe_orderbook
+      title: Subscribe Order Book Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeOrderBookCommand"
+    SubscribeTradesCommand:
+      name: subscribe_trades
+      title: Subscribe Trades Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeTradesCommand"
+    SubscribeCandlesCommand:
+      name: subscribe_candles
+      title: Subscribe Candles Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeCandlesCommand"
+    SubscribePositionsCommand:
+      name: subscribe_positions
+      title: Subscribe Positions Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribePositionsCommand"
+    SubscribeBalanceCommand:
+      name: subscribe_balance
+      title: Subscribe Balance Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeBalanceCommand"
+    SubscribeMarketsCommand:
+      name: subscribe_markets
+      title: Subscribe Markets Command
+      summary: Request to subscribe to a specific stream
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeMarketsCommand"
+
+    AddOrderCommand:
+      name: add_order
+      title: Add Order Command
+      summary: Place a new order
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/AddOrderCommand"
+
+    CancelOrderCommand:
+      name: cancel_order
+      title: Cancel Order Command
+      summary: Cancel an existing order
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/CancelOrderCommand"
+
+    BboUpdate:
+      name: bbo_update
+      title: Best‑Bid‑Offer Update
+      summary: Stream of best bid and offer updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/BboUpdate"
+
+    OrderBookUpdate:
+      name: orderbook_update
+      title: Order Book Update
+      summary: Full L2 book plus deltas for a symbol
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/OrderBookUpdate"
+
+    TradeUpdate:
+      name: trade_update
+      title: Trade Update
+      summary: Stream of recent trades for a symbol
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/TradeUpdate"
+
+    CandleUpdate:
+      name: candle_update
+      title: Candle Update
+      summary: Candle updates for a symbol and interval
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/CandleUpdate"
+
+    BalanceUpdate:
+      name: balance_update
+      title: Balance Update
+      summary: Stream of your balance updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/BalanceUpdate"
+
+    PositionUpdate:
+      name: position_update
+      title: Position Update
+      summary: Stream of your position updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/PositionUpdate"
+
+  schemas:
+    MessageEnvelope:
+      type: object
+      properties:
+        type:
+          type: string
+        connection_id:
+          type: string
+        message_id:
+          type: integer
+        channel:
+          type: string
+        id:
+          type: string
+        contents:
+          type: object
+      required:
+        - type
+        - connection_id
+        - message_id
+
+    SubscribeOrderBookCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_orderbook
+        id:
+          type: string
+          description: Trading pair, e.g. "AAPL-USD"
+      required:
+        - type
+        - channel
+        - id
+
+    SubscribeTradesCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_trades
+        id:
+          type: string
+          description: Trading pair, e.g. "AAPL-USD"
+      required:
+        - type
+        - channel
+        - id
+
+    SubscribeCandlesCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_candles
+        id:
+          type: string
+          description: Symbol/Interval, e.g. "AAPL-USD/1MIN"
+      required:
+        - type
+        - channel
+        - id
+
+    SubscribeMarketsCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_markets
+      required:
+        - type
+        - channel
+
+    SubscribeBalanceCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_balances
+        id:
+          type: string
+          description: API Key
+      required:
+        - type
+        - channel
+        - id
+
+    SubscribePositionsCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_positions
+        id:
+          type: string
+          description: API Key
+      required:
+        - type
+        - channel
+        - id
+
+    AddOrderCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          const: add_order
+        apiKey:
+          type: string
+        order:
+          type: object
+          properties:
+            action:
+              type: string
+              const: ADD
+            marketId:
+              type: string
+            side:
+              type: string
+            type:
+              type: string
+            timeInForce:
+              type: string
+            size:
+              type: string
+            price:
+              type: string
+          required:
+            - action
+            - marketId
+
+    CancelOrderCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          const: cancel_order
+        apiKey:
+          type: string
+        order:
+          type: object
+          properties:
+            action:
+              type: string
+              const: CANCEL
+            orderId:
+              type: string
+          required:
+            - action
+            - orderId
+
+    BboUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/BboPayload"
+
+    OrderBookUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderBookPayload"
+
+    TradeUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/TradePayload"
+
+    CandleUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/CandlePayload"
+
+    BalanceUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/BalancePayload"
+
+    PositionUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/PositionPayload"
+
+    BboPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bidPrice:
+          type: string
+        bidSize:
+          type: string
+        askPrice:
+          type: string
+        askSize:
+          type: string
+
+    OrderBookPayload:
+      type: object
+      properties:
+        bids:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        asks:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+
+    TradePayload:
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        side:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CandlePayload:
+      type: object
+      properties:
+        startedAt:
+          type: string
+          format: date-time
+        ticker:
+          type: string
+        resolution:
+          type: string
+        open:
+          type: string
+        high:
+          type: string
+        low:
+          type: string
+        close:
+          type: string
+        usdVolume:
+          type: string
+
+    BalancePayload:
+      type: object
+      properties:
+        deposit:
+          type: number
+        realised_pnl:
+          type: number
+        unrealised_pnl:
+          type: number
+        order_margin:
+          type: number
+        position_margin:
+          type: number
+        available_balance:
+          type: number
+
+    PositionPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        position:
+          type: number
+        average_price:
+          type: number
+
+    PnlEntryPayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        available_balance:
+          type: number
+        realised_pnl:
+          type: number
