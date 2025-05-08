@@ -11,26 +11,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Get Started",
-            "pages": ["docs/index", "docs/quickstart", "docs/development"]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "docs/essentials/markdown",
-              "docs/essentials/code",
-              "docs/essentials/images",
-              "docs/essentials/settings",
-              "docs/essentials/navigation",
-              "docs/essentials/reusable-snippets"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "API Reference",
         "groups": [
           {
@@ -61,18 +41,13 @@
       "anchors": [
         {
           "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "href": "https://docs.qfex.com/docs",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Trade Now",
+          "href": "https://app.qfex.com",
+          "icon": "chart-line"
         }
       ]
     }
@@ -85,20 +60,20 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@qfex.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Trade Now",
+      "href": "https://app.qfex.com"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/qfex__",
+      "github": "https://github.com/qfex-org",
+      "linkedin": "https://linkedin.com/company/qfex"
     }
   }
 }
