@@ -40,15 +40,6 @@
           {
             "group": "WebSocket",
             "pages": ["docs/websocket/main", "docs/websocket/asyncapi"]
-          },
-          {
-            "group": "Endpoint Examples",
-            "pages": [
-              "docs/api-reference/endpoint/get",
-              "docs/api-reference/endpoint/create",
-              "docs/api-reference/endpoint/delete",
-              "docs/api-reference/endpoint/webhook"
-            ]
           }
         ]
       }

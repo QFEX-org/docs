@@ -1,33 +1,40 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "Introduction"
+description: "Getting started with the Entimox API"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to the Entimox API
 
-## Welcome
+Entimox provides a unified interface for trading and market data via **two** protocols:
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+- **gRPC**: Use for request/response operations (e.g., placing and canceling orders).
+- **WebSocket**: Use for real-time streaming (e.g., market data, orderbook updates, trade feeds).
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+Choose the protocol that best fits your integration needs.
 
-## Authentication
+## Authentication & API Keys
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API calls must be authenticated with an **API Key**. You can create and manage your keys from your Entimox dashboard:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+1. Sign in at [app.entimox.com](https://app.entimox.com).
+2. Navigate to **Account** → **API Keys**.
+3. Click **Create New API Key**, provide a descriptive name, and confirm.
+4. **Copy** the generated key and store it securely — it will only be shown once.
+
+![Navigate to API Keys in your Account menu](#)
+
+![Create a new API Key screen](#)
+
+Include your key in every request:
+
+- **gRPC**: Add an `api-key` metadata field.
+
+```http
+(api-key: YOUR_API_KEY_HERE)
+```
+
+- **WebSocket**: Add an `id` parameter to the request.
+
+```http
+id: YOUR_API_KEY_HERE
 ```
