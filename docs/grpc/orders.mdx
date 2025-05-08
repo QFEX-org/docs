@@ -26,7 +26,7 @@ import common_pb2
 
 def stream_orders(): # Attach API key metadata
 metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
 stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
@@ -74,7 +74,7 @@ import port.CancelOrderRequest;
 
 public class OrderStreamer {
     public static void main(String[] args) throws InterruptedException {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
             .useTransportSecurity()
             .build();
 
@@ -151,7 +151,7 @@ import (
 
 func main() {
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -218,7 +218,7 @@ const portProto = grpc.loadPackageDefinition(portDef).port;
 
 function streamOrders() {
   const client = new portProto.PortService(
-    "grpc.pfex.io:443",
+    "trade.pfex.io:443",
     grpc.credentials.createSsl()
   );
 
