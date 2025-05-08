@@ -1,71 +1,138 @@
 ---
-title: 'Fetch User Orders'
-description: 'Retrieving user order history via gRPC'
+title: "Streaming Orders"
+description: "Bidirectional streaming for sending orders and receiving order responses"
 ---
 
 <Note>
-  This example shows how to call the `GetUserOrders` RPC to fetch your order history.
+  This example shows how to open a bidirectional gRPC stream to send order
+  commands (add, cancel) and receive real-time order responses
+  (acknowledgements, fills, rejections).
 </Note>
 
-## Example: Fetching User Orders
+### Enums
+
+- **OrderType**: `LIMIT`, `MARKET`
+- **Side**: `BUY`, `SELL`
+- **TimeInForce**: `GTC`, `IOC`, `FOK`
+
+## Example: Streaming Orders
 
 <CodeGroup>
 ```python python
 import grpc
-from common_pb2 import ListRequest
+import port_pb2
 import port_pb2_grpc
+import common_pb2
 
+def stream_orders(): # Attach API key metadata
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
-def fetch_user_orders(limit: int = 50):
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    request = ListRequest(limit=limit)
-    response = stub.GetUserOrders(request, metadata=metadata)
-    for order in response.orders:
-        print(order)
+    # Generator for sending requests
+    def request_generator():
+        # Add a limit buy order
+        yield port_pb2.OrdersStreamRequest(
+            addOrder=port_pb2.AddOrderRequest(
+                action=port_pb2.AddOrderRequest.ADD,
+                marketId="SP500-USD",
+                side=port_pb2.AddOrderRequest.BUY,
+                type=port_pb2.AddOrderRequest.LIMIT,
+                timeInForce=port_pb2.AddOrderRequest.GTC,
+                price="4200.50",
+                size="1"
+            )
+        )
+        # Cancel an existing order
+        yield port_pb2.OrdersStreamRequest(
+            cancelOrder=port_pb2.CancelOrderRequest(
+                action=port_pb2.CancelOrderRequest.CANCEL,
+                orderId="order-id-123"
+            )
+        )
 
-if __name__ == '__main__':
-    fetch_user_orders()
-```
+    # Bidirectional streaming call
+    responses = stub.StreamOrders(request_generator(), metadata=metadata)
+    for response in responses:
+        print("Response:", response)
 
+if **name** == "**main**":
+stream_orders()
+
+````
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import common.ListRequest;
+import io.grpc.stub.StreamObserver;
 import port.PortServiceGrpc;
-import port.AllOrdersResponse;
+import port.OrdersStreamRequest;
 import port.OrderResponse;
+import port.AddOrderRequest;
+import port.CancelOrderRequest;
 
-public class UserOrdersFetcher {
-    public static void main(String[] args) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
+public class OrderStreamer {
+    public static void main(String[] args) throws InterruptedException {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
             .useTransportSecurity()
             .build();
 
         Metadata metadata = new Metadata();
-        Metadata.Key<String> apiKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
-        metadata.put(apiKey, API_KEY);
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
 
-        PortServiceGrpc.PortServiceBlockingStub stub =
-            PortServiceGrpc.newBlockingStub(channel)
-                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+        PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
+            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
-        ListRequest request = ListRequest.newBuilder()
-            .setLimit(50)
+        StreamObserver<OrdersStreamRequest> requestObserver = stub.streamOrders(
+            new StreamObserver<OrderResponse>() {
+                @Override
+                public void onNext(OrderResponse value) {
+                    System.out.println("Received: " + value);
+                }
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                }
+                @Override
+                public void onCompleted() {
+                    System.out.println("Stream completed");
+                }
+            }
+        );
+
+        // Send add order
+        AddOrderRequest add = AddOrderRequest.newBuilder()
+            .setAction(AddOrderRequest.Action.ADD)
+            .setMarketId("SP500-USD")
+            .setSide(AddOrderRequest.Side.BUY)
+            .setType(AddOrderRequest.OrderType.LIMIT)
+            .setTimeInForce(AddOrderRequest.TimeInForce.GTC)
+            .setPrice("4200.50")
+            .setSize("1")
             .build();
+        requestObserver.onNext(
+            OrdersStreamRequest.newBuilder().setAddOrder(add).build()
+        );
 
-        AllOrdersResponse response = stub.getUserOrders(request);
-        for (OrderResponse order : response.getOrdersList()) {
-            System.out.println(order);
-        }
+        // Send cancel order
+        CancelOrderRequest cancel = CancelOrderRequest.newBuilder()
+            .setAction(CancelOrderRequest.Action.CANCEL)
+            .setOrderId("order-id-123")
+            .build();
+        requestObserver.onNext(
+            OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
+        );
 
+        // Mark end of requests
+        requestObserver.onCompleted();
+
+        // Wait for responses
+        Thread.sleep(1000);
         channel.shutdown();
     }
 }
-```
+````
 
 ```go go
 package main
@@ -73,66 +140,125 @@ package main
 import (
     "context"
     "fmt"
+    "io"
     "log"
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
-    pbCommon "path/to/proto/common"
-    pbPort "path/to/proto/port"
+    pb "path/to/proto/port"
 )
 
 func main() {
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
     defer conn.Close()
 
-    client := pbPort.NewPortServiceClient(conn)
+    client := pb.NewPortServiceClient(conn)
     ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
 
-    req := &pbCommon.ListRequest{Limit: 50}
-    resp, err := client.GetUserOrders(ctx, req)
+    stream, err := client.StreamOrders(ctx)
     if err != nil {
-        log.Fatalf("error on GetUserOrders: %v", err)
+        log.Fatalf("error on StreamOrders: %v", err)
     }
 
-    for _, order := range resp.GetOrders() {
-        fmt.Println(order)
+    // Send commands concurrently
+    go func() {
+        // Add a limit buy order
+        stream.Send(&pb.OrdersStreamRequest{
+            AddOrder: &pb.AddOrderRequest{
+                Action:      pb.AddOrderRequest_ADD,
+                MarketId:    "SP500-USD",
+                Side:        pb.AddOrderRequest_BUY,
+                Type:        pb.AddOrderRequest_LIMIT,
+                TimeInForce: pb.AddOrderRequest_GTC,
+                Price:       "4200.50",
+                Size:        "1",
+            },
+        })
+        // Cancel an order
+        stream.Send(&pb.OrdersStreamRequest{
+            CancelOrder: &pb.CancelOrderRequest{
+                Action:  pb.CancelOrderRequest_CANCEL,
+                OrderId: "order-id-123",
+            },
+        })
+        stream.CloseSend()
+    }()
+
+    // Receive responses
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println("Response:", resp)
     }
 }
 ```
 
 ```javascript node
-const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
 
-// Load proto definitions
-const commonDef = protoLoader.loadSync('common.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
-const portDef = protoLoader.loadSync('port.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
-const commonProto = grpc.loadPackageDefinition(commonDef).common;
+const portDef = protoLoader.loadSync("port.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
 const portProto = grpc.loadPackageDefinition(portDef).port;
 
-function fetchUserOrders(limit = 50) {
+function streamOrders() {
   const client = new portProto.PortService(
-    'trade.pfex.io:443',
+    "grpc.pfex.io:443",
     grpc.credentials.createSsl()
   );
 
   const metadata = new grpc.Metadata();
-  metadata.add('api-key', API_KEY);
+  metadata.add("api-key", API_KEY);
 
-  client.getUserOrders({ limit }, metadata, (err, response) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    response.orders.forEach(order => console.log(order));
+  const call = client.streamOrders(metadata);
+
+  call.on("data", (resp) => {
+    console.log("Response:", resp);
   });
+  call.on("end", () => {
+    console.log("Stream ended");
+  });
+
+  // Send add order
+  call.write({
+    addOrder: {
+      action: "ADD",
+      marketId: "SP500-USD",
+      side: "BUY",
+      type: "LIMIT",
+      timeInForce: "GTC",
+      price: "4200.50",
+      size: "1",
+    },
+  });
+
+  // Send cancel order
+  call.write({
+    cancelOrder: {
+      action: "CANCEL",
+      orderId: "order-id-123",
+    },
+  });
+
+  call.end();
 }
 
-fetchUserOrders();
+streamOrders();
 ```
+
 </CodeGroup>

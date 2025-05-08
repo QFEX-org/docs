@@ -1,0 +1,192 @@
+---
+title: 'Modify Order'
+description: 'Updating an existing order via gRPC'
+---
+
+<Note>
+  You can only modify orders by **`orderId`**—cancellations by `clientOrderId` work for cancel ops, but modifications require the unique `orderId`.
+</Note>
+
+## Example: Modifying an Order
+
+<CodeGroup>
+```python python
+import grpc
+import port_pb2
+import port_pb2_grpc
+import common_pb2
+
+
+def modify_order():
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+
+    def request_generator():
+        # Modify an existing limit order
+        yield port_pb2.OrdersStreamRequest(
+            modifyOrder=port_pb2.ModifyOrderRequest(
+                action=port_pb2.ModifyOrderRequest.MODIFY,
+                orderId="order-12345",
+                price="4210.00",
+                size="2"
+            )
+        )
+
+    responses = stub.StreamOrders(request_generator(), metadata=metadata)
+    for resp in responses:
+        print("Response:", resp)
+
+if __name__ == '__main__':
+    modify_order()
+```
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import io.grpc.stub.StreamObserver;
+import port.PortServiceGrpc;
+import port.OrdersStreamRequest;
+import port.OrderResponse;
+import port.ModifyOrderRequest;
+
+public class ModifyOrderExample {
+    public static void main(String[] args) throws InterruptedException {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        Metadata metadata = new Metadata();
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
+
+        PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
+            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        StreamObserver<OrdersStreamRequest> reqObs = stub.streamOrders(
+            new StreamObserver<OrderResponse>() {
+                @Override
+                public void onNext(OrderResponse resp) {
+                    System.out.println("Received: " + resp);
+                }
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                }
+                @Override
+                public void onCompleted() {
+                    System.out.println("Stream completed");
+                }
+            }
+        );
+
+        // Send modify order request
+        ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
+            .setAction(ModifyOrderRequest.Action.MODIFY)
+            .setOrderId("order-12345")
+            .setPrice("4210.00")
+            .setSize("2")
+            .build();
+        reqObs.onNext(
+            OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
+        );
+
+        reqObs.onCompleted();
+        Thread.sleep(500);
+        channel.shutdown();
+    }
+}
+```
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pb "path/to/proto/port"
+)
+
+func main() {
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewPortServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+
+    stream, err := client.StreamOrders(ctx)
+    if err != nil {
+        log.Fatalf("error on StreamOrders: %v", err)
+    }
+
+    // Send modify order
+    stream.Send(&pb.OrdersStreamRequest{
+        ModifyOrder: &pb.ModifyOrderRequest{
+            Action:  pb.ModifyOrderRequest_MODIFY,
+            OrderId: "order-12345",
+            Price:   "4210.00",
+            Size:    "2",
+        },
+    })
+    stream.CloseSend()
+
+    // Receive response
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        fmt.Println("Response:", resp)
+    }
+}
+```
+
+```javascript node
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const portDef = protoLoader.loadSync('port.proto', {
+  keepCase: true, longs: String, enums: String, defaults: true, oneofs: true
+});
+const portProto = grpc.loadPackageDefinition(portDef).port;
+
+function modifyOrder() {
+  const client = new portProto.PortService(
+    'grpc.pfex.io:443',
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add('api-key', API_KEY);
+
+  const call = client.streamOrders(metadata);
+
+  call.on('data', resp => console.log('Response:', resp));
+  call.on('end', () => console.log('Stream ended'));
+
+  // Modify an order by orderId
+  call.write({
+    modifyOrder: {
+      action: 'MODIFY',
+      orderId: 'order-12345',
+      price: '4210.00',
+      size: '2'
+    }
+  });
+
+  call.end();
+}
+
+modifyOrder();
+```
+</CodeGroup>

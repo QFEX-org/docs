@@ -1,0 +1,229 @@
+---
+title: 'Cancel Order'
+description: 'How to cancel an order by Order ID or Client Order ID'
+---
+
+<Note>
+  You can cancel an order in two ways:
+  
+  1. **By `orderId`**: Cancels the single order matching that unique identifier.
+  2. **By `clientOrderId`**: Cancels _all_ orders for your account that share the same clientOrderId. Uniqueness is not enforced, so multiple orders may be cancelled at once.
+</Note>
+
+## Example: Cancelling Orders
+
+<CodeGroup>
+```python python
+import grpc
+import port_pb2
+import port_pb2_grpc
+import common_pb2
+
+
+def cancel_orders():
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+
+    # Cancel by orderId
+    stub.CancellableStream(common_pb2.Empty(), metadata=metadata)  # initialize bidi if needed
+    responses = stub.StreamOrders(
+        iter([
+            port_pb2.OrdersStreamRequest(
+                cancelOrder=port_pb2.CancelOrderRequest(
+                    action=port_pb2.CancelOrderRequest.CANCEL,
+                    orderId="order-12345",
+                )
+            )
+        ]),
+        metadata=metadata
+    )
+    for resp in responses:
+        print(resp)
+
+    # Cancel by clientOrderId
+    responses = stub.StreamOrders(
+        iter([
+            port_pb2.OrdersStreamRequest(
+                cancelOrder=port_pb2.CancelOrderRequest(
+                    action=port_pb2.CancelOrderRequest.CANCEL,
+                    clientOrderId="my-client-id-001",
+                )
+            )
+        ]),
+        metadata=metadata
+    )
+    for resp in responses:
+        print(resp)
+
+if __name__ == '__main__':
+    cancel_orders()
+```
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import io.grpc.stub.StreamObserver;
+import port.PortServiceGrpc;
+import port.OrdersStreamRequest;
+import port.OrderResponse;
+import port.CancelOrderRequest;
+
+public class CancelOrderExample {
+    public static void main(String[] args) throws InterruptedException {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        Metadata metadata = new Metadata();
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
+
+        PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
+            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        // Bidirectional stream for cancel requests
+        StreamObserver<OrdersStreamRequest> reqObs = stub.streamOrders(
+            new StreamObserver<OrderResponse>() {
+                @Override
+                public void onNext(OrderResponse resp) {
+                    System.out.println("Response: " + resp);
+                }
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                }
+                @Override
+                public void onCompleted() {
+                    System.out.println("Stream ended");
+                }
+            }
+        );
+
+        // Cancel by orderId
+        reqObs.onNext(
+            OrdersStreamRequest.newBuilder()
+                .setCancelOrder(
+                    CancelOrderRequest.newBuilder()
+                        .setAction(CancelOrderRequest.Action.CANCEL)
+                        .setOrderId("order-12345")
+                        .build()
+                )
+                .build()
+        );
+
+        // Cancel by clientOrderId
+        reqObs.onNext(
+            OrdersStreamRequest.newBuilder()
+                .setCancelOrder(
+                    CancelOrderRequest.newBuilder()
+                        .setAction(CancelOrderRequest.Action.CANCEL)
+                        .setClientOrderId("my-client-id-001")
+                        .build()
+                )
+                .build()
+        );
+
+        reqObs.onCompleted();
+        Thread.sleep(500);
+        channel.shutdown();
+    }
+}
+```
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pb "path/to/proto/port"
+)
+
+func main() {
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewPortServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+
+    stream, err := client.StreamOrders(ctx)
+    if err != nil {
+        log.Fatalf("error on StreamOrders: %v", err)
+    }
+
+    // Cancel by orderId
+    stream.Send(&pb.OrdersStreamRequest{
+        CancelOrder: &pb.CancelOrderRequest{
+            Action:  pb.CancelOrderRequest_CANCEL,
+            OrderId: "order-12345",
+        },
+    })
+
+    // Cancel by clientOrderId
+    stream.Send(&pb.OrdersStreamRequest{
+        CancelOrder: &pb.CancelOrderRequest{
+            Action:        pb.CancelOrderRequest_CANCEL,
+            ClientOrderId: "my-client-id-001",
+        },
+    })
+    stream.CloseSend()
+
+    // Read responses
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        fmt.Println("Response:", resp)
+    }
+}
+```
+```javascript node
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const portDef = protoLoader.loadSync('port.proto', {
+  keepCase: true, longs: String, enums: String, defaults: true, oneofs: true
+});
+const portProto = grpc.loadPackageDefinition(portDef).port;
+
+function cancelOrder() {
+  const client = new portProto.PortService(
+    'grpc.pfex.io:443',
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add('api-key', API_KEY);
+
+  const call = client.streamOrders(metadata);
+
+  call.on('data', resp => console.log('Response:', resp));
+  call.on('end', () => console.log('Stream ended'));
+
+  // Cancel by orderId
+  call.write({
+    cancelOrder: { action: 'CANCEL', orderId: 'order-12345' }
+  });
+
+  // Cancel by clientOrderId
+  call.write({
+    cancelOrder: { action: 'CANCEL', clientOrderId: 'my-client-id-001' }
+  });
+
+  call.end();
+}
+
+cancelOrder();
+```
+</CodeGroup>

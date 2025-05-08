@@ -19,7 +19,7 @@
           },
           {
             "group": "WebSocket",
-            "pages": ["docs/websocket/main", "docs/websocket/asyncapi"]
+            "pages": ["docs/websocket/intro", "docs/websocket/asyncapi"]
           },
           {
             "group": "gRPC",
@@ -27,11 +27,14 @@
               "docs/grpc/main",
               "docs/grpc/refdata",
               "docs/grpc/orderbook",
+              "docs/grpc/orders",
               "docs/grpc/trades",
               "docs/grpc/bbo",
               "docs/grpc/positions",
               "docs/grpc/balance",
-              "docs/grpc/orders"
+              "docs/grpc/get_orders",
+              "docs/grpc/cancel_order",
+              "docs/grpc/modify_order"
             ]
           }
         ]
