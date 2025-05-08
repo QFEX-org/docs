@@ -1,0 +1,149 @@
+---
+title: "Streaming User Balance"
+description: "Consuming live balance updates via gRPC"
+---
+
+<Note>
+  This example shows how to call the `GetUserBalance` RPC to stream your balance
+  updates.
+</Note>
+
+## Example: Streaming Balance
+
+<CodeGroup>
+```python python
+import grpc
+import common_pb2
+import port_pb2_grpc
+
+def stream_balance():
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
+print(bal)
+
+if **name** == '**main**':
+stream_balance()
+
+````
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import common.Empty;
+import port.PortServiceGrpc;
+import port.BalancePublic;
+
+public class BalanceStreamer {
+    public static void main(String[] args) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        Metadata metadata = new Metadata();
+        Metadata.Key<String> apiKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
+        metadata.put(apiKey, API_KEY);
+
+        PortServiceGrpc.PortServiceBlockingStub stub =
+            PortServiceGrpc.newBlockingStub(channel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        stub.getUserBalance(Empty.newBuilder().build())
+            .forEachRemaining(bal -> System.out.println(bal));
+
+        channel.shutdown();
+    }
+}
+````
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pbCommon "path/to/proto/common"
+    pb "path/to/proto/port"
+)
+
+func main() {
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewPortServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+
+    stream, err := client.GetUserBalance(ctx, &pbCommon.Empty{})
+    if err != nil {
+        log.Fatalf("error on GetUserBalance: %v", err)
+    }
+
+    for {
+        bal, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println(bal)
+    }
+}
+```
+
+```javascript node
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
+
+// Load proto definitions
+const commonDef = protoLoader.loadSync("common.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const portDef = protoLoader.loadSync("port.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const commonProto = grpc.loadPackageDefinition(commonDef).common;
+const portProto = grpc.loadPackageDefinition(portDef).port;
+
+function streamBalances() {
+  const client = new portProto.PortService(
+    "grpc.pfex.io:443",
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add("api-key", API_KEY);
+
+  const call = client.getUserBalance({}, metadata);
+  call.on("data", (bal) => {
+    console.log(bal);
+  });
+  call.on("end", () => {
+    console.log("Stream ended");
+  });
+}
+
+streamBalances();
+```
+
+</CodeGroup>

@@ -1,0 +1,151 @@
+---
+title: "Streaming User Positions"
+description: "Consuming live user position updates via gRPC"
+---
+
+<Note>
+  This example shows how to call the `GetUserPositions` RPC to stream your
+  position updates.
+</Note>
+
+## Example: Streaming User Positions
+
+<CodeGroup>
+```python python
+import grpc
+import common_pb2
+import port_pb2_grpc
+
+def stream_positions():
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+    for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
+        print(pos)
+
+if __name__ == '__main__':
+    stream_positions()
+````
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import common.Empty;
+import port.PortServiceGrpc;
+import port.PositionsPublic;
+
+public class PositionStreamer {
+    public static void main(String[] args) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        Metadata metadata = new Metadata();
+        Metadata.Key<String> apiKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
+        metadata.put(apiKey, API_KEY);
+
+        PortServiceGrpc.PortServiceBlockingStub stub =
+            PortServiceGrpc.newBlockingStub(channel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        stub.getUserPositions(Empty.newBuilder().build())
+            .forEachRemaining(pos -> System.out.println(pos));
+
+        channel.shutdown();
+    }
+}
+````
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pbCommon "path/to/proto/common"
+    pb "path/to/proto/port"
+
+)
+
+func main() {
+creds := credentials.NewClientTLSFromCert(nil, "")
+conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+if err != nil {
+log.Fatalf("did not connect: %v", err)
+}
+defer conn.Close()
+
+    client := pb.NewPortServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+
+    stream, err := client.GetUserPositions(ctx, &pbCommon.Empty{})
+    if err != nil {
+        log.Fatalf("error on GetUserPositions: %v", err)
+    }
+
+    for {
+        pos, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println(pos)
+    }
+
+}
+
+```
+
+```javascript node
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
+
+// Load proto definitions
+const commonDef = protoLoader.loadSync("common.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const portDef = protoLoader.loadSync("port.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const commonProto = grpc.loadPackageDefinition(commonDef).common;
+const portProto = grpc.loadPackageDefinition(portDef).port;
+
+function streamUserPositions() {
+  const client = new portProto.PortService(
+    "grpc.pfex.io:443",
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add("api-key", API_KEY);
+
+  const call = client.getUserPositions({}, metadata);
+  call.on("data", (pos) => {
+    console.log(pos);
+  });
+  call.on("end", () => {
+    console.log("Stream ended");
+  });
+}
+
+streamUserPositions();
+```
+
+</CodeGroup>

@@ -1,0 +1,130 @@
+## Example: Streaming Order Book
+
+<CodeGroup>
+```python python
+import grpc
+import market_data_pb2
+import market_data_pb2_grpc
+
+def stream_orderbook(symbol: str):
+    metadata = (("api-key", API_KEY),)
+    channel = grpc.secure_channel('port.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+    request = market_data_pb2.GetSymbol(symbol=symbol)
+    for book in stub.GetOrderBook(request, metadata=metadata):
+        print(book)
+
+if __name__ == '__main__':
+    stream_orderbook('SP500-USD')
+
+````
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import market_data.MarketDataServiceGrpc;
+import market_data.MarketData.GetSymbol;
+import market_data.MarketData.OrderBook;
+
+public class OrderBookStreamer {
+    public static void main(String[] args) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("port.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        Metadata metadata = new Metadata();
+        Metadata.Key<String> authKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
+        metadata.put(authKey, API_KEY);
+
+        MarketDataServiceGrpc.MarketDataServiceStub stub =
+            MarketDataServiceGrpc.newStub(channel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        GetSymbol request = GetSymbol.newBuilder()
+            .setSymbol("SP500-USD")
+            .build();
+
+        stub.getOrderBook(request).forEachRemaining(book -> System.out.println(book));
+        channel.shutdown();
+    }
+}
+````
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pb "path/to/proto/market_data"
+
+)
+
+func main() {
+creds := credentials.NewClientTLSFromCert(nil, "")
+conn, err := grpc.Dial("port.pfex.io:443", grpc.WithTransportCredentials(creds))
+if err != nil {
+log.Fatalf("did not connect: %v", err)
+}
+defer conn.Close()
+
+    client := pb.NewMarketDataServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+
+    stream, err := client.GetOrderBook(ctx, &pb.GetSymbol{Symbol: "SP500-USD"})
+    if err != nil {
+        log.Fatalf("error on GetOrderBook: %v", err)
+    }
+
+    for {
+        book, err := stream.Recv()
+        if err != nil {
+            break
+        }
+        fmt.Println(book)
+    }
+
+}
+
+```
+
+```javascript node
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
+
+const packageDef = protoLoader.loadSync("market_data.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const marketDataProto = grpc.loadPackageDefinition(packageDef).market_data;
+
+function streamOrderBook(symbol) {
+  const client = new marketDataProto.MarketDataService(
+    "port.pfex.io:443",
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add("api-key", API_KEY);
+
+  const call = client.getOrderBook({ symbol }, metadata);
+  call.on("data", (book) => {
+    console.log(book);
+  });
+  call.on("end", () => {
+    console.log("Stream ended");
+  });
+}
+
+streamOrderBook("SP500-USD");
+```
+
+</CodeGroup>

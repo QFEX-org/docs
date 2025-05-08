@@ -1,0 +1,41 @@
+---
+title: "gRPC Overview"
+description: "Using QFEx gRPC services for market data and trading"
+---
+
+<Note>
+  This section documents our gRPC services based on the proto definitions in the
+  [QFEx-org/proto](https://github.com/QFEx-org/proto) repository.
+</Note>
+
+## Getting Started
+
+Clone the proto definitions and generate client code for your preferred language. Example for Python:
+
+```bash
+git clone https://github.com/QFEx-org/proto.git
+cd proto
+pip install grpcio grpcio-tools googleapis-common-protos
+python -m grpc_tools.protoc \
+  -I. \
+  --python_out=../client/ \
+  --grpc_python_out=../client/ \
+  common.proto market_data.proto port.proto
+```
+
+For Node.js projects, install:
+
+```bash
+npm install @grpc/grpc-js @grpc/proto-loader
+```
+
+## Authentication
+
+All gRPC calls to the port service require an **API Key** sent as metadata.
+Read the [introduction](docs/api-reference/introduction) to learn how to get an API key.
+
+## Proto Definitions
+
+- [common.proto](https://github.com/QFEx-org/proto/blob/main/common.proto)
+- [market_data.proto](https://github.com/QFEx-org/proto/blob/main/market_data.proto)
+- [port.proto](https://github.com/QFEx-org/proto/blob/main/market_data.proto)

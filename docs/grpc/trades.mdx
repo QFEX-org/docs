@@ -1,0 +1,136 @@
+---
+title: "Streaming Trades"
+description: "Consuming live trade streams via gRPC"
+---
+
+<Note>
+  This example shows how to call the `GetTrades` RPC to stream live trade data
+  from the Entimox/proto definitions.
+</Note>
+
+## Example: Streaming Trades
+
+<CodeGroup>
+```python python
+    import grpc
+    import market_data_pb2
+    import market_data_pb2_grpc
+
+    def stream_trades(symbol: str):
+        channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+        stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+        request = market_data_pb2.GetSymbol(symbol=symbol)
+        for trade in stub.GetTrades(request):
+        print(trade)
+
+    if __name__ == '__main__':
+        stream_trades('SP500-USD')
+
+````
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import market_data.MarketDataServiceGrpc;
+import market_data.MarketData.GetSymbol;
+import market_data.Trade;
+
+public class TradeStreamer {
+    public static void main(String[] args) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        MarketDataServiceGrpc.MarketDataServiceBlockingStub stub =
+            MarketDataServiceGrpc.newBlockingStub(channel);
+
+        GetSymbol request = GetSymbol.newBuilder()
+            .setSymbol("SP500-USD")
+            .build();
+
+        for (Trade trade : stub.getTrades(request)) {
+            System.out.println(trade);
+        }
+
+        channel.shutdown();
+    }
+}
+````
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pbCommon "path/to/proto/common"
+    pb "path/to/proto/market_data"
+)
+
+func main() {
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("mds.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewMarketDataServiceClient(conn)
+
+    stream, err := client.GetTrades(context.Background(), &pb.GetSymbol{Symbol: "SP500-USD"})
+    if err != nil {
+        log.Fatalf("error on GetTrades: %v", err)
+    }
+
+    for {
+        trade, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println(trade)
+    }
+}
+```
+
+```javascript node
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
+
+// Load proto definitions
+const packageDef = protoLoader.loadSync(["common.proto", "market_data.proto"], {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const proto = grpc.loadPackageDefinition(packageDef);
+const marketDataClient = new proto.market_data.MarketDataService(
+  "mds.pfex.io:443",
+  grpc.credentials.createSsl()
+);
+
+function streamTrades(symbol) {
+  const call = marketDataClient.getTrades({ symbol });
+  call.on("data", (trade) => {
+    console.log(trade);
+  });
+  call.on("end", () => {
+    console.log("Stream ended");
+  });
+}
+
+streamTrades("SP500-USD");
+```
+
+</CodeGroup>

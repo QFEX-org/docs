@@ -1,0 +1,123 @@
+---
+title: 'Streaming BBO'
+description: 'Consuming live best bid/offer updates via gRPC'
+---
+
+<Note>
+  This example shows how to call the `GetBbo` RPC to stream real‑time best bid/offer updates.
+</Note>
+
+## Example: Streaming BBO
+
+<CodeGroup>
+```python python
+import grpc
+import common_pb2
+import market_data_pb2_grpc
+
+
+def stream_bbo():
+    channel = grpc.secure_channel('grpc.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+
+    for bbo in stub.GetBbo(common_pb2.Empty()):
+        print(bbo)
+
+if __name__ == '__main__':
+    stream_bbo()
+```
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import common.Empty;
+import market_data.MarketDataServiceGrpc;
+import market_data.OrderBook;
+
+public class BboStreamer {
+    public static void main(String[] args) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("grpc.pfex.io", 443)
+            .useTransportSecurity()
+            .build();
+
+        MarketDataServiceGrpc.MarketDataServiceBlockingStub stub =
+            MarketDataServiceGrpc.newBlockingStub(channel);
+
+        stub.getBbo(Empty.newBuilder().build())
+            .forEachRemaining(bbo -> System.out.println(bbo));
+
+        channel.shutdown();
+    }
+}
+```
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    pbCommon "path/to/proto/common"
+    pb "path/to/proto/market_data"
+)
+
+func main() {
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("grpc.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewMarketDataServiceClient(conn)
+
+    stream, err := client.GetBbo(context.Background(), &pbCommon.Empty{})
+    if err != nil {
+        log.Fatalf("error on GetBbo: %v", err)
+    }
+
+    for {
+        bbo, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println(bbo)
+    }
+}
+```
+```javascript node
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+// Load proto definitions
+const commonDef = protoLoader.loadSync('common.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
+const marketDef = protoLoader.loadSync('market_data.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
+const commonProto = grpc.loadPackageDefinition(commonDef).common;
+const marketDataProto = grpc.loadPackageDefinition(marketDef).market_data;
+
+function streamBbo() {
+  const client = new marketDataProto.MarketDataService(
+    'grpc.pfex.io:443',
+    grpc.credentials.createSsl()
+  );
+
+  const call = client.getBbo({});
+  call.on('data', (bbo) => {
+    console.log(bbo);
+  });
+  call.on('end', () => {
+    console.log('Stream ended');
+  });
+}
+
+streamBbo();
+```
+</CodeGroup>

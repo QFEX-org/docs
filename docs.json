@@ -40,6 +40,19 @@
           {
             "group": "WebSocket",
             "pages": ["docs/websocket/main", "docs/websocket/asyncapi"]
+          },
+          {
+            "group": "gRPC",
+            "pages": [
+              "docs/grpc/main",
+              "docs/grpc/refdata",
+              "docs/grpc/orderbook",
+              "docs/grpc/trades",
+              "docs/grpc/bbo",
+              "docs/grpc/positions",
+              "docs/grpc/balance",
+              "docs/grpc/orders"
+            ]
           }
         ]
       }
