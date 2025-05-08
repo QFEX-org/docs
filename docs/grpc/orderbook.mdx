@@ -8,7 +8,7 @@ import market_data_pb2_grpc
 
 def stream_orderbook(symbol: str):
     metadata = (("api-key", API_KEY),)
-    channel = grpc.secure_channel('port.pfex.io:443', grpc.ssl_channel_credentials())
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
     stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
     request = market_data_pb2.GetSymbol(symbol=symbol)
     for book in stub.GetOrderBook(request, metadata=metadata):
@@ -28,7 +28,7 @@ import market_data.MarketData.OrderBook;
 
 public class OrderBookStreamer {
     public static void main(String[] args) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("port.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
             .useTransportSecurity()
             .build();
 
@@ -67,7 +67,7 @@ import (
 
 func main() {
 creds := credentials.NewClientTLSFromCert(nil, "")
-conn, err := grpc.Dial("port.pfex.io:443", grpc.WithTransportCredentials(creds))
+conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
 if err != nil {
 log.Fatalf("did not connect: %v", err)
 }
@@ -108,7 +108,7 @@ const marketDataProto = grpc.loadPackageDefinition(packageDef).market_data;
 
 function streamOrderBook(symbol) {
   const client = new marketDataProto.MarketDataService(
-    "port.pfex.io:443",
+    "trade.pfex.io:443",
     grpc.credentials.createSsl()
   );
 
