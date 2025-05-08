@@ -45,9 +45,9 @@
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Trade Now",
-          "href": "https://app.qfex.com",
-          "icon": "chart-line"
+          "anchor": "Status",
+          "href": "https://status.qfex.com",
+          "icon": "signal-bars"
         }
       ]
     }
