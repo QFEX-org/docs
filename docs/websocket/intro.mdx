@@ -31,7 +31,7 @@ async def main():
       if msg["channel"] == "v4_bbo":
         print("BBO", msg["contents"][0])
       elif msg["channel"] == "v4_balances":
-        print("Balance", msg["contents"][0])
+        print("Balance", msg["contents"])
 
 asyncio.run(main())
 
