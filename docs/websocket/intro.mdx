@@ -3,7 +3,7 @@ title: "WebSocket Reference"
 description: "Stream prices and account updates over a single multiplexed socket."
 ---
 
-## Quick‑start client
+## Quickstart Client
 
 <CodeGroup>
 ```python python
@@ -13,25 +13,25 @@ WS_URL = "wss://ws.pfex.io/v4/ws"
 API_KEY = os.getenv("PFEX_API_KEY")
 
 async def main():
-async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
-print(json.loads(await ws.recv()))
+  async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
+    print(json.loads(await ws.recv()))
 
-        # subscribe to public BBO
-        await ws.send(json.dumps({
-            "type": "subscribe", "channel": "v4_bbo", "id": "bbo"
-        }))
+    # subscribe to public BBO
+    await ws.send(json.dumps({
+        "type": "subscribe", "channel": "v4_bbo", "id": "bbo"
+    }))
 
-        # subscribe to your balances
-        await ws.send(json.dumps({
-            "type": "subscribe", "channel": "v4_balances", "id": API_KEY
-        }))
+    # subscribe to your balances
+    await ws.send(json.dumps({
+        "type": "subscribe", "channel": "v4_balances", "id": API_KEY
+    }))
 
-        while True:
-            msg = json.loads(await ws.recv())
-            if msg["channel"] == "v4_bbo":
-                print("BBO", msg["contents"][0])
-            elif msg["channel"] == "v4_balances":
-                print("Balance", msg["contents"][0])
+    while True:
+      msg = json.loads(await ws.recv())
+      if msg["channel"] == "v4_bbo":
+        print("BBO", msg["contents"][0])
+      elif msg["channel"] == "v4_balances":
+        print("Balance", msg["contents"][0])
 
 asyncio.run(main())
 

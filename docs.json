@@ -19,7 +19,7 @@
           },
           {
             "group": "WebSocket",
-            "pages": ["docs/websocket/intro", "docs/websocket/asyncapi"]
+            "pages": ["docs/websocket/asyncapi", "docs/websocket/intro"]
           },
           {
             "group": "gRPC",
