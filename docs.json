@@ -43,11 +43,6 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://docs.qfex.com",
-          "icon": "book-open-cover"
-        },
-        {
           "anchor": "Status",
           "href": "https://status.qfex.com",
           "icon": "signal-bars"
