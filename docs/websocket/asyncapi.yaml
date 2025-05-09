@@ -1,9 +1,9 @@
 asyncapi: 3.0.0
 info:
-  title: QFEx Multiplexed WebSocket API
+  title: QFEX Multiplexed WebSocket API
   version: 1.0.0
   description: |-
-    Single WebSocket gateway for all QFEx real‑time streams.  
+    Single WebSocket gateway for all QFEX real‑time streams.  
     Clients publish subscription and order commands here,  
     and receive all updates over the same endpoint.
 defaultContentType: application/json
