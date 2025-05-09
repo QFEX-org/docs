@@ -10,7 +10,7 @@ description: "Stream prices and account updates over a single multiplexed socket
 import asyncio, json, websockets, os
 
 WS_URL = "wss://ws.pfex.io/v4/ws"
-API_KEY = os.getenv("PFEX_API_KEY")
+API_KEY = os.getenv("QFEX_API_KEY")
 
 async def main():
   async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
