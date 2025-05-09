@@ -169,7 +169,7 @@ components:
     SubscribeOrderBookCommand:
       name: subscribe_orderbook
       title: v4_orderbook
-      summary: Subscribe to Order Book
+      summary: Subscribe to order book
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -178,7 +178,7 @@ components:
     SubscribeTradesCommand:
       name: subscribe_trades
       title: v4_trades
-      summary: Subscribe to Trades
+      summary: Subscribe to public trades
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -187,7 +187,7 @@ components:
     SubscribeCandlesCommand:
       name: subscribe_candles
       title: v4_candles
-      summary: Subscribe to Candles
+      summary: Subscribe to candles
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -196,7 +196,7 @@ components:
     SubscribePositionsCommand:
       name: subscribe_positions
       title: v4_positions
-      summary: Subscribe to Positions
+      summary: Subscribe to user positions
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -205,7 +205,7 @@ components:
     SubscribeBalanceCommand:
       name: subscribe_balance
       title: v4_balances
-      summary: Subscribe to Balance
+      summary: Subscribe to user balance
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -214,7 +214,7 @@ components:
     SubscribeMarketsCommand:
       name: subscribe_markets
       title: v4_markets
-      summary: Subscribe to Markets
+      summary: Subscribe to product reference data
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -224,7 +224,7 @@ components:
     AddOrderCommand:
       name: add_order
       title: v4_orders
-      summary: Add Order
+      summary: Add order
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -234,7 +234,7 @@ components:
     CancelOrderCommand:
       name: cancel_order
       title: v4_orders
-      summary: Cancel Order
+      summary: Cancel order
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -243,8 +243,8 @@ components:
 
     BboUpdate:
       name: bbo_update
-      title: Best‑Bid‑Offer Update
-      summary: Stream of best bid and offer updates
+      title: v4_bbo 
+      summary: Best bid and offer updates
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -253,8 +253,8 @@ components:
 
     OrderBookUpdate:
       name: orderbook_update
-      title: Order Book Update
-      summary: Full L2 book plus deltas for a symbol
+      title: v4_orderbook
+      summary: Changes in the L2 order book
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -263,8 +263,8 @@ components:
 
     TradeUpdate:
       name: trade_update
-      title: Trade Update
-      summary: Stream of recent trades for a symbol
+      title: v4_trades
+      summary: Public trades
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -273,8 +273,8 @@ components:
 
     CandleUpdate:
       name: candle_update
-      title: Candle Update
-      summary: Candle updates for a symbol and interval
+      title: v4_candles
+      summary: Candle updates over various intervals
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -283,8 +283,8 @@ components:
 
     BalanceUpdate:
       name: balance_update
-      title: Balance Update
-      summary: Stream of your balance updates
+      title: v4_balances
+      summary: User balance updates
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -293,8 +293,8 @@ components:
 
     PositionUpdate:
       name: position_update
-      title: Position Update
-      summary: Stream of your position updates
+      title: v4_positions
+      summary: User position updates
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
