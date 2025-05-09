@@ -104,6 +104,7 @@ func main() {
 ```
 
 ```javascript node
+require("dotenv").config();
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
@@ -132,7 +133,7 @@ function streamBalances() {
   );
 
   const metadata = new grpc.Metadata();
-  metadata.add("api-key", API_KEY);
+  metadata.add("api-key", process.env.QFEX_API_KEY);
 
   const call = client.getUserBalance({}, metadata);
   call.on("data", (bal) => {

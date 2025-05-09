@@ -204,11 +204,12 @@ func main() {
 ```
 
 ```javascript node
+require("dotenv").config();
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
 const portDef = protoLoader.loadSync("port.proto", {
-  keepCase: true,
+  keepCase: false,
   longs: String,
   enums: String,
   defaults: true,
@@ -223,39 +224,53 @@ function streamOrders() {
   );
 
   const metadata = new grpc.Metadata();
-  metadata.add("api-key", API_KEY);
+  metadata.add("api-key", process.env.QFEX_API_KEY);
 
   const call = client.streamOrders(metadata);
 
-  call.on("data", (resp) => {
-    console.log("Response:", resp);
-  });
-  call.on("end", () => {
-    console.log("Stream ended");
-  });
-
+  call.on("data", (resp) => console.log("Response:", resp));
+  call.on("error", (err) => console.error("Stream error:", err));
+  call.on("status", (st) => console.log("Stream status:", st));
+  call.on("end", () => console.log("Stream ended"));
   // Send add order
-  call.write({
-    addOrder: {
-      action: "ADD",
-      marketId: "SP500-USD",
-      side: "BUY",
-      type: "LIMIT",
-      timeInForce: "GTC",
-      price: "4200.50",
-      size: "1",
+  call.write(
+    {
+      addOrder: {
+        symbol: "SP500-USD",
+        side: "BUY",
+        type: "LIMIT",
+        timeInForce: "GFD",
+        quantity: 0.001,
+        price: 500.5,
+        clientOrderId: "order-id-123",
+      },
     },
-  });
+    (err) => {
+      if (err) {
+        console.error("❌ write failed:", err);
+      } else {
+        console.log("✅ addOrder sent");
+      }
+    }
+  );
 
   // Send cancel order
-  call.write({
-    cancelOrder: {
-      action: "CANCEL",
-      orderId: "order-id-123",
+  call.write(
+    {
+      cancelOrder: {
+        clientOrderId: "order-id-123",
+        symbol: "SP500-USD", // you must include the symbol too
+      },
     },
-  });
+    (err) => {
+      if (err) console.error("cancel failed:", err);
+      else console.log("✅ cancelOrder enqueued");
+    }
+  );
 
-  call.end();
+  setTimeout(() => {
+    call.end();
+  }, 5000);
 }
 
 streamOrders();

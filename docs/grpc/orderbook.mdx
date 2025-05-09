@@ -7,11 +7,10 @@ import market_data_pb2
 import market_data_pb2_grpc
 
 def stream_orderbook(symbol: str):
-    metadata = (("api-key", API_KEY),)
     channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
     stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
     request = market_data_pb2.GetSymbol(symbol=symbol)
-    for book in stub.GetOrderBook(request, metadata=metadata):
+    for book in stub.GetOrderBook(request):
         print(book)
 
 if __name__ == '__main__':
@@ -32,13 +31,8 @@ public class OrderBookStreamer {
             .useTransportSecurity()
             .build();
 
-        Metadata metadata = new Metadata();
-        Metadata.Key<String> authKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
-        metadata.put(authKey, API_KEY);
-
         MarketDataServiceGrpc.MarketDataServiceStub stub =
-            MarketDataServiceGrpc.newStub(channel)
-                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+            MarketDataServiceGrpc.newStub(channel);
 
         GetSymbol request = GetSymbol.newBuilder()
             .setSymbol("SP500-USD")
@@ -74,9 +68,8 @@ func main() {
     defer conn.Close()
 
     client := pb.NewMarketDataServiceClient(conn)
-    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
 
-    stream, err := client.GetOrderBook(ctx, &pb.GetSymbol{Symbol: "SP500-USD"})
+    stream, err := client.GetOrderBook(context.Background(), &pb.GetSymbol{Symbol: "SP500-USD"})
     if err != nil {
         log.Fatalf("error on GetOrderBook: %v", err)
     }
@@ -112,10 +105,7 @@ function streamOrderBook(symbol) {
     grpc.credentials.createSsl()
   );
 
-  const metadata = new grpc.Metadata();
-  metadata.add("api-key", API_KEY);
-
-  const call = client.getOrderBook({ symbol }, metadata);
+  const call = client.getOrderBook({ symbol });
   call.on("data", (book) => {
     console.log(book);
   });
