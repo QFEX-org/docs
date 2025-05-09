@@ -33,6 +33,8 @@ channels:
         $ref: "#/components/messages/SubscribePositionsCommand"
       subscribeBalance:
         $ref: "#/components/messages/SubscribeBalanceCommand"
+      subscribeOrders:
+        $ref: "#/components/messages/SubscribeOrdersCommand"
       addOrder:
         $ref: "#/components/messages/AddOrderCommand"
       cancelOrder:
@@ -100,6 +102,16 @@ operations:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
       - $ref: "#/channels/qfexMultiplex/messages/subscribeBalance"
+
+  subscribeOrdersStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfexMultiplex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfexMultiplex/messages/subscribeOrders"
 
   subscribeMarketsStream:
     action: receive
@@ -211,6 +223,15 @@ components:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
         $ref: "#/components/schemas/SubscribeBalanceCommand"
+    SubscribeOrdersCommand:
+      name: subscribe_orders
+      title: v4_orders
+      summary: Subscribe to user orders
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeOrdersCommand"
     SubscribeMarketsCommand:
       name: subscribe_markets
       title: v4_markets
@@ -223,8 +244,8 @@ components:
 
     AddOrderCommand:
       name: add_order
-      title: v4_orders
-      summary: Add order
+      title: v4_orders/Add Order
+      summary: Add order. Ensure you have subscribed to the v4_orders channel first
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -233,8 +254,8 @@ components:
 
     CancelOrderCommand:
       name: cancel_order
-      title: v4_orders
-      summary: Cancel order
+      title: v4_orders/Cancel Order
+      summary: Cancel order. Ensure you have subscribed to the v4_orders channel first
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -421,6 +442,27 @@ components:
         - channel
         - id
 
+    SubscribeOrdersCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channel:
+          type: string
+          enum:
+            - v4_orders
+          description: v4_orders
+        id:
+          type: string
+          description: API Key
+      required:
+        - type
+        - channel
+        - id
+
     SubscribePositionsCommand:
       type: object
       properties:
@@ -489,6 +531,10 @@ components:
             - type
             - timeInForce
             - size
+      required:
+        - channel
+        - id
+        - order
 
     CancelOrderCommand:
       type: object
@@ -509,9 +555,16 @@ components:
                 - CANCEL
             orderId:
               type: string
+            marketId:
+              type: string
           required:
             - action
             - orderId
+            - marketId
+      required:
+        - channel
+        - id
+        - order
 
     BboUpdate:
       examples:
