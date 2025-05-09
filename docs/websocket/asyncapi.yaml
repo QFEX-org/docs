@@ -168,8 +168,8 @@ components:
   messages:
     SubscribeOrderBookCommand:
       name: subscribe_orderbook
-      title: Subscribe Order Book Command
-      summary: Request to subscribe to a specific stream
+      title: v4_orderbook
+      summary: Subscribe Order Book Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -177,8 +177,8 @@ components:
         $ref: "#/components/schemas/SubscribeOrderBookCommand"
     SubscribeTradesCommand:
       name: subscribe_trades
-      title: Subscribe Trades Command
-      summary: Request to subscribe to a specific stream
+      title: v4_trades
+      summary: Subscribe Trades Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -186,8 +186,8 @@ components:
         $ref: "#/components/schemas/SubscribeTradesCommand"
     SubscribeCandlesCommand:
       name: subscribe_candles
-      title: Subscribe Candles Command
-      summary: Request to subscribe to a specific stream
+      title: v4_candles
+      summary: Subscribe Candles Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -195,8 +195,8 @@ components:
         $ref: "#/components/schemas/SubscribeCandlesCommand"
     SubscribePositionsCommand:
       name: subscribe_positions
-      title: Subscribe Positions Command
-      summary: Request to subscribe to a specific stream
+      title: v4_positions
+      summary: Subscribe Positions Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -204,8 +204,8 @@ components:
         $ref: "#/components/schemas/SubscribePositionsCommand"
     SubscribeBalanceCommand:
       name: subscribe_balance
-      title: Subscribe Balance Command
-      summary: Request to subscribe to a specific stream
+      title: v4_balances
+      summary: Subscribe Balance Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -213,8 +213,8 @@ components:
         $ref: "#/components/schemas/SubscribeBalanceCommand"
     SubscribeMarketsCommand:
       name: subscribe_markets
-      title: Subscribe Markets Command
-      summary: Request to subscribe to a specific stream
+      title: v4_markets
+      summary: Subscribe Markets Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -223,8 +223,8 @@ components:
 
     AddOrderCommand:
       name: add_order
-      title: Add Order Command
-      summary: Place a new order
+      title: v4_orders
+      summary: Add Order Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -233,8 +233,8 @@ components:
 
     CancelOrderCommand:
       name: cancel_order
-      title: Cancel Order Command
-      summary: Cancel an existing order
+      title: v4_orders
+      summary: Cancel Order Command
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
