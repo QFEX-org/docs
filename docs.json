@@ -1,11 +1,17 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "QFEX API Documentation",
   "colors": {
     "primary": "#01bf81",
     "light": "#01cafe",
     "dark": "#07363e"
+  },
+  "background": {
+    "color": {
+      "light": "#f5fffc",
+      "dark": "#07363e"
+    }
   },
   "favicon": "/favicon.svg",
   "navigation": {
