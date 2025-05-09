@@ -445,11 +445,11 @@ components:
     AddOrderCommand:
       type: object
       properties:
-        type:
+        channel:
           type: string
           enum:
-            - add_order
-        apiKey:
+            - v4_orders
+        id:
           type: string
           description: API Key
         order:
@@ -488,11 +488,11 @@ components:
     CancelOrderCommand:
       type: object
       properties:
-        type:
+        channel:
           type: string
           enum:
-            - cancel_order
-        apiKey:
+            - v4_orders
+        id:
           type: string
           description: API Key
         order:
