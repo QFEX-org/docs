@@ -458,10 +458,20 @@ components:
               type: string
             side:
               type: string
+              enum:
+                - BUY
+                - SELL
             type:
               type: string
+              enum:
+                - LIMIT
+                - MARKET
             timeInForce:
               type: string
+              enum:
+                - GTC
+                - IOC
+                - FOK
             size:
               type: string
             price:
