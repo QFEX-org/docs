@@ -3,6 +3,29 @@ title: "WebSocket Reference"
 description: "Stream prices and account updates over a single multiplexed socket."
 ---
 
+## Endpoint
+
+| URL                          | Notes                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| **`wss://ws.pfex.io/v4/ws`** | One socket. All channels (BBO, orders, balances …) are multiplexed here. |
+
+---
+
+## Channels
+
+| Channel        | `id` Example     | gRPC Upstream                        |
+| -------------- | ---------------- | ------------------------------------ |
+| `v4_bbo`       | `bbo`            | `MarketDataService.GetBbo`           |
+| `v4_orderbook` | `AAPL-USD`       | `MarketDataService.GetOrderBook`     |
+| `v4_trades`    | `AAPL-USD`       | `MarketDataService.GetTrades`        |
+| `v4_candles`   | `AAPL-USD/1MIN`  | `MarketDataService.GetLatestCandle`  |
+| `v4_orders`    | **your API key** | `PortService.StreamOrders` _(bi‑di)_ |
+| `v4_balances`  | **your API key** | `PortService.GetUserBalance`         |
+| `v4_positions` | **your API key** | `PortService.GetUserPositions`       |
+| `v4_pnl`       | _none_           | `PortService.PnlLeaderboard`         |
+
+---
+
 ## Quick‑start client
 
 <CodeGroup>
