@@ -443,7 +443,8 @@ components:
       properties:
         type:
           type: string
-          const: add_order
+          enum:
+            - add_order
         apiKey:
           type: string
         order:
@@ -451,7 +452,8 @@ components:
           properties:
             action:
               type: string
-              const: ADD
+              enum:
+                - ADD
             marketId:
               type: string
             side:
@@ -473,7 +475,8 @@ components:
       properties:
         type:
           type: string
-          const: cancel_order
+          enum:
+            - cancel_order
         apiKey:
           type: string
         order:
@@ -481,7 +484,8 @@ components:
           properties:
             action:
               type: string
-              const: CANCEL
+              enum:
+                - CANCEL
             orderId:
               type: string
           required:
