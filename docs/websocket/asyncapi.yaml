@@ -243,7 +243,7 @@ components:
 
     BboUpdate:
       name: bbo_update
-      title: v4_bbo 
+      title: v4_bbo
       summary: Best bid and offer updates
       contentType: application/json
       traits:
@@ -445,11 +445,11 @@ components:
     AddOrderCommand:
       type: object
       properties:
-        type:
+        channel:
           type: string
           enum:
-            - add_order
-        apiKey:
+            - v4_orders
+        id:
           type: string
           description: API Key
         order:
@@ -481,18 +481,23 @@ components:
               type: string
             price:
               type: string
+              description: This is only required for LIMIT orders
           required:
             - action
             - marketId
+            - side
+            - type
+            - timeInForce
+            - size
 
     CancelOrderCommand:
       type: object
       properties:
-        type:
+        channel:
           type: string
           enum:
-            - cancel_order
-        apiKey:
+            - v4_orders
+        id:
           type: string
           description: API Key
         order:
