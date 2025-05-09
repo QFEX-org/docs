@@ -334,6 +334,7 @@ components:
           type: string
           enum:
             - v4_orderbook
+          description: v4_orderbook
         id:
           type: string
           description: Trading pair, e.g. "AAPL-USD"
@@ -354,6 +355,7 @@ components:
           type: string
           enum:
             - v4_trades
+          description: v4_trades
         id:
           type: string
           description: Trading pair, e.g. "AAPL-USD"
@@ -374,6 +376,7 @@ components:
           type: string
           enum:
             - v4_candles
+          description: v4_candles
         id:
           type: string
           description: Symbol/Interval, e.g. "AAPL-USD/1MIN"
@@ -394,6 +397,7 @@ components:
           type: string
           enum:
             - v4_markets
+          description: v4_markets
       required:
         - type
         - channel
@@ -410,6 +414,7 @@ components:
           type: string
           enum:
             - v4_balances
+          description: v4_balances
         id:
           type: string
           description: API Key
@@ -430,6 +435,7 @@ components:
           type: string
           enum:
             - v4_positions
+          description: v4_positions
         id:
           type: string
           description: API Key
@@ -447,6 +453,7 @@ components:
             - add_order
         apiKey:
           type: string
+          description: API Key
         order:
           type: object
           properties:
@@ -489,6 +496,7 @@ components:
             - cancel_order
         apiKey:
           type: string
+          description: API Key
         order:
           type: object
           properties:
