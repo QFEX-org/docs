@@ -75,12 +75,12 @@ import (
 )
 
 func main() {
-creds := credentials.NewClientTLSFromCert(nil, "")
-conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
-if err != nil {
-log.Fatalf("did not connect: %v", err)
-}
-defer conn.Close()
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
 
     client := pb.NewPortServiceClient(conn)
     ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
