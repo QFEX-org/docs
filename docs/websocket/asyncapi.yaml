@@ -315,8 +315,6 @@ components:
           type: string
         id:
           type: string
-        contents:
-          type: object
       required:
         - type
         - connection_id
@@ -511,6 +509,20 @@ components:
             - orderId
 
     BboUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "ee987ddf-822c-4356-b0d1-9cbb14859b00"
+          message_id: 1
+          id: null
+          channel: v4_bbo
+          contents:
+            bbo:
+              - MSFT-USD:
+                  symbol: MSFT-USD
+                  bidPrice: "437.45"
+                  bidSize: "2.741"
+                  askPrice: "439.05"
+                  askSize: "2.731"
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -521,6 +533,21 @@ components:
                 $ref: "#/components/schemas/BboPayload"
 
     OrderBookUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "bfbbeb78-c95d-43c4-8a0f-833fab5a3f39"
+          message_id: 1
+          id: "SP500-USD"
+          channel: v4_orderbook
+          contents:
+            bids:
+              - price: "564.1"
+                size: "2.126"
+              - price: "560.3"
+                size: "0.001"
+            asks:
+              - price: "566.2"
+                size: "2.118"
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -531,6 +558,17 @@ components:
                 $ref: "#/components/schemas/OrderBookPayload"
 
     TradeUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "bfbbeb78-c95d-43c4-8a0f-833fab5a3f39"
+          message_id: 1
+          id: "SP500-USD"
+          channel: v4_trades
+          contents:
+            - price: "564.1"
+              size: "2.126"
+              side: "BUY"
+              createdAt: "2025-05-08T20:52:48.000Z"
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -541,6 +579,21 @@ components:
                 $ref: "#/components/schemas/TradePayload"
 
     CandleUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "ee987ddf-822c-4356-b0d1-012314859b00"
+          message_id: 1
+          id: "AAPL-USD/1MIN"
+          channel: v4_candles
+          contents:
+            - startedAt: "2025-05-08T19:00:00Z"
+              ticker: "AAPL-USD"
+              resolution: "1MIN"
+              open: "173.00"
+              high: "174.00"
+              low: "172.50"
+              close: "173.50"
+              usdVolume: "100000"
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -551,6 +604,22 @@ components:
                 $ref: "#/components/schemas/CandlePayload"
 
     BalanceUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "ee987ddf-822c-4356-b0d1-012314859b00"
+          message_id: 1
+          id: "3ab267fd-7c83-49c6-b42e-65bb94682b41"
+          channel: v4_balances
+          contents:
+            - id: "2cb208e3-6e54-48c4-82e9-641e64bf185d"
+              user_id: "0f5208e3-6e54-48c4-82e9-641e64bf185d"
+              deposit: 1000
+              realised_pnl: -898.65735
+              unrealised_pnl: 0
+              order_margin: 0
+              position_margin: 0
+              net_funding: -1.5354636
+              available_balance: 99.80721
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -561,6 +630,28 @@ components:
                 $ref: "#/components/schemas/BalancePayload"
 
     PositionUpdate:
+      examples:
+        - type: subscribed
+          connection_id: "ee987ddf-822c-4356-b0d1-012314859b00"
+          message_id: 1
+          id: "3ab267fd-7c83-49c6-b42e-65bb94682b41"
+          channel: v4_positions
+          contents:
+            - id: "PLTR-USD"
+              symbol: "PLTR-USD"
+              user_id: "0f5208e3-6e54-48c4-82e9-641e64bf185d"
+              position: 0
+              margin_alloc: 0
+              realised_pnl: 1.327875
+              unrealised_pnl: 0
+              net_funding: 0.00000482
+              open_orders: 1
+              open_quantity: 10
+              leverage: 20
+              initial_margin: 0
+              maintenance_margin: 0
+              average_price: 0
+              timestamp: "2025-05-09T03:47:20.505934+00:00"
       allOf:
         - $ref: "#/components/schemas/MessageEnvelope"
         - type: object
@@ -620,7 +711,6 @@ components:
       properties:
         startedAt:
           type: string
-          format: date-time
         ticker:
           type: string
         resolution:
