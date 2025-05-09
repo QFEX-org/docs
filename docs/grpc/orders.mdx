@@ -25,9 +25,9 @@ import port_pb2_grpc
 import common_pb2
 
 def stream_orders(): # Attach API key metadata
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
