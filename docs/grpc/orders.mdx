@@ -167,7 +167,7 @@ import (
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
     pb "path/to/proto/port"
-    pb "path/to/proto/common"
+    pbCommon "path/to/proto/common"
 )
 
 func main() {
@@ -192,9 +192,9 @@ func main() {
         stream.Send(&pb.OrdersStreamRequest{
             AddOrder: &pb.AddOrderRequest{
                 Symbol:         "SP500-USD",
-                Side:           pb.OrderSide_BUY,
-                Type:           pb.OrderType_LIMIT,
-                TimeInForce:    pb.OrderTimeInForce_GTC,
+                Side:           pbCommon.OrderSide_BUY,
+                Type:           pbCommon.OrderType_LIMIT,
+                TimeInForce:    pbCommon.OrderTimeInForce_GTC,
                 Price:          4200.50,
                 Size:           0.1,
                 ClientOrderId:  "order-id-123",
