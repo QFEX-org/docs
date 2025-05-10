@@ -1,10 +1,12 @@
 ---
-title: 'Streaming BBO'
-description: 'Consuming live best bid/offer updates via gRPC'
+title: "Streaming BBO"
+description: "Consuming live best bid/offer updates via gRPC"
 ---
 
 <Note>
-  This example shows how to call the `GetBbo` RPC to stream real‑time best bid/offer updates.
+  This example shows how to call the
+  [`GetBbo`](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L16)
+  RPC to stream real‑time best bid/offer updates.
 </Note>
 
 ## Example: Streaming BBO
@@ -15,17 +17,17 @@ import grpc
 import common_pb2
 import market_data_pb2_grpc
 
-
 def stream_bbo():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for bbo in stub.GetBbo(common_pb2.Empty()):
         print(bbo)
 
-if __name__ == '__main__':
-    stream_bbo()
-```
+if **name** == '**main**':
+stream_bbo()
+
+````
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -50,7 +52,8 @@ public class BboStreamer {
         channel.shutdown();
     }
 }
-```
+````
+
 ```go go
 package main
 
@@ -93,31 +96,45 @@ func main() {
     }
 }
 ```
+
 ```javascript node
-const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
 
 // Load proto definitions
-const commonDef = protoLoader.loadSync('common.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
-const marketDef = protoLoader.loadSync('market_data.proto', { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true });
+const commonDef = protoLoader.loadSync("common.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const marketDef = protoLoader.loadSync("market_data.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
 const commonProto = grpc.loadPackageDefinition(commonDef).common;
 const marketDataProto = grpc.loadPackageDefinition(marketDef).market_data;
 
 function streamBbo() {
   const client = new marketDataProto.MarketDataService(
-    'mds.pfex.io:443',
+    "mds.pfex.io:443",
     grpc.credentials.createSsl()
   );
 
   const call = client.getBbo({});
-  call.on('data', (bbo) => {
+  call.on("data", (bbo) => {
     console.log(bbo);
   });
-  call.on('end', () => {
-    console.log('Stream ended');
+  call.on("end", () => {
+    console.log("Stream ended");
   });
 }
 
 streamBbo();
 ```
+
 </CodeGroup>
