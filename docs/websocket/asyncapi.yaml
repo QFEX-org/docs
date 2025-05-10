@@ -503,6 +503,7 @@ components:
                 - ADD
             marketId:
               type: string
+              description: Symbol, e.g. "AAPL-USD"
             side:
               type: string
               enum:
@@ -557,6 +558,7 @@ components:
               type: string
             marketId:
               type: string
+            description: Symbol, e.g. "AAPL-USD"
           required:
             - action
             - orderId

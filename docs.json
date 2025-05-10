@@ -31,16 +31,26 @@
             "group": "gRPC",
             "pages": [
               "docs/grpc/main",
-              "docs/grpc/refdata",
-              "docs/grpc/orderbook",
-              "docs/grpc/orders",
-              "docs/grpc/trades",
-              "docs/grpc/bbo",
-              "docs/grpc/positions",
-              "docs/grpc/balance",
-              "docs/grpc/get_orders",
-              "docs/grpc/cancel_order",
-              "docs/grpc/modify_order"
+              {
+                "group": "Market Data",
+                "pages": [
+                  "docs/grpc/refdata",
+                  "docs/grpc/orderbook",
+                  "docs/grpc/bbo"
+                ]
+              },
+              {
+                "group": "Trade",
+                "pages": [
+                  "docs/grpc/orders",
+                  "docs/grpc/trades",
+                  "docs/grpc/positions",
+                  "docs/grpc/balance",
+                  "docs/grpc/get_orders",
+                  "docs/grpc/cancel_order",
+                  "docs/grpc/modify_order"
+                ]
+              }
             ]
           }
         ]
