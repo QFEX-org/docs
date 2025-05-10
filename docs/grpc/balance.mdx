@@ -21,7 +21,7 @@ def stream_balance():
     channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
     for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
-    print(bal)
+      print(bal)
 
 if __name__ == '__main__':
     stream_balance()
