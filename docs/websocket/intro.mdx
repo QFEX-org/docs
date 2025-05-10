@@ -13,8 +13,8 @@ WS_URL = "wss://ws.pfex.io/v4/ws"
 API_KEY = os.getenv("QFEX_API_KEY")
 
 async def main():
-  async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
-    print(json.loads(await ws.recv()))
+async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
+print(json.loads(await ws.recv()))
 
     # subscribe to public BBO
     await ws.send(json.dumps({
@@ -38,6 +38,7 @@ asyncio.run(main())
 ````
 
 ```js node
+// save this file as `index.mjs` and run `node index.mjs`
 import WebSocket from "isomorphic-ws";
 
 const ws = new WebSocket("wss://ws.pfex.io/v4/ws");
