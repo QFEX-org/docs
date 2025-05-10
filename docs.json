@@ -21,7 +21,10 @@
         "groups": [
           {
             "group": "API Documentation",
-            "pages": ["docs/api-reference/introduction"]
+            "pages": [
+              "docs/api-reference/introduction",
+              "docs/api-reference/enums"
+            ]
           },
           {
             "group": "WebSocket",

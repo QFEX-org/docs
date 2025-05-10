@@ -1,0 +1,104 @@
+---
+title: "Enums"
+---
+
+## OrderType
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `LIMIT` | 0 | Limit order |
+| `MARKET` | 1 | Market order |
+| `LIQUIDATE` | 2 |  |
+| `ALO` | 3 |  |
+
+## OrderDirection
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `BUY` | 0 | Buy order |
+| `SELL` | 1 | Sell order |
+
+## OrderTimeInForce
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `GFD` | 0 | Good till canceled |
+| `IOC` | 1 | Immediate or cancel |
+| `FOK` | 2 | Fill or kill |
+
+## OrderAction
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `NEW` | 0 |  |
+| `MODIFY` | 1 |  |
+| `CANCEL` | 2 |  |
+| `FLUSH` | 3 |  |
+| `FILL` | 4 |  |
+| `INIT` | 99 |  |
+
+## OrderStatus
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ACK` | 0 |  |
+| `EXPIRED` | 6 |  |
+| `IOC_CANCELLED` | 7 |  |
+| `INVALID_PRICE` | 8 |  |
+| `INVALID_QUANTITY` | 9 |  |
+| `NOT_FOUND` | 10 |  |
+| `IOC_PARTIALLY_FILLED` | 11 |  |
+| `USER_NOT_FOUND` | 12 |  |
+| `PERMISSION_DENIED` | 13 |  |
+| `FILLED` | 2 |  |
+| `MODIFIED` | 20 |  |
+| `CANCELLED` | 30 |  |
+| `CANCELLED_STP` | 31 |  |
+| `REJECTED` | 50 |  |
+| `NO_SUCH_ORDER` | 52 |  |
+| `INVALID_ORDER_TYPE` | 53 |  |
+| `BAD_SYMBOL` | 54 |  |
+| `PRICE_LESS_THAN_MIN_PRICE` | 55 |  |
+| `PRICE_GREATER_THAN_MAX_PRICE` | 56 |  |
+| `CANNOT_MODIFY_PARTIAL_FILL` | 58 |  |
+| `FAILED_MARGIN_CHECK` | 60 |  |
+| `REJECTED_MUST_CHANGE_VALUE_MODIFY` | 61 |  |
+| `NO_CHANGE_NO_UPDATE` | 62 |  |
+| `INVALID_TICK_SIZE_PRECISION_PRICE` | 63 |  |
+| `INVALID_TICK_SIZE_PRECISION_QUANTITY` | 64 |  |
+| `QUANTITY_LESS_THAN_MIN_QUANTITY` | 65 |  |
+| `QUANTITY_GREATER_THAN_MAX_QUANTITY` | 66 |  |
+| `REJECTED_GREATER_THAN_MAX_PRICE_BAND` | 67 |  |
+| `REJECTED_LESS_THAN_MIN_PRICE_BAND` | 68 |  |
+| `INVALID_TIME_IN_FORCE` | 69 |  |
+| `REJECTED_WOULD_BREACH_MAX_POSITION` | 70 |  |
+| `CANNOT_MODIFY_NO_SUCH_ORDER` | 71 |  |
+| `REJECTED_MARKET_CLOSED` | 72 |  |
+| `RATE_LIMITED` | 97 |  |
+
+## SymbolStatus
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ACTIVE` | 0 |  |
+| `INACTIVE` | 1 |  |
+| `DELISTED` | 2 |  |
+
+## CandlesInterval
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ONE_MINUTE` | 0 |  |
+| `FIVE_MINUTES` | 2 |  |
+| `FIFTEEN_MINUTES` | 3 |  |
+| `THIRTY_MINUTES` | 4 |  |
+| `ONE_HOUR` | 5 |  |
+| `FOUR_HOURS` | 6 |  |
+| `ONE_DAY` | 7 |  |
+
+## OrderRespType
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ACK` | 0 |  |
+| `RESULT` | 1 |  |
