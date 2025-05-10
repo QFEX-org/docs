@@ -7,10 +7,13 @@ description: 'Retrieving user order history via [User Orders RPC](https://github
 
 <CodeGroup>
 ```python python
+improt os
+
 import grpc
 from common_pb2 import ListRequest
 import port_pb2_grpc
 
+API_KEY = os.getenv("QFEX_API_KEY")
 
 def fetch_user_orders(limit: int = 50):
     metadata = (('api-key', API_KEY),)

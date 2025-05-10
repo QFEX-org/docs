@@ -7,9 +7,13 @@ description: "Consuming live balance updates via [Balance RPC](https://github.co
 
 <CodeGroup>
 ```python python
+import os
+
 import grpc
 import common_pb2
 import port_pb2_grpc
+
+API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_balance():
     metadata = (('api-key', API_KEY),)

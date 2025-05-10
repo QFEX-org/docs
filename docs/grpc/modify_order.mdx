@@ -16,15 +16,19 @@ description: "Modify an existing order via [Stream Orders RPC](https://github.co
 
 <CodeGroup>
 ```python python
+import os
+
 import grpc
 import port_pb2
 import port_pb2_grpc
 import common_pb2
 
+API_KEY = os.getenv("QFEX_API_KEY")
+
 def modify_order():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
 
     def request_generator():
         # Modify an existing limit order
@@ -41,8 +45,8 @@ stub = port_pb2_grpc.PortServiceStub(channel)
     for resp in responses:
         print("Response:", resp)
 
-if **name** == '**main**':
-modify_order()
+if __name__ == '__main__':
+    modify_order()
 
 ````
 ```java java
