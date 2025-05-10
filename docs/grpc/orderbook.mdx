@@ -118,3 +118,34 @@ streamOrderBook("SP500-USD");
 ```
 
 </CodeGroup>
+
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L10)
+
+```proto
+Received data: symbol: "SP500-USD"
+timestamp {
+  seconds: 1746911241
+  nanos: 829600944
+}
+asks {
+  price: 566.6
+  quantity: 1.411
+}
+bids {
+  price: 563.5
+  quantity: 1.418
+}
+bids {
+  price: 540
+  quantity: 0.002
+}
+bids {
+  price: 530
+  quantity: 0.002
+}
+bids {
+  price: 500.5
+  quantity: 0.001
+}
+sequence: 6313309
+```
