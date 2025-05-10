@@ -4,14 +4,17 @@ title: "Enums"
 
 ## OrderType
 
+This defines how the order is executed by the engine.
+
 | Name | Value | Description |
 | ---- | ----- | ----------- |
 | `LIMIT` | 0 | Limit order |
 | `MARKET` | 1 | Market order |
-| `LIQUIDATE` | 2 |  |
-| `ALO` | 3 |  |
+| `ALO` | 3 | Add Liquidity Order. If the order would cross the book, the order will be rejected. |
 
 ## OrderDirection
+
+This defines the direction of the order.
 
 | Name | Value | Description |
 | ---- | ----- | ----------- |
@@ -20,61 +23,45 @@ title: "Enums"
 
 ## OrderTimeInForce
 
-| Name | Value | Description |
-| ---- | ----- | ----------- |
-| `GFD` | 0 | Good till canceled |
-| `IOC` | 1 | Immediate or cancel |
-| `FOK` | 2 | Fill or kill |
-
-## OrderAction
+This defines the time in force of the order.
 
 | Name | Value | Description |
 | ---- | ----- | ----------- |
-| `NEW` | 0 |  |
-| `MODIFY` | 1 |  |
-| `CANCEL` | 2 |  |
-| `FLUSH` | 3 |  |
-| `FILL` | 4 |  |
-| `INIT` | 99 |  |
+| `GTC` | 0 | Good till canceled. This order will stay in the book until it is filled or canceled. |
+| `IOC` | 1 | Immediate or cancel. This order will fill as much as possible and then be canceled. If the order cannot be filled immediately, the remaining quantity will be canceled. |
+| `FOK` | 2 | Fill or kill. This order will be canceled if it cannot be filled immediately. If the order cannot be filled immediately, the entire order will be canceled. |
 
 ## OrderStatus
 
+This is returned on any order response. This will indicate the current status of the order.
+
 | Name | Value | Description |
 | ---- | ----- | ----------- |
-| `ACK` | 0 |  |
-| `EXPIRED` | 6 |  |
-| `IOC_CANCELLED` | 7 |  |
-| `INVALID_PRICE` | 8 |  |
-| `INVALID_QUANTITY` | 9 |  |
-| `NOT_FOUND` | 10 |  |
-| `IOC_PARTIALLY_FILLED` | 11 |  |
-| `USER_NOT_FOUND` | 12 |  |
-| `PERMISSION_DENIED` | 13 |  |
-| `FILLED` | 2 |  |
-| `MODIFIED` | 20 |  |
-| `CANCELLED` | 30 |  |
-| `CANCELLED_STP` | 31 |  |
-| `REJECTED` | 50 |  |
-| `NO_SUCH_ORDER` | 52 |  |
-| `INVALID_ORDER_TYPE` | 53 |  |
-| `BAD_SYMBOL` | 54 |  |
-| `PRICE_LESS_THAN_MIN_PRICE` | 55 |  |
-| `PRICE_GREATER_THAN_MAX_PRICE` | 56 |  |
-| `CANNOT_MODIFY_PARTIAL_FILL` | 58 |  |
-| `FAILED_MARGIN_CHECK` | 60 |  |
-| `REJECTED_MUST_CHANGE_VALUE_MODIFY` | 61 |  |
-| `NO_CHANGE_NO_UPDATE` | 62 |  |
-| `INVALID_TICK_SIZE_PRECISION_PRICE` | 63 |  |
-| `INVALID_TICK_SIZE_PRECISION_QUANTITY` | 64 |  |
-| `QUANTITY_LESS_THAN_MIN_QUANTITY` | 65 |  |
-| `QUANTITY_GREATER_THAN_MAX_QUANTITY` | 66 |  |
-| `REJECTED_GREATER_THAN_MAX_PRICE_BAND` | 67 |  |
-| `REJECTED_LESS_THAN_MIN_PRICE_BAND` | 68 |  |
-| `INVALID_TIME_IN_FORCE` | 69 |  |
-| `REJECTED_WOULD_BREACH_MAX_POSITION` | 70 |  |
-| `CANNOT_MODIFY_NO_SUCH_ORDER` | 71 |  |
-| `REJECTED_MARKET_CLOSED` | 72 |  |
-| `RATE_LIMITED` | 97 |  |
+| `ACK` | 0 | Order accepted |
+| `NOT_FOUND` | 10 | Order not found |
+| `FILLED` | 2 | Order filled, this could be partially filled. |
+| `MODIFIED` | 20 | Order successfully modified |
+| `CANCELLED` | 30 | Order successfully cancelled |
+| `CANCELLED_STP` | 31 | Order cancelled by self trade prevention |
+| `REJECTED` | 50 | Order rejected |
+| `NO_SUCH_ORDER` | 52 | No such order exists |
+| `INVALID_ORDER_TYPE` | 53 | Invalid order type |
+| `BAD_SYMBOL` | 54 | Invalid symbol |
+| `PRICE_LESS_THAN_MIN_PRICE` | 55 | Price less than minimum price for this symbol |
+| `PRICE_GREATER_THAN_MAX_PRICE` | 56 | Price greater than maximum price for this symbol |
+| `CANNOT_MODIFY_PARTIAL_FILL` | 58 | Cannot modify partial fill. Please cancel your current order and place a new order. |
+| `FAILED_MARGIN_CHECK` | 60 | Failed margin check. Please check your available balance. |
+| `INVALID_TICK_SIZE_PRECISION_PRICE` | 63 | Invalid tick size for this symbol. Check the price tick size in the reference data. |
+| `INVALID_TICK_SIZE_PRECISION_QUANTITY` | 64 | Invalid tick size for this symbol. Check the quantity tick size in the reference data. |
+| `QUANTITY_LESS_THAN_MIN_QUANTITY` | 65 | Quantity less than minimum quantity for this symbol. Check the minimum quantity in the reference data. |
+| `QUANTITY_GREATER_THAN_MAX_QUANTITY` | 66 | Quantity greater than maximum quantity for this symbol. Check the maximum quantity in the reference data. |
+| `REJECTED_GREATER_THAN_MAX_PRICE_BAND` | 67 | Rejected greater than max price band. Check the max price band in the reference data. |
+| `REJECTED_LESS_THAN_MIN_PRICE_BAND` | 68 | Rejected less than min price band. Check the min price band in the reference data. |
+| `INVALID_TIME_IN_FORCE` | 69 | Invalid time in force for this order type. |
+| `REJECTED_WOULD_BREACH_MAX_POSITION` | 70 | Rejected would breach max position. Check the max position for your account in gRPC PortService.GetUserLeverage |
+| `CANNOT_MODIFY_NO_SUCH_ORDER` | 71 | Failed to modify this order. Order does not exist. |
+| `REJECTED_MARKET_CLOSED` | 72 | QFEX is currently not accepting orders for this symbol. |
+| `RATE_LIMITED` | 97 | You have sent too many requests to trade.pfex.io. Please slow down or contact support to raise your limits. |
 
 ## SymbolStatus
 

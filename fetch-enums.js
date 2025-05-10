@@ -1,108 +1,120 @@
 #!/usr/bin/env node
 // merge-enums.js
 // Usage: node merge-enums.js
-// Reads the preamble from docs/api-reference/enums_pre.mdx,
-// fetches and parses enums from common.proto, mds.proto, port.proto,
-// then writes combined output to docs/api-reference/enums.mdx.
+// Reads a preamble from docs/api-reference/enums_pre.mdx,
+// fetches and parses all enums (with '///' block comments) from the three .proto files,
+// and writes the combined MDX to docs/api-reference/enums.mdx.
 
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 
 // Paths
-const PREAMBLE_PATH = path.resolve(__dirname, 'docs/api-reference/enums_pre.mdx');
-const OUTPUT_PATH   = path.resolve(__dirname, 'docs/api-reference/enums.mdx');
+const PREAMBLE_PATH = path.resolve(
+  __dirname,
+  "docs/api-reference/enums_pre.mdx"
+);
+const OUTPUT_PATH = path.resolve(__dirname, "docs/api-reference/enums.mdx");
 
-// Proto sources
-const PROTO_FILES = [
-  { url: 'https://raw.githubusercontent.com/QFEX-org/proto/main/common.proto' },
-  { url: 'https://raw.githubusercontent.com/QFEX-org/proto/main/market_data.proto'    },
-  { url: 'https://raw.githubusercontent.com/QFEX-org/proto/main/port.proto'   },
+// Proto source URLs
+const PROTO_URLS = [
+  "https://raw.githubusercontent.com/QFEX-org/proto/main/common.proto",
+  "https://raw.githubusercontent.com/QFEX-org/proto/main/market_data.proto",
+  "https://raw.githubusercontent.com/QFEX-org/proto/main/port.proto",
 ];
 
-// Fetch a URL over HTTPS
+// Fetch text over HTTPS
 function fetchText(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, res => {
-      if (res.statusCode !== 200) {
-        return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
-      }
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(data));
-    }).on('error', reject);
+    https
+      .get(url, (res) => {
+        if (res.statusCode !== 200) {
+          return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+        }
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(data));
+      })
+      .on("error", reject);
   });
 }
 
-// Parse enums from a proto file content
+// Parse enums with '///' leading description blocks
 function parseEnums(protoText) {
+  const lines = protoText.split(/\r?\n/);
   const enums = [];
-  const enumRegex = /(?:\/\/[^\n]*\n\s*)*enum\s+(\w+)\s*\{([\s\S]*?)\}/gm;
-  let match;
-  while ((match = enumRegex.exec(protoText))) {
-    const [full, name, body] = match;
-    // Leading comments
-    const lines = full.split(/\r?\n/);
-    const leading = [];
-    for (const l of lines) {
-      if (l.trim().startsWith('//')) leading.push(l.trim().slice(2).trim());
-      else if (l.includes(`enum ${name}`)) break;
-    }
-    const description = leading.join(' ');
-
-    // Members
-    const values = [];
-    for (const line of body.split(/\r?\n/)) {
-      const m = line.trim().match(/^([A-Z0-9_]+)\s*=\s*(\d+)\s*;(?:\s*\/\/\s*(.*))?/);
-      if (m) {
-        const [, valName, valNum, inline] = m;
-        let desc = inline || '';
-        if (!desc) {
-          // preceding comments not implemented here for brevity
-        }
-        values.push({ name: valName, number: valNum, description: desc });
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (trimmed.startsWith("enum ")) {
+      const name = trimmed.split(/\s+/)[1];
+      // Gather leading '///' description lines
+      const descLines = [];
+      let k = i - 1;
+      while (k >= 0 && lines[k].trim().startsWith("///")) {
+        descLines.unshift(lines[k].trim().slice(3).trim());
+        k--;
       }
+      const description = descLines.slice(1).join(" ");
+      // Collect enum members
+      const values = [];
+      i++;
+      while (i < lines.length && !lines[i].includes("}")) {
+        const m = lines[i]
+          .trim()
+          .match(/^([A-Z0-9_]+)\s*=\s*(\d+)\s*;(?:\s*\/\/\s*(.*))?/);
+        if (m) {
+          const [, valName, valNum, inlineDesc] = m;
+          values.push({
+            name: valName,
+            number: valNum,
+            description: inlineDesc || "",
+          });
+        }
+        i++;
+      }
+      enums.push({ name, description, values });
     }
-    enums.push({ name, description, values });
   }
   return enums;
 }
 
-// Generate MDX table sections for enums
-function generateEnumSections(enums) {
-  return enums.map(e => {
-    const header = [`## ${e.name}`, ''];
-    if (e.description) header.push(e.description, '');
+// Generate MDX sections for enums
+function generateSections(enums) {
+  return enums.map((e) => {
+    const header = [`## ${e.name}`, ""];
+    if (e.description) header.push(e.description, "");
     const table = [
-      '| Name | Value | Description |',
-      '| ---- | ----- | ----------- |',
-      ...e.values.map(v => `| \`${v.name}\` | ${v.number} | ${v.description} |`)
+      "| Name | Value | Description |",
+      "| ---- | ----- | ----------- |",
+      ...e.values.map(
+        (v) => `| \`${v.name}\` | ${v.number} | ${v.description} |`
+      ),
     ];
-    return [...header, ...table].join('\n');
+    return [...header, ...table].join("\n");
   });
 }
 
 (async () => {
   try {
     // Read preamble
-    const preamble = fs.readFileSync(PREAMBLE_PATH, 'utf8').trim();
+    const preamble = fs.readFileSync(PREAMBLE_PATH, "utf8").trim();
 
-    // Fetch and parse enums
+    // Fetch and parse enums from all protos
     let allEnums = [];
-    for (const file of PROTO_FILES) {
-      const text = await fetchText(file.url);
+    for (const url of PROTO_URLS) {
+      const text = await fetchText(url);
       allEnums = allEnums.concat(parseEnums(text));
     }
 
-    // Build output
-    const sections = generateEnumSections(allEnums).join('\n\n');
-    const out = `${preamble}\n\n${sections}\n`;
+    // Build output MDX
+    const sections = generateSections(allEnums).join("\n\n");
+    const output = `${preamble}\n\n${sections}\n`;
 
-    // Write enums.mdx
-    fs.writeFileSync(OUTPUT_PATH, out, 'utf8');
+    // Write to file
+    fs.writeFileSync(OUTPUT_PATH, output, "utf8");
     console.log(`✅ Written ${OUTPUT_PATH}`);
   } catch (err) {
-    console.error('❌ Error:', err);
+    console.error("❌ Error:", err.message);
     process.exit(1);
   }
 })();

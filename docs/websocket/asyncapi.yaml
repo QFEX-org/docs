@@ -558,7 +558,7 @@ components:
               type: string
             marketId:
               type: string
-            description: Symbol, e.g. "AAPL-USD"
+              description: Symbol, e.g. "AAPL-USD"
           required:
             - action
             - orderId
