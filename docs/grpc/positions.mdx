@@ -17,14 +17,15 @@ import common_pb2
 import port_pb2_grpc
 
 def stream_positions():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
-        print(pos)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
+print(pos)
 
-if __name__ == '__main__':
-    stream_positions()
+if **name** == '**main**':
+stream_positions()
+
 ````
 ```java java
 import io.grpc.ManagedChannel;
@@ -149,3 +150,27 @@ streamUserPositions();
 ```
 
 </CodeGroup>
+
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L152)
+
+```proto
+data {
+  id: "abc12345-23bb-4635-ace5-969ca441c803"
+  symbol: "SP500-USD"
+  user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+  realised_pnl: 1431.8186
+  net_funding: -0.90625922
+  open_orders: 5
+  open_quantity: 0.005
+  leverage: 50
+  timestamp {
+    seconds: 1746906295
+    nanos: 506666000
+  }
+}
+count: 1
+timestamp {
+  seconds: 1746906297
+  nanos: 124665000
+}
+```
