@@ -40,7 +40,8 @@
                   "docs/grpc/refdata",
                   "docs/grpc/orderbook",
                   "docs/grpc/trades",
-                  "docs/grpc/bbo"
+                  "docs/grpc/bbo",
+                  "docs/grpc/underlier"
                 ]
               },
               {

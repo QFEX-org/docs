@@ -1,15 +1,15 @@
 ---
-title: "Streaming BBO"
-description: "Consuming live best bid/offer updates via gRPC"
+title: "Streaming Underlier Price"
+description: "Consume live underlier price"
 ---
 
 <Note>
   This example shows how to call the
-  [`GetBbo`](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L16)
-  RPC to stream real‑time best bid/offer updates.
+  [`GetUnderlier`](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L11)
+  RPC to stream real‑time underlier price updates.
 </Note>
 
-## Example: Streaming BBO
+## Example: Streaming Underlier
 
 <CodeGroup>
 ```python python
@@ -17,23 +17,21 @@ import grpc
 import common_pb2
 import market_data_pb2_grpc
 
-def stream_bbo():
-channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+def stream_underlier():
+    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
-    for bbo in stub.GetBbo(common_pb2.Empty()):
-        print(bbo)
+    for underlier in stub.GetUnderlier(common_pb2.GetSymbol(symbol="SP500-USD")):
+        print(underlier)
 
-if **name** == '**main**':
-stream_bbo()
+if __name__ == '__main__':
+    stream_underlier()
 
 ````
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
-import common.Empty;
+import common.GetSymbol;
 import market_data.MarketDataServiceGrpc;
 import market_data.OrderBook;
 
@@ -46,8 +44,8 @@ public class BboStreamer {
         MarketDataServiceGrpc.MarketDataServiceBlockingStub stub =
             MarketDataServiceGrpc.newBlockingStub(channel);
 
-        stub.getBbo(Empty.newBuilder().build())
-            .forEachRemaining(bbo -> System.out.println(bbo));
+        stub.getUnderlier(GetSymbol.newBuilder().setSymbol("SP500-USD").build())
+            .forEachRemaining(underlier -> System.out.println(underlier));
 
         channel.shutdown();
     }
@@ -79,20 +77,20 @@ func main() {
 
     client := pb.NewMarketDataServiceClient(conn)
 
-    stream, err := client.GetBbo(context.Background(), &pbCommon.Empty{})
+    stream, err := client.GetUnderlier(context.Background(), &pbCommon.GetSymbol{Symbol: "SP500-USD"})
     if err != nil {
-        log.Fatalf("error on GetBbo: %v", err)
+        log.Fatalf("error on GetUnderlier: %v", err)
     }
 
     for {
-        bbo, err := stream.Recv()
+        underlier, err := stream.Recv()
         if err == io.EOF {
             break
         }
         if err != nil {
             log.Fatalf("stream error: %v", err)
         }
-        fmt.Println(bbo)
+        fmt.Println(underlier)
     }
 }
 ```
@@ -125,9 +123,9 @@ function streamBbo() {
     grpc.credentials.createSsl()
   );
 
-  const call = client.getBbo({});
-  call.on("data", (bbo) => {
-    console.log(bbo);
+  const call = client.getUnderlier({symbol: "SP500-USD"});
+  call.on("data", (underlier) => {
+    console.log(underlier);
   });
   call.on("end", () => {
     console.log("Stream ended");
@@ -138,3 +136,13 @@ streamBbo();
 ```
 
 </CodeGroup>
+
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12)
+```proto
+symbol: "SP500-USD"
+price: 566.6
+timestamp {
+  seconds: 1746911241
+  nanos: 829600944
+}
+```
