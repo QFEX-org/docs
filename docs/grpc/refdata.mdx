@@ -2,54 +2,6 @@
 title: "Reference Data"
 ---
 
-## [Response Model](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L85)
-<CodeGroup>
-```proto
-clobPairId: "4"
-  symbol: "GOOG-USD"
-  underlier_price: 154.16
-  price_change_24h: -2
-  tick_size: "0.05"
-  lot_size: "0.001"
-  min_price: "112"
-  max_price: "209"
-  min_quantity: "0.001"
-  max_quantity: "100000000"
-  base_asset: "GOOG"
-  quote_asset: "USD"
-  margin_asset: "USD"
-  order_time_in_force: GFD
-  order_time_in_force: IOC
-  order_time_in_force: FOK
-  order_types: LIMIT
-  order_types: MARKET
-  order_types: ALO
-  market_hours {
-    tz: "America/New_York"
-    monday {
-      open: "04:00:00"
-      close: "20:00:00"
-    }
-    tuesday {
-      open: "04:00:00"
-      close: "20:00:00"
-    }
-    wednesday {
-      open: "04:00:00"
-      close: "20:00:00"
-    }
-    thursday {
-      open: "04:00:00"
-      close: "20:00:00"
-    }
-    friday {
-      open: "04:00:00"
-      close: "20:00:00"
-    }
-  }
-      ...
-```
-</CodeGroup>
 
 ## Sample Code 
 
@@ -168,5 +120,54 @@ function fetchRefData() {
 fetchRefData();
 ```
 
+</CodeGroup>
+
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L85)
+<CodeGroup>
+```proto
+clobPairId: "4"
+  symbol: "GOOG-USD"
+  underlier_price: 154.16
+  price_change_24h: -2
+  tick_size: "0.05"
+  lot_size: "0.001"
+  min_price: "112"
+  max_price: "209"
+  min_quantity: "0.001"
+  max_quantity: "100000000"
+  base_asset: "GOOG"
+  quote_asset: "USD"
+  margin_asset: "USD"
+  order_time_in_force: GFD
+  order_time_in_force: IOC
+  order_time_in_force: FOK
+  order_types: LIMIT
+  order_types: MARKET
+  order_types: ALO
+  market_hours {
+    tz: "America/New_York"
+    monday {
+      open: "04:00:00"
+      close: "20:00:00"
+    }
+    tuesday {
+      open: "04:00:00"
+      close: "20:00:00"
+    }
+    wednesday {
+      open: "04:00:00"
+      close: "20:00:00"
+    }
+    thursday {
+      open: "04:00:00"
+      close: "20:00:00"
+    }
+    friday {
+      open: "04:00:00"
+      close: "20:00:00"
+    }
+  }
+      ...
+```
 </CodeGroup>
 
