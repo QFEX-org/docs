@@ -39,6 +39,7 @@
                 "pages": [
                   "docs/grpc/refdata",
                   "docs/grpc/orderbook",
+                  "docs/grpc/trades",
                   "docs/grpc/bbo"
                 ]
               },
@@ -46,7 +47,6 @@
                 "group": "Trade",
                 "pages": [
                   "docs/grpc/orders",
-                  "docs/grpc/trades",
                   "docs/grpc/positions",
                   "docs/grpc/balance",
                   "docs/grpc/get_orders",

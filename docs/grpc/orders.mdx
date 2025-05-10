@@ -4,8 +4,8 @@ description: "Bidirectional streaming for sending orders and receiving order res
 ---
 
 <Note>
-  This example shows how to open a bidirectional gRPC stream to send order
-  commands (add, cancel) and receive real-time order responses
+  This example shows how to open a bidirectional [StreamOrders](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) to send order
+  commands (add, cancel, modify) and receive real-time order responses
   (acknowledgements, fills, rejections).
 </Note>
 
@@ -33,21 +33,29 @@ def stream_orders(): # Attach API key metadata
     def request_generator():
         # Add a limit buy order
         yield port_pb2.OrdersStreamRequest(
-            addOrder=port_pb2.AddOrderRequest(
-                action=port_pb2.AddOrderRequest.ADD,
-                marketId="SP500-USD",
-                side=port_pb2.AddOrderRequest.BUY,
-                type=port_pb2.AddOrderRequest.LIMIT,
-                timeInForce=port_pb2.AddOrderRequest.GTC,
-                price="4200.50",
-                size="1"
+            add_order=port_pb2.AddOrderRequest(
+                symbol="SP500-USD",
+                side=common_pb2.OrderSide.BUY,
+                type=common_pb2.OrderType.LIMIT,
+                time_in_force=common_pb2.OrderTimeInForce.GTC,
+                price=4200.50,
+                quantity=0.1,
+                client_order_id="order-id-123"
+            )
+        )
+        # Modify an existing order. 
+        yield port_pb2.OrdersStreamRequest(
+            modify_order=port_pb2.ModifyOrderRequest(
+                order_id="abc12345-12345-12345-12345", # Note, for modifies we must use the order_id not client_order_id
+                price=4200.60,
+                quantity=0.2
             )
         )
         # Cancel an existing order
         yield port_pb2.OrdersStreamRequest(
-            cancelOrder=port_pb2.CancelOrderRequest(
-                action=port_pb2.CancelOrderRequest.CANCEL,
-                orderId="order-id-123"
+            cancel_order=port_pb2.CancelOrderRequest(
+                client_order_id="order-id-123", # Note, for cancels we can use either the client_order_id or order_id
+                symbol="SP500-USD"
             )
         )
 
@@ -56,8 +64,8 @@ def stream_orders(): # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-if **name** == "**main**":
-stream_orders()
+if __name__ == "__main__":
+    stream_orders()
 
 ````
 ```java java
@@ -71,6 +79,9 @@ import port.OrdersStreamRequest;
 import port.OrderResponse;
 import port.AddOrderRequest;
 import port.CancelOrderRequest;
+import common.OrderSide;
+import common.OrderType;
+import common.OrderTimeInForce;
 
 public class OrderStreamer {
     public static void main(String[] args) throws InterruptedException {
@@ -103,22 +114,31 @@ public class OrderStreamer {
 
         // Send add order
         AddOrderRequest add = AddOrderRequest.newBuilder()
-            .setAction(AddOrderRequest.Action.ADD)
-            .setMarketId("SP500-USD")
-            .setSide(AddOrderRequest.Side.BUY)
-            .setType(AddOrderRequest.OrderType.LIMIT)
-            .setTimeInForce(AddOrderRequest.TimeInForce.GTC)
-            .setPrice("4200.50")
-            .setSize("1")
+            .setSymbol("SP500-USD")
+            .setSide(OrderSide.BUY)
+            .setType(OrderType.LIMIT)
+            .setTimeInForce(OrderTimeInForce.GTC)
+            .setPrice(4200.50)
+            .setQuantity(0.1)
+            .setClientOrderId("order-id-123")
             .build();
         requestObserver.onNext(
             OrdersStreamRequest.newBuilder().setAddOrder(add).build()
         );
 
+        // Send modify order
+        ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
+            .setOrderId("abc12345-12345-12345-12345") // Note, for modifies we must use the order_id not client_order_id
+            .setPrice(4200.60)
+            .setQuantity(0.2)
+            .build();
+        requestObserver.onNext(
+            OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
+        );
+
         // Send cancel order
         CancelOrderRequest cancel = CancelOrderRequest.newBuilder()
-            .setAction(CancelOrderRequest.Action.CANCEL)
-            .setOrderId("order-id-123")
+            .setClientOrderId("order-id-123") // Note, for cancels we can use either the client_order_id or order_id
             .build();
         requestObserver.onNext(
             OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
@@ -147,6 +167,7 @@ import (
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
     pb "path/to/proto/port"
+    pb "path/to/proto/common"
 )
 
 func main() {
@@ -170,20 +191,28 @@ func main() {
         // Add a limit buy order
         stream.Send(&pb.OrdersStreamRequest{
             AddOrder: &pb.AddOrderRequest{
-                Action:      pb.AddOrderRequest_ADD,
-                MarketId:    "SP500-USD",
-                Side:        pb.AddOrderRequest_BUY,
-                Type:        pb.AddOrderRequest_LIMIT,
-                TimeInForce: pb.AddOrderRequest_GTC,
-                Price:       "4200.50",
-                Size:        "1",
+                Symbol:         "SP500-USD",
+                Side:           pb.OrderSide_BUY,
+                Type:           pb.OrderType_LIMIT,
+                TimeInForce:    pb.OrderTimeInForce_GTC,
+                Price:          4200.50,
+                Size:           0.1,
+                ClientOrderId:  "order-id-123",
+            },
+        })
+        // Modify an order
+        stream.Send(&pb.OrdersStreamRequest{
+            ModifyOrder: &pb.ModifyOrderRequest{
+                OrderId: "abc12345-12345-12345-12345",
+                Price:   4200.60,
+                Size:    0.2,
             },
         })
         // Cancel an order
         stream.Send(&pb.OrdersStreamRequest{
             CancelOrder: &pb.CancelOrderRequest{
-                Action:  pb.CancelOrderRequest_CANCEL,
-                OrderId: "order-id-123",
+                ClientOrderId: "order-id-123",
+                Symbol:        "SP500-USD",
             },
         })
         stream.CloseSend()
@@ -254,12 +283,27 @@ function streamOrders() {
     }
   );
 
+  // Send modify order
+  call.write(
+    {
+      modifyOrder: {
+        orderId: "abc12345-12345-12345-12345", // Note, for modifies we must use the order_id not client_order_id
+        price: 4200.60,
+        quantity: 0.2,
+      },
+    },
+    (err) => {
+      if (err) console.error("modify failed:", err);
+      else console.log("✅ modifyOrder enqueued");
+    }
+  );
+
   // Send cancel order
   call.write(
     {
       cancelOrder: {
-        clientOrderId: "order-id-123",
-        symbol: "SP500-USD", // you must include the symbol too
+        clientOrderId: "order-id-123", // Note, for cancels we can use either the client_order_id or order_id
+        symbol: "SP500-USD",
       },
     },
     (err) => {
