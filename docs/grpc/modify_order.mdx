@@ -1,12 +1,15 @@
 ---
 title: "Modify Order"
-description: "Updating an existing order via gRPC"
+description: "Modify an existing order via [Stream Orders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9)"
 ---
 
 <Note>
-  You can only modify orders by **`orderId`**. This is to prevent modifications
-  of inflight orders. If you must modify an order before receiving an ACK,
+  You can only modify orders by **`orderId`**. 
+  
+  This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
   cancel the order and re-add it.
+
+  You cannot modify an order that has been partially filled.
 </Note>
 
 ## Example: Modifying an Order

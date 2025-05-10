@@ -1,13 +1,7 @@
 ---
 title: "Streaming Funding Rate"
-description: "Consume live funding rate"
+description: "Consume live funding rate via [Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L13)"
 ---
-
-<Note>
-  This example shows how to call the
-  [`GetFundingRate`](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L13)
-  RPC to stream real‑time funding rate updates.
-</Note>
 
 ## Example: Streaming Funding Rate
 
@@ -25,7 +19,7 @@ def stream_funding_rate():
         print(funding_rate)
 
 if __name__ == '__main__':
-    stream_funding_rate()
+  stream_funding_rate()
 
 ````
 ```java java
@@ -33,9 +27,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import common.GetSymbol;
 import market_data.MarketDataServiceGrpc;
-import market_data.OrderBook;
+import market_data.FundingRate;
 
-public class BboStreamer {
+public class FundingRateStreamer {
     public static void main(String[] args) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
             .useTransportSecurity()
@@ -123,7 +117,7 @@ function streamBbo() {
     grpc.credentials.createSsl()
   );
 
-  const call = client.getFundingRate({symbol: "SP500-USD"});
+  const call = client.getFundingRate({ symbol: "SP500-USD" });
   call.on("data", (funding_rate) => {
     console.log(funding_rate);
   });
@@ -138,6 +132,7 @@ streamBbo();
 </CodeGroup>
 
 ## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L60)
+
 ```proto
 symbol: "SP500-USD"
 rate: 0.0154

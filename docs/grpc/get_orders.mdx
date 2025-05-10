@@ -1,11 +1,7 @@
 ---
 title: 'Fetch User Orders'
-description: 'Retrieving user order history via gRPC'
+description: 'Retrieving user order history via [User Orders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L12)'
 ---
-
-<Note>
-  This example shows how to call the `GetUserOrders` RPC to fetch your order history.
-</Note>
 
 ## Example: Fetching User Orders
 
@@ -136,3 +132,26 @@ function fetchUserOrders(limit = 50) {
 fetchUserOrders();
 ```
 </CodeGroup>
+
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L99)
+
+```proto
+orders {
+  order_id: "081f26e9-56b1-4739-a2e2-27ce7fbe5857"
+  symbol: "AAPL-USD"
+  quantity: 0.001
+  price: 180
+  update_time {
+    seconds: 1746833819
+    nanos: 995280058
+  }
+  user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+  client_order_id: "081f26e9-56b1-4739-a2e2-27ce7fbe5857"
+  quantity_remaining: 0.001
+}
+timestamp {
+  seconds: 1746916950
+  nanos: 348992017
+}
+count: 1
+```

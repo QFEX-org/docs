@@ -102,10 +102,10 @@ function parseEnums(protoText, fileSpec) {
 // Generate MDX sections for enums, including file link
 function generateSections(enums) {
   return enums.map((e) => {
-    const header = [`## ${e.name}`, ""];
+    const header = [`## [${e.name}](${e.repoUrl}#L${e.line})`, ""];
     // Link to definition
-    const link = `${e.repoUrl}#L${e.line}`;
-    header.push(`[View definition in \`${e.file}\`](${link})`, "");
+    // const link = `${e.repoUrl}#L${e.line}`;
+    // header.push(`<Note>[${e.name}](${e.repoUrl}#L${e.line})</Note>`, "");
     if (e.description) header.push(e.description, "");
 
     const table = [

@@ -1,29 +1,19 @@
 ---
 title: "Streaming Orders"
-description: "Bidirectional streaming for sending orders and receiving order responses"
+description: "Bidirectional streaming for sending orders and receiving order responses via [StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9)"
 ---
-
-<Note>
-  This example shows how to open a bidirectional
-  [StreamOrders](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) to
-  send order commands (add, cancel, modify) and receive real-time order
-  responses (acknowledgements, fills, rejections).
-</Note>
-
-### Enums
-
-- **OrderType**: `LIMIT`, `MARKET`
-- **Side**: `BUY`, `SELL`
-- **TimeInForce**: `GTC`, `IOC`, `FOK`
 
 ## Example: Streaming Orders
 
 <CodeGroup>
 ```python python
+import os
 import grpc
 import port_pb2
 import port_pb2_grpc
 import common_pb2
+
+API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_orders(): # Attach API key metadata
     metadata = (('api-key', API_KEY),)
@@ -66,8 +56,8 @@ def stream_orders(): # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-if **name** == "**main**":
-stream_orders()
+if __name__ == '__main__':
+    stream_orders()
 
 ````
 ```java java

@@ -1,12 +1,16 @@
 ---
 title: "Cancel Order"
-description: "How to cancel an order by Order ID or Client Order ID"
+description: "How to cancel an order by Order ID or Client Order ID via [Stream Orders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9)"
 ---
 
 <Note>
-  You can cancel an order in two ways: 1. **By `orderId`**: Cancels the single
-  order matching that unique identifier. 2. **By `clientOrderId`**: Cancels
-  _all_ orders for your account that share the same clientOrderId. Uniqueness is
+  You can cancel an order in two ways: 
+  
+  1. **By `order_id`**: Cancels the single
+  order matching that unique identifier. 
+  
+  2. **By `client_order_id`**: Cancels _all_ orders 
+  for your account that share the same client_order_id. Uniqueness is
   not enforced, so multiple orders may be cancelled at once.
 </Note>
 
@@ -14,15 +18,19 @@ description: "How to cancel an order by Order ID or Client Order ID"
 
 <CodeGroup>
 ```python python
+import os
+
 import grpc
 import port_pb2
 import port_pb2_grpc
 import common_pb2
 
+API_KEY = os.getenv("QFEX_API_KEY")
+
 def cancel_orders():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Cancel by orderId
     stub.CancellableStream(common_pb2.Empty(), metadata=metadata)  # initialize bidi if needed
@@ -55,8 +63,8 @@ stub = port_pb2_grpc.PortServiceStub(channel)
     for resp in responses:
         print(resp)
 
-if **name** == '**main**':
-cancel_orders()
+if __name__ == '__main__':
+    cancel_orders()
 
 ````
 ```java java

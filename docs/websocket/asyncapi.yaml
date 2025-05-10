@@ -14,7 +14,7 @@ servers:
     description: Production WebSocket gateway
 
 channels:
-  qfexMultiplex:
+  qfex:
     address: /v4/ws
     description: Single channel for subscriptions, order commands, and all updates
     # parameters:
@@ -56,107 +56,107 @@ operations:
   subscribeOrderBookStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeOrderBook"
+      - $ref: "#/channels/qfex/messages/subscribeOrderBook"
 
   subscribeTradesStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeTrades"
+      - $ref: "#/channels/qfex/messages/subscribeTrades"
 
   subscribeCandlesStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeCandles"
+      - $ref: "#/channels/qfex/messages/subscribeCandles"
 
   subscribePositionsStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribePositions"
+      - $ref: "#/channels/qfex/messages/subscribePositions"
 
   subscribeBalanceStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeBalance"
+      - $ref: "#/channels/qfex/messages/subscribeBalance"
 
   subscribeOrdersStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeOrders"
+      - $ref: "#/channels/qfex/messages/subscribeOrders"
 
   subscribeMarketsStream:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Subscribe to a data stream
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/subscribeMarkets"
+      - $ref: "#/channels/qfex/messages/subscribeMarkets"
 
   placeOrder:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Place a new order
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/addOrder"
+      - $ref: "#/channels/qfex/messages/addOrder"
 
   cancelOrder:
     action: receive
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Cancel an existing order
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/cancelOrder"
+      - $ref: "#/channels/qfex/messages/cancelOrder"
 
   receiveUpdates:
     action: send
     channel:
-      $ref: "#/channels/qfexMultiplex"
+      $ref: "#/channels/qfex"
     summary: Receive all update messages and events
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfexMultiplex/messages/bboUpdate"
-      - $ref: "#/channels/qfexMultiplex/messages/orderBookUpdate"
-      - $ref: "#/channels/qfexMultiplex/messages/tradeUpdate"
-      - $ref: "#/channels/qfexMultiplex/messages/candleUpdate"
-      - $ref: "#/channels/qfexMultiplex/messages/balanceUpdate"
-      - $ref: "#/channels/qfexMultiplex/messages/positionUpdate"
+      - $ref: "#/channels/qfex/messages/bboUpdate"
+      - $ref: "#/channels/qfex/messages/orderBookUpdate"
+      - $ref: "#/channels/qfex/messages/tradeUpdate"
+      - $ref: "#/channels/qfex/messages/candleUpdate"
+      - $ref: "#/channels/qfex/messages/balanceUpdate"
+      - $ref: "#/channels/qfex/messages/positionUpdate"
 
 components:
   parameters:
