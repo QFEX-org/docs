@@ -4,8 +4,9 @@ description: "Updating an existing order via gRPC"
 ---
 
 <Note>
-  You can only modify orders by **`orderId`**—cancellations by `clientOrderId`
-  work for cancel ops, but modifications require the unique `orderId`.
+  You can only modify orders by **`orderId`**. This is to prevent modifications
+  of inflight orders. If you must modify an order before receiving an ACK,
+  cancel the order and re-add it.
 </Note>
 
 ## Example: Modifying an Order
@@ -18,18 +19,18 @@ import port_pb2_grpc
 import common_pb2
 
 def modify_order():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
 
     def request_generator():
         # Modify an existing limit order
         yield port_pb2.OrdersStreamRequest(
-            modifyOrder=port_pb2.ModifyOrderRequest(
-                action=port_pb2.ModifyOrderRequest.MODIFY,
-                orderId="order-12345",
-                price="4210.00",
-                size="2"
+            modify_order=port_pb2.ModifyOrderRequest(
+                order_id="order-12345",
+                symbol="SP500-USD",
+                price=4210.00,
+                size=2.0
             )
         )
 
@@ -83,10 +84,10 @@ public class ModifyOrderExample {
 
         // Send modify order request
         ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
-            .setAction(ModifyOrderRequest.Action.MODIFY)
-            .setOrderId("order-12345")
-            .setPrice("4210.00")
-            .setSize("2")
+            .setOrder_id("abc12345-12345-12345-12345")
+            .setSymbol("SP500-USD")
+            .setPrice(4210.00)
+            .setQuantity(2.0)
             .build();
         reqObs.onNext(
             OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
@@ -133,10 +134,10 @@ func main() {
     // Send modify order
     stream.Send(&pb.OrdersStreamRequest{
         ModifyOrder: &pb.ModifyOrderRequest{
-            Action:  pb.ModifyOrderRequest_MODIFY,
-            OrderId: "order-12345",
-            Price:   "4210.00",
-            Size:    "2",
+            OrderId: "abc12345-12345-12345-12345",
+            Symbol:  "SP500-USD",
+            Price:   4210.00,
+            Size:    2,
         },
     })
     stream.CloseSend()
@@ -182,10 +183,10 @@ function modifyOrder() {
   // Modify an order by orderId
   call.write({
     modifyOrder: {
-      action: "MODIFY",
-      orderId: "order-12345",
-      price: "4210.00",
-      size: "2",
+      order_id: "abc12345-12345-12345-12345",
+      symbol: "SP500-USD",
+      price: 4210.00,
+      size: 2,
     },
   });
 

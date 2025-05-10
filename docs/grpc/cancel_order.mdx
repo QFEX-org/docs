@@ -20,9 +20,9 @@ import port_pb2_grpc
 import common_pb2
 
 def cancel_orders():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Cancel by orderId
     stub.CancellableStream(common_pb2.Empty(), metadata=metadata)  # initialize bidi if needed
@@ -30,8 +30,8 @@ stub = port_pb2_grpc.PortServiceStub(channel)
         iter([
             port_pb2.OrdersStreamRequest(
                 cancelOrder=port_pb2.CancelOrderRequest(
-                    action=port_pb2.CancelOrderRequest.CANCEL,
-                    orderId="order-12345",
+                    orderId="abc12345-12345-12345-12345",
+                    symbol="SP500-USD",
                 )
             )
         ]),
@@ -45,8 +45,8 @@ stub = port_pb2_grpc.PortServiceStub(channel)
         iter([
             port_pb2.OrdersStreamRequest(
                 cancelOrder=port_pb2.CancelOrderRequest(
-                    action=port_pb2.CancelOrderRequest.CANCEL,
                     clientOrderId="my-client-id-001",
+                    symbol="SP500-USD",
                 )
             )
         ]),
@@ -105,8 +105,8 @@ public class CancelOrderExample {
             OrdersStreamRequest.newBuilder()
                 .setCancelOrder(
                     CancelOrderRequest.newBuilder()
-                        .setAction(CancelOrderRequest.Action.CANCEL)
-                        .setOrderId("order-12345")
+                        .setOrderId("abc12345-12345-12345-12345")
+                        .setSymbol("SP500-USD")
                         .build()
                 )
                 .build()
@@ -117,8 +117,8 @@ public class CancelOrderExample {
             OrdersStreamRequest.newBuilder()
                 .setCancelOrder(
                     CancelOrderRequest.newBuilder()
-                        .setAction(CancelOrderRequest.Action.CANCEL)
                         .setClientOrderId("my-client-id-001")
+                        .setSymbol("SP500-USD")
                         .build()
                 )
                 .build()
@@ -165,16 +165,16 @@ func main() {
     // Cancel by orderId
     stream.Send(&pb.OrdersStreamRequest{
         CancelOrder: &pb.CancelOrderRequest{
-            Action:  pb.CancelOrderRequest_CANCEL,
-            OrderId: "order-12345",
+            OrderId: "abc12345-12345-12345-12345",
+            Symbol:  "SP500-USD",
         },
     })
 
     // Cancel by clientOrderId
     stream.Send(&pb.OrdersStreamRequest{
         CancelOrder: &pb.CancelOrderRequest{
-            Action:        pb.CancelOrderRequest_CANCEL,
             ClientOrderId: "my-client-id-001",
+            Symbol:        "SP500-USD",
         },
     })
     stream.CloseSend()
@@ -219,12 +219,18 @@ function cancelOrder() {
 
   // Cancel by orderId
   call.write({
-    cancelOrder: { action: "CANCEL", orderId: "order-12345" },
+    cancelOrder: {
+      orderId: "abc12345-12345-12345-12345",
+      symbol: "SP500-USD",
+    },
   });
 
   // Cancel by clientOrderId
   call.write({
-    cancelOrder: { action: "CANCEL", clientOrderId: "my-client-id-001" },
+    cancelOrder: {
+      clientOrderId: "my-client-id-001",
+      symbol: "SP500-USD",
+    },
   });
 
   call.end();
