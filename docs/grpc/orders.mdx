@@ -4,9 +4,10 @@ description: "Bidirectional streaming for sending orders and receiving order res
 ---
 
 <Note>
-  This example shows how to open a bidirectional [StreamOrders](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) to send order
-  commands (add, cancel, modify) and receive real-time order responses
-  (acknowledgements, fills, rejections).
+  This example shows how to open a bidirectional
+  [StreamOrders](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) to
+  send order commands (add, cancel, modify) and receive real-time order
+  responses (acknowledgements, fills, rejections).
 </Note>
 
 ### Enums
@@ -25,9 +26,9 @@ import port_pb2_grpc
 import common_pb2
 
 def stream_orders(): # Attach API key metadata
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
@@ -43,7 +44,7 @@ def stream_orders(): # Attach API key metadata
                 client_order_id="order-id-123"
             )
         )
-        # Modify an existing order. 
+        # Modify an existing order.
         yield port_pb2.OrdersStreamRequest(
             modify_order=port_pb2.ModifyOrderRequest(
                 order_id="abc12345-12345-12345-12345", # Note, for modifies we must use the order_id not client_order_id
@@ -65,8 +66,8 @@ def stream_orders(): # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-if __name__ == "__main__":
-    stream_orders()
+if **name** == "**main**":
+stream_orders()
 
 ````
 ```java java
@@ -293,7 +294,7 @@ function streamOrders() {
       modifyOrder: {
         orderId: "abc12345-12345-12345-12345", // Note, for modifies we must use the order_id not client_order_id
         symbol: "SP500-USD",
-        price: 560.60,
+        price: 560.6,
         quantity: 0.2,
       },
     },
@@ -327,10 +328,10 @@ streamOrders();
 
 </CodeGroup>
 
-
-## Example Response
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L171)
 
 ### Add Order
+
 ```proto
 order_id: "510333ac-3f7b-4d88-934a-4396d48824cc"
 symbol: "SP500-USD"
@@ -346,6 +347,7 @@ quantity_remaining: 0.1
 ```
 
 ### Modify Order
+
 ```proto
 order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
 symbol: "SP500-USD"
@@ -362,6 +364,7 @@ quantity_remaining: 0.2
 ```
 
 ### Cancel Order
+
 ```proto
 order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
 symbol: "SP500-USD"
