@@ -35,10 +35,10 @@ def stream_orders(): # Attach API key metadata
         yield port_pb2.OrdersStreamRequest(
             add_order=port_pb2.AddOrderRequest(
                 symbol="SP500-USD",
-                side=common_pb2.OrderSide.BUY,
+                side=common_pb2.OrderDirection.BUY,
                 type=common_pb2.OrderType.LIMIT,
                 time_in_force=common_pb2.OrderTimeInForce.GTC,
-                price=4200.50,
+                price=560.50,
                 quantity=0.1,
                 client_order_id="order-id-123"
             )
@@ -47,7 +47,8 @@ def stream_orders(): # Attach API key metadata
         yield port_pb2.OrdersStreamRequest(
             modify_order=port_pb2.ModifyOrderRequest(
                 order_id="abc12345-12345-12345-12345", # Note, for modifies we must use the order_id not client_order_id
-                price=4200.60,
+                symbol="SP500-USD",
+                price=560.60,
                 quantity=0.2
             )
         )
@@ -79,7 +80,7 @@ import port.OrdersStreamRequest;
 import port.OrderResponse;
 import port.AddOrderRequest;
 import port.CancelOrderRequest;
-import common.OrderSide;
+import common.OrderDirection;
 import common.OrderType;
 import common.OrderTimeInForce;
 
@@ -115,10 +116,10 @@ public class OrderStreamer {
         // Send add order
         AddOrderRequest add = AddOrderRequest.newBuilder()
             .setSymbol("SP500-USD")
-            .setSide(OrderSide.BUY)
+            .setSide(OrderDirection.BUY)
             .setType(OrderType.LIMIT)
             .setTimeInForce(OrderTimeInForce.GTC)
-            .setPrice(4200.50)
+            .setPrice(560.50)
             .setQuantity(0.1)
             .setClientOrderId("order-id-123")
             .build();
@@ -129,7 +130,8 @@ public class OrderStreamer {
         // Send modify order
         ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
             .setOrderId("abc12345-12345-12345-12345") // Note, for modifies we must use the order_id not client_order_id
-            .setPrice(4200.60)
+            .setSymbol("SP500-USD")
+            .setPrice(560.60)
             .setQuantity(0.2)
             .build();
         requestObserver.onNext(
@@ -139,6 +141,7 @@ public class OrderStreamer {
         // Send cancel order
         CancelOrderRequest cancel = CancelOrderRequest.newBuilder()
             .setClientOrderId("order-id-123") // Note, for cancels we can use either the client_order_id or order_id
+            .setSymbol("SP500-USD")
             .build();
         requestObserver.onNext(
             OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
@@ -192,10 +195,10 @@ func main() {
         stream.Send(&pb.OrdersStreamRequest{
             AddOrder: &pb.AddOrderRequest{
                 Symbol:         "SP500-USD",
-                Side:           pbCommon.OrderSide_BUY,
+                Side:           pbCommon.OrderDirection_BUY,
                 Type:           pbCommon.OrderType_LIMIT,
                 TimeInForce:    pbCommon.OrderTimeInForce_GTC,
-                Price:          4200.50,
+                Price:          560.50,
                 Size:           0.1,
                 ClientOrderId:  "order-id-123",
             },
@@ -204,7 +207,8 @@ func main() {
         stream.Send(&pb.OrdersStreamRequest{
             ModifyOrder: &pb.ModifyOrderRequest{
                 OrderId: "abc12345-12345-12345-12345",
-                Price:   4200.60,
+                Symbol:  "SP500-USD",
+                Price:   560.60,
                 Size:    0.2,
             },
         })
@@ -288,7 +292,8 @@ function streamOrders() {
     {
       modifyOrder: {
         orderId: "abc12345-12345-12345-12345", // Note, for modifies we must use the order_id not client_order_id
-        price: 4200.60,
+        symbol: "SP500-USD",
+        price: 560.60,
         quantity: 0.2,
       },
     },
@@ -321,3 +326,53 @@ streamOrders();
 ```
 
 </CodeGroup>
+
+
+## Example Response
+
+### Add Order
+```proto
+order_id: "510333ac-3f7b-4d88-934a-4396d48824cc"
+symbol: "SP500-USD"
+quantity: 0.1
+price: 560.5
+update_time {
+  seconds: 1746908349
+  nanos: 465551861
+}
+user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+client_order_id: "order-id-123"
+quantity_remaining: 0.1
+```
+
+### Modify Order
+```proto
+order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
+symbol: "SP500-USD"
+status: MODIFIED
+quantity: 0.2
+price: 560.6
+update_time {
+  seconds: 1746908577
+  nanos: 126561133
+}
+user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+client_order_id: "order-id-123"
+quantity_remaining: 0.2
+```
+
+### Cancel Order
+```proto
+order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
+symbol: "SP500-USD"
+status: CANCELLED
+quantity: 0.2
+price: 560.6
+update_time {
+  seconds: 1746908631
+  nanos: 805088248
+}
+user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+client_order_id: "order-id-123"
+quantity_remaining: 0.2
+```
