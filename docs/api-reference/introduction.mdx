@@ -23,17 +23,3 @@ All API calls must be authenticated with an **API Key**. You can create and mana
 <Frame>
   <img src="/images/generate_api_key.png" style={{ borderRadius: "0.5rem" }} />
 </Frame>
-
-Include your key in every request:
-
-- **gRPC**: Add an `api-key` metadata field.
-
-```http
-(api-key: YOUR_API_KEY_HERE)
-```
-
-- **WebSocket**: Add an `id` parameter to the request.
-
-```http
-id: YOUR_API_KEY_HERE
-```

@@ -7,6 +7,11 @@ title: "gRPC Overview"
   [QFEX-org/proto](https://github.com/QFEX-org/proto) repository.
 </Note>
 
+QFEX provides 2 endpoints for gRPC:
+- [mds.pfex.io](https://github.com/QFEX-org/proto/blob/main/market_data.proto) for public market and reference data.
+- [trade.pfex.io](https://github.com/QFEX-org/proto/blob/main/port.proto) for order entry and private data.
+These endpoints have a common set of [enums](https://github.com/QFEX-org/proto/blob/main/common.proto).
+
 ## Getting Started
 
 Clone the proto definitions and generate client code for your preferred language. Example for Python:
@@ -30,11 +35,10 @@ npm install @grpc/grpc-js @grpc/proto-loader
 
 ## Authentication
 
-All gRPC calls to the port service require an **API Key** sent as metadata.
+All gRPC calls to `trade.pfex.io` require an **API Key** sent as metadata.
 Read the [introduction](docs/api-reference/introduction) to learn how to get an API key.
+Then add it to the `api-key` metadata field in your gRPC client.
 
-## Proto Definitions
-
-- [common.proto](https://github.com/QFEX-org/proto/blob/main/common.proto)
-- [market_data.proto](https://github.com/QFEX-org/proto/blob/main/market_data.proto)
-- [port.proto](https://github.com/QFEX-org/proto/blob/main/market_data.proto)
+```http
+(api-key: YOUR_API_KEY_HERE)
+```
