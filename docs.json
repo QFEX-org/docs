@@ -41,7 +41,8 @@
                   "docs/grpc/orderbook",
                   "docs/grpc/trades",
                   "docs/grpc/bbo",
-                  "docs/grpc/underlier"
+                  "docs/grpc/underlier",
+                  "docs/grpc/funding_rate"
                 ]
               },
               {
