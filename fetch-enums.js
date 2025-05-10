@@ -3,7 +3,7 @@
 // Usage: node merge-enums.js
 // Reads a preamble from docs/api-reference/enums_pre.mdx,
 // fetches and parses all enums (with '///' block comments) from the three .proto files,
-// and writes the combined MDX to docs/api-reference/enums.mdx.
+// and writes the combined MDX to docs/api-reference/enums.mdx, including links to each enum's definition line.
 
 const https = require("https");
 const fs = require("fs");
@@ -16,11 +16,25 @@ const PREAMBLE_PATH = path.resolve(
 );
 const OUTPUT_PATH = path.resolve(__dirname, "docs/api-reference/enums.mdx");
 
-// Proto source URLs
-const PROTO_URLS = [
-  "https://raw.githubusercontent.com/QFEX-org/proto/main/common.proto",
-  "https://raw.githubusercontent.com/QFEX-org/proto/main/market_data.proto",
-  "https://raw.githubusercontent.com/QFEX-org/proto/main/port.proto",
+// Proto file specifications with raw and repo URLs
+const PROTO_SPECS = [
+  {
+    name: "common.proto",
+    rawUrl:
+      "https://raw.githubusercontent.com/QFEX-org/proto/main/common.proto",
+    repoUrl: "https://github.com/QFEX-org/proto/blob/main/common.proto",
+  },
+  {
+    name: "market_data.proto",
+    rawUrl:
+      "https://raw.githubusercontent.com/QFEX-org/proto/main/market_data.proto",
+    repoUrl: "https://github.com/QFEX-org/proto/blob/main/market_data.proto",
+  },
+  {
+    name: "port.proto",
+    rawUrl: "https://raw.githubusercontent.com/QFEX-org/proto/main/port.proto",
+    repoUrl: "https://github.com/QFEX-org/proto/blob/main/port.proto",
+  },
 ];
 
 // Fetch text over HTTPS
@@ -39,27 +53,27 @@ function fetchText(url) {
   });
 }
 
-// Parse enums with '///' leading description blocks
-function parseEnums(protoText) {
+// Parse enums with '///' description blocks, capturing file and line number
+function parseEnums(protoText, fileSpec) {
   const lines = protoText.split(/\r?\n/);
   const enums = [];
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
     if (trimmed.startsWith("enum ")) {
       const name = trimmed.split(/\s+/)[1];
       // Gather leading '///' description lines
       const descLines = [];
-      let k = i - 1;
+      let k = idx - 1;
       while (k >= 0 && lines[k].trim().startsWith("///")) {
         descLines.unshift(lines[k].trim().slice(3).trim());
         k--;
       }
-      const description = descLines.slice(1).join(" ");
-      // Collect enum members
+      const description = descLines.join(" ");
+      // Parse enum members until closing '}'
       const values = [];
-      i++;
-      while (i < lines.length && !lines[i].includes("}")) {
-        const m = lines[i]
+      for (let j = idx + 1; j < lines.length && !lines[j].includes("}"); j++) {
+        const m = lines[j]
           .trim()
           .match(/^([A-Z0-9_]+)\s*=\s*(\d+)\s*;(?:\s*\/\/\s*(.*))?/);
         if (m) {
@@ -70,19 +84,30 @@ function parseEnums(protoText) {
             description: inlineDesc || "",
           });
         }
-        i++;
       }
-      enums.push({ name, description, values });
+      enums.push({
+        name,
+        description,
+        values,
+        file: fileSpec.name,
+        line: idx + 1,
+        repoUrl: fileSpec.repoUrl,
+      });
     }
-  }
+  });
+
   return enums;
 }
 
-// Generate MDX sections for enums
+// Generate MDX sections for enums, including file link
 function generateSections(enums) {
   return enums.map((e) => {
     const header = [`## ${e.name}`, ""];
+    // Link to definition
+    const link = `${e.repoUrl}#L${e.line}`;
+    header.push(`[View definition in \`${e.file}\`](${link})`, "");
     if (e.description) header.push(e.description, "");
+
     const table = [
       "| Name | Value | Description |",
       "| ---- | ----- | ----------- |",
@@ -90,6 +115,7 @@ function generateSections(enums) {
         (v) => `| \`${v.name}\` | ${v.number} | ${v.description} |`
       ),
     ];
+
     return [...header, ...table].join("\n");
   });
 }
@@ -101,9 +127,9 @@ function generateSections(enums) {
 
     // Fetch and parse enums from all protos
     let allEnums = [];
-    for (const url of PROTO_URLS) {
-      const text = await fetchText(url);
-      allEnums = allEnums.concat(parseEnums(text));
+    for (const spec of PROTO_SPECS) {
+      const text = await fetchText(spec.rawUrl);
+      allEnums = allEnums.concat(parseEnums(text, spec));
     }
 
     // Build output MDX
