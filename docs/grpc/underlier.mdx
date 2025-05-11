@@ -2,9 +2,11 @@
 title: "Underlier Price"
 ---
 
-[Underlier RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12) provides a pulsed underlier price stream, aggregated over multiple exchanges. It is used in the funding calculation. 
+[Underlier RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12) provides a pulsed underlier price stream, aggregated over multiple exchanges. It is used in the funding calculation.
 
-## Sample Code 
+<Note>Outside of extended market hours, the underlier price will not be returned.</Note>
+
+## Sample Code
 
 <CodeGroup>
 ```python python
@@ -58,8 +60,7 @@ import (
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
-    pbCommon "path/to/proto/common"
-    pb "path/to/proto/market_data"
+    pb "github.com/QFEX-org/proto/market_data"
 )
 
 func main() {
@@ -72,7 +73,7 @@ func main() {
 
     client := pb.NewMarketDataServiceClient(conn)
 
-    stream, err := client.GetUnderlier(context.Background(), &pbCommon.GetSymbol{Symbol: "SP500-USD"})
+    stream, err := client.GetUnderlier(context.Background(), &pb.GetSymbol{Symbol: "SP500-USD"})
     if err != nil {
         log.Fatalf("error on GetUnderlier: %v", err)
     }
@@ -118,7 +119,7 @@ function streamBbo() {
     grpc.credentials.createSsl()
   );
 
-  const call = client.getUnderlier({symbol: "SP500-USD"});
+  const call = client.getUnderlier({ symbol: "SP500-USD" });
   call.on("data", (underlier) => {
     console.log(underlier);
   });
@@ -133,6 +134,7 @@ streamBbo();
 </CodeGroup>
 
 ## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12)
+
 ```proto
 symbol: "SP500-USD"
 price: 566.6

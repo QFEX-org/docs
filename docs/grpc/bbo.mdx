@@ -60,8 +60,8 @@ import (
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
-    pbCommon "path/to/proto/common"
-    pb "path/to/proto/market_data"
+    pbCommon "github.com/QFEX-org/proto/common"
+    pb "github.com/QFEX-org/proto/market_data"
 )
 
 func main() {
@@ -137,5 +137,18 @@ streamBbo();
 ## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L35)
 
 ```proto
-todo
+symbol: "NVDA-USD"  
+timestamp {
+    seconds:1746989556  
+    nanos:92588003
+}
+bids {
+    price:116.1  
+    quantity:6.882
+}
+asks {
+    price:116.7 
+    quantity:6.847
+}
+sequence: 7262686
 ```

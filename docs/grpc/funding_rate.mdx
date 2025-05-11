@@ -4,6 +4,8 @@ title: "Funding Rate"
 
 [Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L13) provides a stream of the current funding rate for a symbol, if the funding window were to end now. The funding rate value at the end of a funding window is used to compute funding payments.
 
+<Note>Outside of extended market hours, the funding rate is 0 and will not be returned.</Note>
+
 ## Sample Code
 
 <CodeGroup>

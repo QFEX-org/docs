@@ -58,8 +58,8 @@ import (
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
-    pbCommon "path/to/proto/common"
-    pb "path/to/proto/market_data"
+    pbCommon "github.com/QFEX-org/proto/common"
+    pbMD "github.com/QFEX-org/proto/market_data"
 )
 
 func main() {
@@ -70,7 +70,7 @@ func main() {
     }
     defer conn.Close()
 
-    client := pb.NewMarketDataServiceClient(conn)
+    client := pbMD.NewMarketDataServiceClient(conn)
 
     resp, err := client.GetRefData(context.Background(), &pbCommon.Empty{})
     if err != nil {

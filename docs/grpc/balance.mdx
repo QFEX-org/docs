@@ -76,15 +76,20 @@ import (
     "fmt"
     "io"
     "log"
-
+    "os"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
-    pbCommon "path/to/proto/common"
-    pb "path/to/proto/port"
+    pbCommon "github.com/QFEX-org/proto/common"
+    pb "github.com/QFEX-org/proto/port"
 )
 
 func main() {
+    apiKey := os.Getenv("QFEX_API_KEY")
+    if apiKey == "" {
+        log.Fatal("QFEX_API_KEY environment variable not set")
+    }
+
     creds := credentials.NewClientTLSFromCert(nil, "")
     conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
     if err != nil {
@@ -93,7 +98,7 @@ func main() {
     defer conn.Close()
 
     client := pb.NewPortServiceClient(conn)
-    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
     stream, err := client.GetUserBalance(ctx, &pbCommon.Empty{})
     if err != nil {

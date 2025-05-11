@@ -58,8 +58,7 @@ import (
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
-    "google.golang.org/grpc/metadata"
-    pb "path/to/proto/market_data"
+    pb "github.com/QFEX-org/proto/market_data"
 
 )
 
@@ -85,9 +84,7 @@ func main() {
         }
         fmt.Println(book)
     }
-
 }
-
 ```
 
 ```javascript node
