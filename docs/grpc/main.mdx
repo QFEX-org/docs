@@ -3,11 +3,12 @@ title: "gRPC Overview"
 ---
 
 <Note>
-  This section documents our gRPC services based on the protobuf definitions in the
-  [QFEX-org/proto](https://github.com/QFEX-org/proto) repository.
+  This section documents our gRPC services based on the protobuf definitions in
+  the [QFEX-org/proto](https://github.com/QFEX-org/proto) repository.
 </Note>
 
 QFEX provides 2 endpoints for gRPC:
+
 - [mds.pfex.io](https://github.com/QFEX-org/proto/blob/main/market_data.proto) for public market and reference data.
 - [trade.pfex.io](https://github.com/QFEX-org/proto/blob/main/port.proto) for order entry and private data.
 
@@ -15,24 +16,33 @@ These endpoints have a common set of [enums](/docs/api-reference/enums).
 
 ## Getting Started
 
-Clone the proto definitions and generate client code for your preferred language. Example for Python:
+Clone the proto definitions and generate client code for your preferred language.
 
-```bash
-git clone https://github.com/QFEX-org/proto.git
-cd proto
-pip install grpcio grpcio-tools googleapis-common-protos
-python -m grpc_tools.protoc \
-  -I. \
-  --python_out=../client/ \
-  --grpc_python_out=../client/ \
-  common.proto market_data.proto port.proto
-```
-
-For Node.js projects, install:
-
-```bash
-npm install @grpc/grpc-js @grpc/proto-loader
-```
+<AccordionGroup>
+  <Accordion icon="python" title="Setup python">
+    ```bash 
+    git clone https://github.com/QFEX-org/proto.git 
+    cd proto 
+    pip install
+    
+    grpcio grpcio-tools googleapis-common-protos python -m grpc_tools.protoc \
+    -I. \ --python_out=../client/ \ --grpc_python_out=../client/ \ common.proto
+    market_data.proto port.proto 
+    ```
+  </Accordion>
+  <Accordion icon="node" title="Setup Node">
+    ```bash 
+    npm install @grpc/grpc-js @grpc/proto-loader 
+    ```
+  </Accordion>
+  <Accordion icon="golang" title="Setup Go">
+    ```bash 
+    go get google.golang.org/protobuf/cmd/protoc-gen-go@latest 
+    go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest 
+    go get github.com/QFEX-org/proto@main
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## Authentication
 
