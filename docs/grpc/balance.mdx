@@ -28,34 +28,44 @@ if __name__ == '__main__':
 
 ````
 ```java java
+package com.qfex;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import common.Empty;
-import port.PortServiceGrpc;
-import port.BalancePublic;
+import com.qfex.market_data.MarketDataServiceGrpc;
+import com.qfex.market_data.GetSymbol;
+import com.qfex.common.Empty;
+import com.qfex.port.PortServiceGrpc;
+import com.qfex.port.BalancePublic;
 
 public class BalanceStreamer {
     public static void main(String[] args) {
+        String apiKeyValue = System.getenv("QFEX_API_KEY");
+        if (apiKeyValue == null || apiKeyValue.isEmpty()) {
+            System.err.println("ERROR: QFEX_API_KEY not set");
+            System.exit(1);
+        }
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
+                .useTransportSecurity()
+                .build();
 
         Metadata metadata = new Metadata();
         Metadata.Key<String> apiKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
-        metadata.put(apiKey, API_KEY);
+        metadata.put(apiKey, apiKeyValue);
 
         PortServiceGrpc.PortServiceBlockingStub stub =
-            PortServiceGrpc.newBlockingStub(channel)
-                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+                PortServiceGrpc.newBlockingStub(channel)
+                        .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
         stub.getUserBalance(Empty.newBuilder().build())
-            .forEachRemaining(bal -> System.out.println(bal));
+                .forEachRemaining(bal -> System.out.println(bal));
 
         channel.shutdown();
     }
 }
+
 ````
 
 ```go go

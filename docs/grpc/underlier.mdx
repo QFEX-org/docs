@@ -27,10 +27,10 @@ if __name__ == '__main__':
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import common.GetSymbol;
-import market_data.MarketDataServiceGrpc;
-import market_data.OrderBook;
+import com.qfex.market_data.MarketDataServiceGrpc;
+import com.qfex.market_data.Underlier;
 
-public class BboStreamer {
+public class UnderlierStreamer {
     public static void main(String[] args) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
             .useTransportSecurity()

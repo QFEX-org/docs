@@ -106,76 +106,83 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
-import port.PortServiceGrpc;
-import port.OrdersStreamRequest;
-import port.OrderResponse;
-import port.AddOrderRequest;
-import port.CancelOrderRequest;
-import common.OrderDirection;
-import common.OrderType;
-import common.OrderTimeInForce;
+import com.qfex.port.PortServiceGrpc;
+import com.qfex.port.OrdersStreamRequest;
+import com.qfex.port.OrderResponse;
+import com.qfex.port.AddOrderRequest;
+import com.qfex.port.ModifyOrderRequest;
+import com.qfex.port.CancelOrderRequest;
+import com.qfex.common.OrderDirection;
+import com.qfex.common.OrderType;
+import com.qfex.common.OrderTimeInForce;
 
 public class OrderStreamer {
     public static void main(String[] args) throws InterruptedException {
+        String apiKeyValue = System.getenv("QFEX_API_KEY");
+        if (apiKeyValue == null || apiKeyValue.isEmpty()) {
+            System.err.println("ERROR: QFEX_API_KEY not set");
+            System.exit(1);
+        }
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
+                .useTransportSecurity()
+                .build();
 
         Metadata metadata = new Metadata();
-        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), apiKeyValue);
 
         PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
         StreamObserver<OrdersStreamRequest> requestObserver = stub.streamOrders(
-            new StreamObserver<OrderResponse>() {
-                @Override
-                public void onNext(OrderResponse value) {
-                    System.out.println("Received: " + value);
+                new StreamObserver<OrderResponse>() {
+                    @Override
+                    public void onNext(OrderResponse value) {
+                        System.out.println("Received: " + value);
+                    }
+                    @Override
+                    public void onError(Throwable t) {
+                        t.printStackTrace();
+                    }
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("Stream completed");
+                    }
                 }
-                @Override
-                public void onError(Throwable t) {
-                    t.printStackTrace();
-                }
-                @Override
-                public void onCompleted() {
-                    System.out.println("Stream completed");
-                }
-            }
         );
 
         // Send add order
         AddOrderRequest add = AddOrderRequest.newBuilder()
-            .setSymbol("SP500-USD")
-            .setSide(OrderDirection.BUY)
-            .setType(OrderType.LIMIT)
-            .setTimeInForce(OrderTimeInForce.GTC)
-            .setPrice(560.50)
-            .setQuantity(0.1)
-            .setClientOrderId("order-id-123")
-            .build();
+                .setSymbol("SP500-USD")
+                .setSide(OrderDirection.BUY)
+                .setType(OrderType.LIMIT)
+                .setTimeInForce(OrderTimeInForce.GTC)
+                .setPrice(560.50)
+                .setQuantity(0.1)
+                .setClientOrderId("order-id-123")
+                .build();
         requestObserver.onNext(
-            OrdersStreamRequest.newBuilder().setAddOrder(add).build()
+                OrdersStreamRequest.newBuilder().setAddOrder(add).build()
         );
 
         // Send modify order
         ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
-            .setOrderId("abc12345-12345-12345-12345") // Note, for modifies we must use the order_id not client_order_id
-            .setSymbol("SP500-USD")
-            .setPrice(560.60)
-            .setQuantity(0.2)
-            .build();
+                .setOrderId("abc12345-12345-12345-12345") // Note, for modifies we must use the order_id not client_order_id
+                .setSymbol("SP500-USD")
+                .setPrice(560.60)
+                .setQuantity(0.2)
+                .build();
         requestObserver.onNext(
-            OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
+                OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
         );
 
         // Send cancel order
         CancelOrderRequest cancel = CancelOrderRequest.newBuilder()
-            .setClientOrderId("order-id-123") // Note, for cancels we can use either the client_order_id or order_id
-            .setSymbol("SP500-USD")
-            .build();
+                .setClientOrderId("order-id-123") // Note, for cancels we can use either the client_order_id or order_id
+                .setSymbol("SP500-USD")
+                .build();
         requestObserver.onNext(
-            OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
+                OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
         );
 
         // Mark end of requests

@@ -28,30 +28,29 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import market_data.MarketDataServiceGrpc;
-import market_data.MarketData.GetSymbol;
-import market_data.Trade;
+import com.qfex.market_data.MarketDataServiceGrpc;
+import com.qfex.market_data.GetSymbol;
+import com.qfex.market_data.Trade;
 
 public class TradeStreamer {
     public static void main(String[] args) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
+                .useTransportSecurity()
+                .build();
 
         MarketDataServiceGrpc.MarketDataServiceBlockingStub stub =
-            MarketDataServiceGrpc.newBlockingStub(channel);
+                MarketDataServiceGrpc.newBlockingStub(channel);
 
         GetSymbol request = GetSymbol.newBuilder()
-            .setSymbol("SP500-USD")
-            .build();
+                .setSymbol("SP500-USD")
+                .build();
 
-        for (Trade trade : stub.getTrades(request)) {
-            System.out.println(trade);
-        }
+        stub.getTrades(request).forEachRemaining(trade -> System.out.println(trade));
 
         channel.shutdown();
     }
 }
+
 ````
 
 ```go go

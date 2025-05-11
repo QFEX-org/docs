@@ -32,31 +32,35 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import common.Empty;
-import port.PortServiceGrpc;
-import port.PositionsPublic;
+import com.qfex.common.Empty;
+import com.qfex.port.PortServiceGrpc;
 
 public class PositionStreamer {
     public static void main(String[] args) {
+        String apiKeyValue = System.getenv("QFEX_API_KEY");
+        if (apiKeyValue == null || apiKeyValue.isEmpty()) {
+            System.err.println("ERROR: QFEX_API_KEY not set");
+            System.exit(1);
+        }
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
+                .useTransportSecurity()
+                .build();
 
         Metadata metadata = new Metadata();
         Metadata.Key<String> apiKey = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
-        metadata.put(apiKey, API_KEY);
+        metadata.put(apiKey, apiKeyValue);
 
         PortServiceGrpc.PortServiceBlockingStub stub =
-            PortServiceGrpc.newBlockingStub(channel)
-                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+                PortServiceGrpc.newBlockingStub(channel)
+                        .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
         stub.getUserPositions(Empty.newBuilder().build())
-            .forEachRemaining(pos -> System.out.println(pos));
+                .forEachRemaining(pos -> System.out.println(pos));
 
         channel.shutdown();
     }
-}
-````
+}````
 
 ```go go
 package main

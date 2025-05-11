@@ -27,9 +27,9 @@ if __name__ == '__main__':
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
-import market_data.MarketDataServiceGrpc;
-import market_data.MarketData.GetSymbol;
-import market_data.MarketData.OrderBook;
+import com.qfex.market_data.MarketDataServiceGrpc;
+import com.qfex.market_data.GetSymbol;
+import com.qfex.market_data.OrderBook;
 
 public class OrderBookStreamer {
     public static void main(String[] args) {
@@ -37,14 +37,12 @@ public class OrderBookStreamer {
             .useTransportSecurity()
             .build();
 
-        MarketDataServiceGrpc.MarketDataServiceStub stub =
-            MarketDataServiceGrpc.newStub(channel);
+        MarketDataServiceGrpc.MarketDataServiceBlockingStub stub =
+            MarketDataServiceGrpc.newBlockingStub(channel);
 
-        GetSymbol request = GetSymbol.newBuilder()
-            .setSymbol("SP500-USD")
-            .build();
+        stub.getOrderBook(GetSymbol.newBuilder().setSymbol("SP500-USD").build())
+            .forEachRemaining(book -> System.out.println(book));
 
-        stub.getOrderBook(request).forEachRemaining(book -> System.out.println(book));
         channel.shutdown();
     }
 }
