@@ -1,9 +1,47 @@
 ---
-title: "Streaming Orders"
-description: "Bidirectional streaming for sending orders and receiving order responses via [StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9)"
+title: "Order Entry"
+description: "[StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) provides a bidirectional streaming interface for sending Add, Modify, and Cancel order requests and receiving responses."
 ---
 
-## Example: Streaming Orders
+## Example Requests 
+
+### [Add Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L27)
+
+```proto
+fill this out
+```
+
+### [Modify Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L46)
+<Note>
+  You can only modify orders by **`orderId`**. 
+  
+  This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
+  cancel the order and re-add it.
+
+  You cannot modify an order that has been partially filled.
+</Note>
+
+```proto
+fill this out
+```
+
+### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L38)
+<Note>
+  You can cancel an order in two ways: 
+  
+  1. **By `order_id`**: Cancels the single
+  order matching that unique identifier. 
+  
+  2. **By `client_order_id`**: Cancels _all_ orders 
+  for your account that share the same client_order_id. Uniqueness is
+  not enforced, so multiple orders may be cancelled at once.
+</Note>
+
+```proto
+fill this out
+```
+
+## Sample Code
 
 <CodeGroup>
 ```python python
@@ -319,14 +357,14 @@ streamOrders();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L171)
-
-### [Add Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L27)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L84)
+This response is for an Add Order request. For Modify and Cancel requests, the response will be the same but with the `status` field set to `MODIFIED` or `CANCELLED` respectively.
 
 ```proto
 order_id: "510333ac-3f7b-4d88-934a-4396d48824cc"
 symbol: "SP500-USD"
 quantity: 0.1
+status: ACK
 price: 560.5
 update_time {
   seconds: 1746908349
@@ -335,38 +373,4 @@ update_time {
 user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
 client_order_id: "order-id-123"
 quantity_remaining: 0.1
-```
-
-### [Modify Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L47)
-
-```proto
-order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
-symbol: "SP500-USD"
-status: MODIFIED
-quantity: 0.2
-price: 560.6
-update_time {
-  seconds: 1746908577
-  nanos: 126561133
-}
-user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
-client_order_id: "order-id-123"
-quantity_remaining: 0.2
-```
-
-### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L37)
-
-```proto
-order_id: "e486bf5b-15cb-49e5-848c-8eb29f295f0f"
-symbol: "SP500-USD"
-status: CANCELLED
-quantity: 0.2
-price: 560.6
-update_time {
-  seconds: 1746908631
-  nanos: 805088248
-}
-user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
-client_order_id: "order-id-123"
-quantity_remaining: 0.2
 ```

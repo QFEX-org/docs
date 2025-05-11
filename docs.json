@@ -52,8 +52,6 @@
                   "docs/grpc/positions",
                   "docs/grpc/balance",
                   "docs/grpc/get_orders",
-                  "docs/grpc/cancel_order",
-                  "docs/grpc/modify_order"
                 ]
               }
             ]
