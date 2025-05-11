@@ -13,15 +13,16 @@ title: "Order Entry"
 import os
 
 import grpc
-import port_pb2
-import port_pb2_grpc
-import common_pb2
+from port import port_pb2
+from port import port_pb2_grpc
+from common import common_pb2
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-def stream_orders(): # Attach API key metadata
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+
+def stream_orders():  # Attach API key metadata
+    metadata = (("api-key", API_KEY),)
+    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
@@ -33,9 +34,9 @@ def stream_orders(): # Attach API key metadata
                 side=common_pb2.OrderDirection.BUY,
                 type=common_pb2.OrderType.LIMIT,
                 time_in_force=common_pb2.OrderTimeInForce.GTC,
-                price=560.50,
+                price=530.50,
                 quantity=0.1,
-                client_order_id="order-id-123"
+                client_order_id="order-id-123",
             )
         )
 
@@ -44,7 +45,8 @@ def stream_orders(): # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     stream_orders()
 
 ````
@@ -105,7 +107,7 @@ public class OrderStreamer {
                 .setSide(OrderDirection.BUY)
                 .setType(OrderType.LIMIT)
                 .setTimeInForce(OrderTimeInForce.GTC)
-                .setPrice(560.50)
+                .setPrice(530.50)
                 .setQuantity(0.1)
                 .setClientOrderId("order-id-123")
                 .build();
@@ -131,15 +133,20 @@ import (
     "fmt"
     "io"
     "log"
-
+    "os"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
-    pb "path/to/proto/port"
-    pbCommon "path/to/proto/common"
+    pb "github.com/QFEX-org/proto/port"
+    pbCommon "github.com/QFEX-org/proto/common"
 )
 
 func main() {
+    apiKey := os.Getenv("QFEX_API_KEY")
+    if apiKey == "" {
+        log.Fatal("QFEX_API_KEY environment variable not set")
+    }
+
     creds := credentials.NewClientTLSFromCert(nil, "")
     conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
     if err != nil {
@@ -148,27 +155,32 @@ func main() {
     defer conn.Close()
 
     client := pb.NewPortServiceClient(conn)
-    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
     stream, err := client.StreamOrders(ctx)
     if err != nil {
         log.Fatalf("error on StreamOrders: %v", err)
     }
 
+	clientOID := "order-id-123"
+
+
     // Send commands concurrently
     go func() {
         // Add a limit buy order
         stream.Send(&pb.OrdersStreamRequest{
-            AddOrder: &pb.AddOrderRequest{
-                Symbol:         "SP500-USD",
-                Side:           pbCommon.OrderDirection_BUY,
-                Type:           pbCommon.OrderType_LIMIT,
-                TimeInForce:    pbCommon.OrderTimeInForce_GTC,
-                Price:          560.50,
-                Size:           0.1,
-                ClientOrderId:  "order-id-123",
-            },
-        })
+			RequestType: &pb.OrdersStreamRequest_AddOrder{
+				AddOrder: &pb.AddOrderRequest{
+                    Symbol:         "SP500-USD",
+                    Side:           pbCommon.OrderDirection_BUY,
+                    Type:           pbCommon.OrderType_LIMIT,
+                    TimeInForce:    pbCommon.OrderTimeInForce_GTC,
+                    Price:          560.50,
+                    Quantity:       0.1,
+                    ClientOrderId:  &clientOID,
+				},
+			},
+		})
         stream.CloseSend()
     }()
 
@@ -247,209 +259,8 @@ streamOrders();
 
 </CodeGroup>
 
-### [Modify Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L46)
-<Note>
-  You can only modify orders by **`orderId`**. 
-  
-  This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
-  cancel the order and re-add it.
-
-  You cannot modify an order that has been partially filled.
-</Note>
-
-<CodeGroup>
-```python python
-import os
-
-import grpc
-import port_pb2
-import port_pb2_grpc
-import common_pb2
-
-API_KEY = os.getenv("QFEX_API_KEY")
-
-def modify_order():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-
-    def request_generator():
-        # Modify an existing limit order
-        yield port_pb2.OrdersStreamRequest(
-            modify_order=port_pb2.ModifyOrderRequest(
-                order_id="order-12345",
-                symbol="SP500-USD",
-                price=4210.00,
-                size=2.0
-            )
-        )
-
-    responses = stub.StreamOrders(request_generator(), metadata=metadata)
-    for resp in responses:
-        print("Response:", resp)
-
-if __name__ == '__main__':
-    modify_order()
-
-````
-```java java
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
-import io.grpc.stub.StreamObserver;
-import port.PortServiceGrpc;
-import port.OrdersStreamRequest;
-import port.OrderResponse;
-import port.ModifyOrderRequest;
-
-public class ModifyOrderExample {
-    public static void main(String[] args) throws InterruptedException {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
-
-        Metadata metadata = new Metadata();
-        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
-
-        PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
-
-        StreamObserver<OrdersStreamRequest> reqObs = stub.streamOrders(
-            new StreamObserver<OrderResponse>() {
-                @Override
-                public void onNext(OrderResponse resp) {
-                    System.out.println("Received: " + resp);
-                }
-                @Override
-                public void onError(Throwable t) {
-                    t.printStackTrace();
-                }
-                @Override
-                public void onCompleted() {
-                    System.out.println("Stream completed");
-                }
-            }
-        );
-
-        // Send modify order request
-        ModifyOrderRequest mod = ModifyOrderRequest.newBuilder()
-            .setOrder_id("abc12345-12345-12345-12345")
-            .setSymbol("SP500-USD")
-            .setPrice(4210.00)
-            .setQuantity(2.0)
-            .build();
-        reqObs.onNext(
-            OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
-        );
-
-        reqObs.onCompleted();
-        Thread.sleep(500);
-        channel.shutdown();
-    }
-}
-````
-
-```go go
-package main
-
-import (
-    "context"
-    "fmt"
-    "io"
-    "log"
-
-    "google.golang.org/grpc"
-    "google.golang.org/grpc/credentials"
-    "google.golang.org/grpc/metadata"
-    pb "path/to/proto/port"
-)
-
-func main() {
-    creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
-    if err != nil {
-        log.Fatalf("did not connect: %v", err)
-    }
-    defer conn.Close()
-
-    client := pb.NewPortServiceClient(conn)
-    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
-
-    stream, err := client.StreamOrders(ctx)
-    if err != nil {
-        log.Fatalf("error on StreamOrders: %v", err)
-    }
-
-    // Send modify order
-    stream.Send(&pb.OrdersStreamRequest{
-        ModifyOrder: &pb.ModifyOrderRequest{
-            OrderId: "abc12345-12345-12345-12345",
-            Symbol:  "SP500-USD",
-            Price:   4210.00,
-            Size:    2,
-        },
-    })
-    stream.CloseSend()
-
-    // Receive response
-    for {
-        resp, err := stream.Recv()
-        if err == io.EOF {
-            break
-        }
-        fmt.Println("Response:", resp)
-    }
-}
-```
-
-```javascript node
-const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
-
-const portDef = protoLoader.loadSync("port.proto", {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-});
-const portProto = grpc.loadPackageDefinition(portDef).port;
-
-function modifyOrder() {
-  const client = new portProto.PortService(
-    "trade.pfex.io:443",
-    grpc.credentials.createSsl()
-  );
-
-  const metadata = new grpc.Metadata();
-  metadata.add("api-key", API_KEY);
-
-  const call = client.streamOrders(metadata);
-
-  call.on("data", (resp) => console.log("Response:", resp));
-  call.on("end", () => console.log("Stream ended"));
-
-  // Modify an order by orderId
-  call.write({
-    modifyOrder: {
-      order_id: "abc12345-12345-12345-12345",
-      symbol: "SP500-USD",
-      price: 4210.0,
-      size: 2,
-    },
-  });
-
-  call.end();
-}
-
-modifyOrder();
-```
-
-</CodeGroup>
-
-
 ### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L38)
+
 <Note>
   You can cancel an order in two ways: 
   
@@ -466,50 +277,36 @@ modifyOrder();
 import os
 
 import grpc
-import port_pb2
-import port_pb2_grpc
-import common_pb2
+from port import port_pb2
+from port import port_pb2_grpc
+from common import common_pb2
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-def cancel_orders():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+
+def stream_orders():  # Attach API key metadata
+    metadata = (("api-key", API_KEY),)
+    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
 
-    # Cancel by orderId
-    stub.CancellableStream(common_pb2.Empty(), metadata=metadata)  # initialize bidi if needed
-    responses = stub.StreamOrders(
-        iter([
-            port_pb2.OrdersStreamRequest(
-                cancelOrder=port_pb2.CancelOrderRequest(
-                    orderId="abc12345-12345-12345-12345",
-                    symbol="SP500-USD",
-                )
+    # Generator for sending requests
+    def request_generator():
+        # Cancenl an buy order
+        yield port_pb2.OrdersStreamRequest(
+            cancel_order=port_pb2.CancelOrderRequest(
+                symbol="SP500-USD",
+                client_order_id="order-id-123",
             )
-        ]),
-        metadata=metadata
-    )
-    for resp in responses:
-        print(resp)
+        )
 
-    # Cancel by clientOrderId
-    responses = stub.StreamOrders(
-        iter([
-            port_pb2.OrdersStreamRequest(
-                cancelOrder=port_pb2.CancelOrderRequest(
-                    clientOrderId="my-client-id-001",
-                    symbol="SP500-USD",
-                )
-            )
-        ]),
-        metadata=metadata
-    )
-    for resp in responses:
-        print(resp)
+    # Bidirectional streaming call
+    responses = stub.StreamOrders(request_generator(), metadata=metadata)
+    for response in responses:
+        print("Response:", response)
 
-if __name__ == '__main__':
-    cancel_orders()
+
+if __name__ == "__main__":
+    stream_orders()
 
 ````
 ```java java
@@ -518,67 +315,65 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
-import port.PortServiceGrpc;
-import port.OrdersStreamRequest;
-import port.OrderResponse;
-import port.CancelOrderRequest;
+import com.qfex.port.PortServiceGrpc;
+import com.qfex.port.OrdersStreamRequest;
+import com.qfex.port.OrderResponse;
+import com.qfex.port.AddOrderRequest;
+import com.qfex.port.ModifyOrderRequest;
+import com.qfex.port.CancelOrderRequest;
+import com.qfex.common.OrderDirection;
+import com.qfex.common.OrderType;
+import com.qfex.common.OrderTimeInForce;
 
-public class CancelOrderExample {
+public class OrderStreamer {
     public static void main(String[] args) throws InterruptedException {
+        String apiKeyValue = System.getenv("QFEX_API_KEY");
+        if (apiKeyValue == null || apiKeyValue.isEmpty()) {
+            System.err.println("ERROR: QFEX_API_KEY not set");
+            System.exit(1);
+        }
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
-            .useTransportSecurity()
-            .build();
+                .useTransportSecurity()
+                .build();
 
         Metadata metadata = new Metadata();
-        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), API_KEY);
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), apiKeyValue);
 
         PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
-        // Bidirectional stream for cancel requests
-        StreamObserver<OrdersStreamRequest> reqObs = stub.streamOrders(
-            new StreamObserver<OrderResponse>() {
-                @Override
-                public void onNext(OrderResponse resp) {
-                    System.out.println("Response: " + resp);
+        StreamObserver<OrdersStreamRequest> requestObserver = stub.streamOrders(
+                new StreamObserver<OrderResponse>() {
+                    @Override
+                    public void onNext(OrderResponse value) {
+                        System.out.println("Received: " + value);
+                    }
+                    @Override
+                    public void onError(Throwable t) {
+                        t.printStackTrace();
+                    }
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("Stream completed");
+                    }
                 }
-                @Override
-                public void onError(Throwable t) {
-                    t.printStackTrace();
-                }
-                @Override
-                public void onCompleted() {
-                    System.out.println("Stream ended");
-                }
-            }
         );
 
-        // Cancel by orderId
-        reqObs.onNext(
-            OrdersStreamRequest.newBuilder()
-                .setCancelOrder(
-                    CancelOrderRequest.newBuilder()
-                        .setOrderId("abc12345-12345-12345-12345")
-                        .setSymbol("SP500-USD")
-                        .build()
-                )
-                .build()
+        // Send cancel order
+        CancelOrderRequest cancel = CancelOrderRequest.newBuilder()
+                .setSymbol("SP500-USD")
+                .setClientOrderId("order-id-123")
+                .build();
+        requestObserver.onNext(
+                OrdersStreamRequest.newBuilder().setCancelOrder(cancel).build()
         );
 
-        // Cancel by clientOrderId
-        reqObs.onNext(
-            OrdersStreamRequest.newBuilder()
-                .setCancelOrder(
-                    CancelOrderRequest.newBuilder()
-                        .setClientOrderId("my-client-id-001")
-                        .setSymbol("SP500-USD")
-                        .build()
-                )
-                .build()
-        );
+        // Mark end of requests
+        requestObserver.onCompleted();
 
-        reqObs.onCompleted();
-        Thread.sleep(500);
+        // Wait for responses
+        Thread.sleep(1000);
         channel.shutdown();
     }
 }
@@ -592,14 +387,20 @@ import (
     "fmt"
     "io"
     "log"
-
+    "os"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
-    pb "path/to/proto/port"
+    pb "github.com/QFEX-org/proto/port"
+    pbCommon "github.com/QFEX-org/proto/common"
 )
 
 func main() {
+    apiKey := os.Getenv("QFEX_API_KEY")
+    if apiKey == "" {
+        log.Fatal("QFEX_API_KEY environment variable not set")
+    }
+
     creds := credentials.NewClientTLSFromCert(nil, "")
     conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
     if err != nil {
@@ -608,35 +409,35 @@ func main() {
     defer conn.Close()
 
     client := pb.NewPortServiceClient(conn)
-    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", API_KEY)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
     stream, err := client.StreamOrders(ctx)
     if err != nil {
         log.Fatalf("error on StreamOrders: %v", err)
     }
 
-    // Cancel by orderId
-    stream.Send(&pb.OrdersStreamRequest{
-        CancelOrder: &pb.CancelOrderRequest{
-            OrderId: "abc12345-12345-12345-12345",
-            Symbol:  "SP500-USD",
-        },
-    })
+    // Send commands concurrently
+    go func() {
+        // Add a limit buy order
+        stream.Send(&pb.OrdersStreamRequest{
+			RequestType: &pb.OrdersStreamRequest_CancelOrder{
+				CancelOrder: &pb.CancelOrderRequest{
+                    Symbol:         "SP500-USD",
+                    ClientOrderId:  "order-id-123",
+				},
+			},
+		})
+        stream.CloseSend()
+    }()
 
-    // Cancel by clientOrderId
-    stream.Send(&pb.OrdersStreamRequest{
-        CancelOrder: &pb.CancelOrderRequest{
-            ClientOrderId: "my-client-id-001",
-            Symbol:        "SP500-USD",
-        },
-    })
-    stream.CloseSend()
-
-    // Read responses
+    // Receive responses
     for {
         resp, err := stream.Recv()
         if err == io.EOF {
             break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
         }
         fmt.Println("Response:", resp)
     }
@@ -644,11 +445,12 @@ func main() {
 ```
 
 ```javascript node
+require("dotenv").config();
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
 const portDef = protoLoader.loadSync("port.proto", {
-  keepCase: true,
+  keepCase: false,
   longs: String,
   enums: String,
   defaults: true,
@@ -656,40 +458,292 @@ const portDef = protoLoader.loadSync("port.proto", {
 });
 const portProto = grpc.loadPackageDefinition(portDef).port;
 
-function cancelOrder() {
+function streamOrders() {
   const client = new portProto.PortService(
     "trade.pfex.io:443",
     grpc.credentials.createSsl()
   );
 
   const metadata = new grpc.Metadata();
-  metadata.add("api-key", API_KEY);
+  metadata.add("api-key", process.env.QFEX_API_KEY);
 
   const call = client.streamOrders(metadata);
 
   call.on("data", (resp) => console.log("Response:", resp));
+  call.on("error", (err) => console.error("Stream error:", err));
+  call.on("status", (st) => console.log("Stream status:", st));
   call.on("end", () => console.log("Stream ended"));
-
-  // Cancel by orderId
-  call.write({
-    cancelOrder: {
-      orderId: "abc12345-12345-12345-12345",
-      symbol: "SP500-USD",
+  // Modify an order
+  call.write(
+    {
+      cancelOrder: {
+        symbol: "SP500-USD",
+        clientOrderId: "order-id-123",
+      },
     },
-  });
+    (err) => {
+      if (err) {
+        console.error("❌ write failed:", err);
+      } else {
+        console.log("✅ addOrder sent");
+      }
+    }
+  );
 
-  // Cancel by clientOrderId
-  call.write({
-    cancelOrder: {
-      clientOrderId: "my-client-id-001",
-      symbol: "SP500-USD",
-    },
-  });
-
-  call.end();
+  setTimeout(() => {
+    call.end();
+  }, 5000);
 }
 
-cancelOrder();
+streamOrders();
+```
+
+</CodeGroup>
+
+### [Modify Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L46)
+<Note>
+  You can only modify orders by **`orderId`**. 
+  
+  This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
+  cancel the order and re-add it.
+
+  You cannot modify an order that has been partially filled.
+</Note>
+
+<CodeGroup>
+```python python
+import os
+
+import grpc
+from port import port_pb2
+from port import port_pb2_grpc
+from common import common_pb2
+
+API_KEY = os.getenv("QFEX_API_KEY")
+
+
+def stream_orders():  # Attach API key metadata
+    metadata = (("api-key", API_KEY),)
+    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+
+    # Generator for sending requests
+    def request_generator():
+        # Modify a buy order
+        yield port_pb2.OrdersStreamRequest(
+            modify_order=port_pb2.ModifyOrderRequest(
+                symbol="SP500-USD",
+                price=530.60,
+                quantity=0.2,
+                order_id="abc12345-12345-12345-12345",
+            )
+        )
+
+    # Bidirectional streaming call
+    responses = stub.StreamOrders(request_generator(), metadata=metadata)
+    for response in responses:
+        print("Response:", response)
+
+
+if __name__ == "__main__":
+    stream_orders()
+
+````
+```java java
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
+import io.grpc.stub.StreamObserver;
+import com.qfex.port.PortServiceGrpc;
+import com.qfex.port.OrdersStreamRequest;
+import com.qfex.port.OrderResponse;
+import com.qfex.port.AddOrderRequest;
+import com.qfex.port.ModifyOrderRequest;
+import com.qfex.port.CancelOrderRequest;
+import com.qfex.common.OrderDirection;
+import com.qfex.common.OrderType;
+import com.qfex.common.OrderTimeInForce;
+
+public class OrderStreamer {
+    public static void main(String[] args) throws InterruptedException {
+        String apiKeyValue = System.getenv("QFEX_API_KEY");
+        if (apiKeyValue == null || apiKeyValue.isEmpty()) {
+            System.err.println("ERROR: QFEX_API_KEY not set");
+            System.exit(1);
+        }
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
+                .useTransportSecurity()
+                .build();
+
+        Metadata metadata = new Metadata();
+        metadata.put(Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER), apiKeyValue);
+
+        PortServiceGrpc.PortServiceStub stub = PortServiceGrpc.newStub(channel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+
+        StreamObserver<OrdersStreamRequest> requestObserver = stub.streamOrders(
+                new StreamObserver<OrderResponse>() {
+                    @Override
+                    public void onNext(OrderResponse value) {
+                        System.out.println("Received: " + value);
+                    }
+                    @Override
+                    public void onError(Throwable t) {
+                        t.printStackTrace();
+                    }
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("Stream completed");
+                    }
+                }
+        );
+
+        // Send add order
+        ModifyOrderRequest modify = ModifyOrderRequest.newBuilder()
+                .setSymbol("SP500-USD")
+                .setPrice(530.50)
+                .setQuantity(0.1)
+                .setOrderId("abc12345-12345-12345-12345")
+                .build();
+        requestObserver.onNext(
+                OrdersStreamRequest.newBuilder().setModifyOrder(modify).build()
+        );
+
+        // Mark end of requests
+        requestObserver.onCompleted();
+
+        // Wait for responses
+        Thread.sleep(1000);
+        channel.shutdown();
+    }
+}
+````
+
+```go go
+package main
+
+import (
+    "context"
+    "fmt"
+    "io"
+    "log"
+    "os"
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/credentials"
+    "google.golang.org/grpc/metadata"
+    pb "github.com/QFEX-org/proto/port"
+    pbCommon "github.com/QFEX-org/proto/common"
+)
+
+func main() {
+    apiKey := os.Getenv("QFEX_API_KEY")
+    if apiKey == "" {
+        log.Fatal("QFEX_API_KEY environment variable not set")
+    }
+
+    creds := credentials.NewClientTLSFromCert(nil, "")
+    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewPortServiceClient(conn)
+    ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
+
+    stream, err := client.StreamOrders(ctx)
+    if err != nil {
+        log.Fatalf("error on StreamOrders: %v", err)
+    }
+
+
+
+    // Send commands concurrently
+    go func() {
+        // Add a limit buy order
+        stream.Send(&pb.OrdersStreamRequest{
+			RequestType: &pb.OrdersStreamRequest_ModifyOrder{
+				ModifyOrder: &pb.ModifyOrderRequest{
+                    Symbol:         "SP500-USD",
+                    Price:          560.60,
+                    Quantity:       0.2,
+                    OrderId:        "abc12345-12345-12345-12345",
+				},
+			},
+		})
+        stream.CloseSend()
+    }()
+
+    // Receive responses
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatalf("stream error: %v", err)
+        }
+        fmt.Println("Response:", resp)
+    }
+}
+```
+
+```javascript node
+require("dotenv").config();
+const grpc = require("@grpc/grpc-js");
+const protoLoader = require("@grpc/proto-loader");
+
+const portDef = protoLoader.loadSync("port.proto", {
+  keepCase: false,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const portProto = grpc.loadPackageDefinition(portDef).port;
+
+function streamOrders() {
+  const client = new portProto.PortService(
+    "trade.pfex.io:443",
+    grpc.credentials.createSsl()
+  );
+
+  const metadata = new grpc.Metadata();
+  metadata.add("api-key", process.env.QFEX_API_KEY);
+
+  const call = client.streamOrders(metadata);
+
+  call.on("data", (resp) => console.log("Response:", resp));
+  call.on("error", (err) => console.error("Stream error:", err));
+  call.on("status", (st) => console.log("Stream status:", st));
+  call.on("end", () => console.log("Stream ended"));
+  // Modify an order
+  call.write(
+    {
+      modifyOrder: {
+        symbol: "SP500-USD",
+        price: 560.6,
+        quantity: 0.2,
+        orderId: "abc12345-12345-12345-12345",
+      },
+    },
+    (err) => {
+      if (err) {
+        console.error("❌ write failed:", err);
+      } else {
+        console.log("✅ addOrder sent");
+      }
+    }
+  );
+
+  setTimeout(() => {
+    call.end();
+  }, 5000);
+}
+
+streamOrders();
 ```
 
 </CodeGroup>
@@ -880,35 +934,43 @@ func main() {
         log.Fatalf("error on StreamOrders: %v", err)
     }
 
+    clientOID := "order-id-123"
+
     // Send commands concurrently
     go func() {
         // Add a limit buy order
         stream.Send(&pb.OrdersStreamRequest{
-            AddOrder: &pb.AddOrderRequest{
-                Symbol:         "SP500-USD",
-                Side:           pbCommon.OrderDirection_BUY,
-                Type:           pbCommon.OrderType_LIMIT,
-                TimeInForce:    pbCommon.OrderTimeInForce_GTC,
-                Price:          560.50,
-                Size:           0.1,
-                ClientOrderId:  "order-id-123",
-            },
+			RequestType: &pb.OrdersStreamRequest_AddOrder{
+				AddOrder: &pb.AddOrderRequest{
+                    Symbol:         "SP500-USD",
+                    Side:           pbCommon.OrderDirection_BUY,
+                    Type:           pbCommon.OrderType_LIMIT,
+                    TimeInForce:    pbCommon.OrderTimeInForce_GTC,
+                    Price:          560.50,
+                    Quantity:       0.1,
+                    ClientOrderId:  &clientOID,
+				},
+			},
         })
         // Modify an order
         stream.Send(&pb.OrdersStreamRequest{
-            ModifyOrder: &pb.ModifyOrderRequest{
-                OrderId: "abc12345-12345-12345-12345",
-                Symbol:  "SP500-USD",
-                Price:   560.60,
-                Size:    0.2,
-            },
+			RequestType: &pb.OrdersStreamRequest_ModifyOrder{
+				ModifyOrder: &pb.ModifyOrderRequest{
+                    Symbol:         "SP500-USD",
+                    Price:          560.60,
+                    Quantity:       0.2,
+                    OrderId:        "abc12345-12345-12345-12345",
+				},
+			},
         })
         // Cancel an order
         stream.Send(&pb.OrdersStreamRequest{
-            CancelOrder: &pb.CancelOrderRequest{
-                ClientOrderId: "order-id-123",
-                Symbol:        "SP500-USD",
-            },
+			RequestType: &pb.OrdersStreamRequest_CancelOrder{
+				CancelOrder: &pb.CancelOrderRequest{
+                    Symbol:         "SP500-USD",
+                    ClientOrderId:  "order-id-123",
+				},
+			},
         })
         stream.CloseSend()
     }()
