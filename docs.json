@@ -13,6 +13,9 @@
       "dark": "#07363e"
     }
   },
+  "fonts": {
+    "family": "DM Sans"
+  },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
