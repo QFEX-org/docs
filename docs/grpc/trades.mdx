@@ -17,7 +17,7 @@ def stream_trades(symbol: str):
     stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
     request = market_data_pb2.GetSymbol(symbol=symbol)
     for trade in stub.GetTrades(request):
-    print(trade)
+        print(trade)
 
 if __name__ == '__main__':
     stream_trades('SP500-USD')
@@ -133,5 +133,12 @@ streamTrades("SP500-USD");
 ## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L43)
 
 ```proto
-todo
+trade_id: "f9aa6d05-b8e6-4f67-acd6-dce47e0285dc"
+symbol: "SP500-USD"
+price: 566.6
+quantity: 0.001
+trade_timestamp {
+  seconds: 1746982861
+  nanos: 911839684
+}
 ```
