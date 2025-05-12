@@ -1,8 +1,8 @@
 ---
-title: "User Orders"
+title: "Get Available Leverage Levels"
 ---
 
-[User Orders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L15) returns a list of user orders.
+[Get Available Leverage Levels RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L24) returns a list of available leverage levels for the user.
 
 ## Sample Code
 
@@ -16,17 +16,16 @@ import port_pb2_grpc
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-def fetch_user_orders(limit: int = 50):
+def get_available_leverage_levels():
     metadata = (('api-key', API_KEY),)
     channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
-    request = ListRequest(limit=limit)
-    response = stub.GetUserOrders(request, metadata=metadata)
-    for order in response.orders:
-        print(order)
+    request = ListRequest()
+    response = stub.GetAvailableLeverageLevels(request, metadata=metadata)
+    print(response)
 
 if __name__ == '__main__':
-    fetch_user_orders()
+    get_available_leverage_levels()
 
 ````
 
@@ -61,13 +60,10 @@ public class UserOrdersFetcher {
                         .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
         ListRequest request = ListRequest.newBuilder()
-                .setLimit(50)
                 .build();
 
-        AllOrdersResponse response = stub.getUserOrders(request);
-        for (OrderResponse order : response.getOrdersList()) {
-            System.out.println(order);
-        }
+        AllOrdersResponse response = stub.GetAvailableLeverageLevels(request);
+        System.out.println(response);
 
         channel.shutdown();
     }
@@ -105,15 +101,13 @@ func main() {
     client := pbPort.NewPortServiceClient(conn)
     ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
-    req := &pbCommon.ListRequest{Limit: 50}
-    resp, err := client.GetUserOrders(ctx, req)
+    req := &pbCommon.ListRequest{}
+    resp, err := client.GetAvailableLeverageLevels(ctx, req)
     if err != nil {
-        log.Fatalf("error on GetUserOrders: %v", err)
+        log.Fatalf("error on GetAvailableLeverageLevels: %v", err)
     }
 
-    for _, order := range resp.GetOrders() {
-        fmt.Println(order)
-    }
+    fmt.Println(resp)
 }
 ```
 
@@ -139,7 +133,7 @@ const portDef = protoLoader.loadSync("port.proto", {
 const commonProto = grpc.loadPackageDefinition(commonDef).common;
 const portProto = grpc.loadPackageDefinition(portDef).port;
 
-function fetchUserOrders(limit = 50) {
+function getAvailableLeverageLevels() {
   const client = new portProto.PortService(
     "trade.pfex.io:443",
     grpc.credentials.createSsl()
@@ -148,24 +142,33 @@ function fetchUserOrders(limit = 50) {
   const metadata = new grpc.Metadata();
   metadata.add("api-key", API_KEY);
 
-  client.getUserOrders({ limit }, metadata, (err, response) => {
+  client.getAvailableLeverageLevels({}, metadata, (err, response) => {
     if (err) {
       console.error(err);
       return;
     }
-    response.orders.forEach((order) => console.log(order));
+    console.log(response);
   });
 }
 
-fetchUserOrders();
+getAvailableLeverageLevels();
 ```
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L102)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L72)
 
 ```proto
 success: true
+leverages {
+  id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+  symbol: "AAPL-USD"
+  initial_margin: 0.1
+  maintenance_margin: 0.05
+  max_position: 1000
+  leverage: "10"
+}
+user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
 timestamp {
   seconds: 1746916950
   nanos: 348992017

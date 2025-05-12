@@ -54,7 +54,10 @@
                   "docs/grpc/orders",
                   "docs/grpc/positions",
                   "docs/grpc/balance",
-                  "docs/grpc/get_orders"
+                  "docs/grpc/get_orders",
+                  "docs/grpc/cancel_all_orders",
+                  "docs/grpc/get_available_leverage_levels",
+                  "docs/grpc/set_leverage"
                 ]
               }
             ]

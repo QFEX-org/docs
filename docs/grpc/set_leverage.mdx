@@ -1,8 +1,8 @@
 ---
-title: "User Orders"
+title: "Set Leverage"
 ---
 
-[User Orders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L15) returns a list of user orders.
+[Set Leverage RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L26) sets the leverage for a specific symbol.
 
 ## Sample Code
 
@@ -11,22 +11,21 @@ title: "User Orders"
 import os
 
 import grpc
-from common_pb2 import ListRequest
+from common_pb2 import SetLeverageRequest
 import port_pb2_grpc
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-def fetch_user_orders(limit: int = 50):
+def set_leverage():
     metadata = (('api-key', API_KEY),)
     channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
-    request = ListRequest(limit=limit)
-    response = stub.GetUserOrders(request, metadata=metadata)
-    for order in response.orders:
-        print(order)
+    request = SetLeverageRequest(symbol="AAPL-USD", leverage=10)
+    response = stub.SetUserLeverage(request, metadata=metadata)
+    print(response)
 
 if __name__ == '__main__':
-    fetch_user_orders()
+    set_leverage()
 
 ````
 
@@ -35,7 +34,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import com.qfex.common.ListRequest;
+import com.qfex.common.SetLeverageRequest;
 import com.qfex.port.PortServiceGrpc;
 import com.qfex.port.AllOrdersResponse;
 import com.qfex.port.OrderResponse;
@@ -60,14 +59,13 @@ public class UserOrdersFetcher {
                 PortServiceGrpc.newBlockingStub(channel)
                         .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
-        ListRequest request = ListRequest.newBuilder()
-                .setLimit(50)
+        SetLeverageRequest request = SetLeverageRequest.newBuilder()
+                .setSymbol("AAPL-USD")
+                .setLeverage(10)
                 .build();
 
-        AllOrdersResponse response = stub.getUserOrders(request);
-        for (OrderResponse order : response.getOrdersList()) {
-            System.out.println(order);
-        }
+        AllOrdersResponse response = stub.SetUserLeverage(request);
+        System.out.println(response);
 
         channel.shutdown();
     }
@@ -105,15 +103,16 @@ func main() {
     client := pbPort.NewPortServiceClient(conn)
     ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
-    req := &pbCommon.ListRequest{Limit: 50}
-    resp, err := client.GetUserOrders(ctx, req)
+    req := &pbCommon.SetLeverageRequest{
+        Symbol: "AAPL-USD",
+        Leverage: 10,
+    }
+    resp, err := client.SetUserLeverage(ctx, req)
     if err != nil {
-        log.Fatalf("error on GetUserOrders: %v", err)
+        log.Fatalf("error on SetUserLeverage: %v", err)
     }
 
-    for _, order := range resp.GetOrders() {
-        fmt.Println(order)
-    }
+    fmt.Println(resp)
 }
 ```
 
@@ -139,7 +138,7 @@ const portDef = protoLoader.loadSync("port.proto", {
 const commonProto = grpc.loadPackageDefinition(commonDef).common;
 const portProto = grpc.loadPackageDefinition(portDef).port;
 
-function fetchUserOrders(limit = 50) {
+function setUserLeverage() {
   const client = new portProto.PortService(
     "trade.pfex.io:443",
     grpc.credentials.createSsl()
@@ -148,24 +147,33 @@ function fetchUserOrders(limit = 50) {
   const metadata = new grpc.Metadata();
   metadata.add("api-key", API_KEY);
 
-  client.getUserOrders({ limit }, metadata, (err, response) => {
+  client.setUserLeverage({}, metadata, (err, response) => {
     if (err) {
       console.error(err);
       return;
     }
-    response.orders.forEach((order) => console.log(order));
+    console.log(response);
   });
 }
 
-fetchUserOrders();
+setUserLeverage();
 ```
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L102)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L72)
 
 ```proto
 success: true
+leverages {
+  id: "abc12345-6e54-48c4-82e9-641e64bf185d"
+  symbol: "AAPL-USD"
+  initial_margin: 0.1
+  maintenance_margin: 0.05
+  max_position: 1000
+  leverage: "10"
+}
+user_id: "abc12345-6e54-48c4-82e9-641e64bf185d"
 timestamp {
   seconds: 1746916950
   nanos: 348992017

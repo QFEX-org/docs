@@ -1,8 +1,9 @@
 ---
-title: "User Orders"
+title: "Cancel All Orders"
 ---
 
-[User Orders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L15) returns a list of user orders.
+[Cancel All Orders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L16) cancels all orders placed by the user.
+You can cancel orders for specific symbols by passing a list of symbols to the `symbols` field. If no symbols are specified, all orders will be cancelled.
 
 ## Sample Code
 
@@ -11,22 +12,21 @@ title: "User Orders"
 import os
 
 import grpc
-from common_pb2 import ListRequest
+from port_pb2 import CancelAllOrdersRequest
 import port_pb2_grpc
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-def fetch_user_orders(limit: int = 50):
+def cancel_all_orders():
     metadata = (('api-key', API_KEY),)
     channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
     stub = port_pb2_grpc.PortServiceStub(channel)
-    request = ListRequest(limit=limit)
-    response = stub.GetUserOrders(request, metadata=metadata)
-    for order in response.orders:
-        print(order)
+    request = CancelAllOrdersRequest(symbols=['AAPL-USD'])
+    response = stub.CancelAllOrders(request, metadata=metadata)
+    print(response)
 
 if __name__ == '__main__':
-    fetch_user_orders()
+    cancel_all_orders()
 
 ````
 
@@ -35,7 +35,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import com.qfex.common.ListRequest;
+import com.qfex.port.CancelAllOrdersRequest;
 import com.qfex.port.PortServiceGrpc;
 import com.qfex.port.AllOrdersResponse;
 import com.qfex.port.OrderResponse;
@@ -60,14 +60,12 @@ public class UserOrdersFetcher {
                 PortServiceGrpc.newBlockingStub(channel)
                         .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
 
-        ListRequest request = ListRequest.newBuilder()
-                .setLimit(50)
+        CancelAllOrdersRequest request = CancelAllOrdersRequest.newBuilder()
+                .setSymbols(List.of("AAPL-USD"))
                 .build();
 
         AllOrdersResponse response = stub.getUserOrders(request);
-        for (OrderResponse order : response.getOrdersList()) {
-            System.out.println(order);
-        }
+        System.out.println(response);
 
         channel.shutdown();
     }
@@ -85,7 +83,6 @@ import (
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/metadata"
-    pbCommon "github.com/QFEX-org/proto/common"
     pbPort "github.com/QFEX-org/proto/port"
 )
 
@@ -105,15 +102,13 @@ func main() {
     client := pbPort.NewPortServiceClient(conn)
     ctx := metadata.AppendToOutgoingContext(context.Background(), "api-key", apiKey)
 
-    req := &pbCommon.ListRequest{Limit: 50}
-    resp, err := client.GetUserOrders(ctx, req)
+    req := &pbPort.CancelAllOrdersRequest{Symbols: []string{"AAPL-USD"}}
+    resp, err := client.CancelAllOrders(ctx, req)
     if err != nil {
-        log.Fatalf("error on GetUserOrders: %v", err)
+        log.Fatalf("error on CancelAllOrders: %v", err)
     }
 
-    for _, order := range resp.GetOrders() {
-        fmt.Println(order)
-    }
+    fmt.Println(resp)
 }
 ```
 
@@ -139,7 +134,7 @@ const portDef = protoLoader.loadSync("port.proto", {
 const commonProto = grpc.loadPackageDefinition(commonDef).common;
 const portProto = grpc.loadPackageDefinition(portDef).port;
 
-function fetchUserOrders(limit = 50) {
+function cancelAllOrders(symbols = []) {
   const client = new portProto.PortService(
     "trade.pfex.io:443",
     grpc.credentials.createSsl()
@@ -148,21 +143,21 @@ function fetchUserOrders(limit = 50) {
   const metadata = new grpc.Metadata();
   metadata.add("api-key", API_KEY);
 
-  client.getUserOrders({ limit }, metadata, (err, response) => {
+  client.cancelAllOrders({ symbols }, metadata, (err, response) => {
     if (err) {
       console.error(err);
       return;
     }
-    response.orders.forEach((order) => console.log(order));
+    console.log(response);
   });
 }
 
-fetchUserOrders();
+cancelAllOrders();
 ```
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L102)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L72)
 
 ```proto
 success: true
