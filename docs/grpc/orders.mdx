@@ -2,11 +2,11 @@
 title: "Order Entry"
 ---
 
-[StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L9) provides a bidirectional streaming interface for sending Add, Modify, and Cancel order requests and receiving responses.
+[StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L12) provides a bidirectional streaming interface for sending Add, Modify, and Cancel order requests and receiving responses.
 
 ## Example Requests
 
-### [Add Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L27)
+### [Add Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L30)
 
 <CodeGroup>
 ```python python
@@ -257,7 +257,7 @@ streamOrders();
 
 </CodeGroup>
 
-### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L38)
+### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L41)
 
 <Note>
   You can cancel an order in two ways: 1. **By `order_id`**: Cancels the single
@@ -492,7 +492,7 @@ streamOrders();
 
 </CodeGroup>
 
-### [Modify Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L46)
+### [Modify Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L49)
 
 <Note>
   You can only modify orders by **`orderId`**. 
@@ -1071,7 +1071,7 @@ streamOrders();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L84)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L87)
 
 This response is for an Add Order request. For Modify and Cancel requests, the response will be the same but with the `status` field set to `MODIFIED` or `CANCELLED` respectively. If any field returns the default value, it will not be printed to console
 

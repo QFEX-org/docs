@@ -2,7 +2,7 @@
 title: "Funding Rate"
 ---
 
-[Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L13) provides a stream of the current funding rate for a symbol, if the funding window were to end now. The funding rate value at the end of a funding window is used to compute funding payments.
+[Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L17) provides a stream of the current funding rate for a symbol, if the funding window were to end now. The funding rate value at the end of a funding window is used to compute funding payments.
 
 <Note>
   Outside of extended market hours, the funding rate is 0 and will not be
@@ -136,7 +136,7 @@ streamBbo();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L60)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L64)
 
 ```proto
 symbol: "SP500-USD"

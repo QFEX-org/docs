@@ -2,82 +2,93 @@
 title: "Enums"
 ---
 
-## [OrderType](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L10)
+## [OrderType](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L14)
 
 This defines how the order is executed by the engine.
 
-| Name     | Value | Description                                                                         |
-| -------- | ----- | ----------------------------------------------------------------------------------- |
-| `LIMIT`  | 0     | Limit order                                                                         |
-| `MARKET` | 1     | Market order                                                                        |
-| `ALO`    | 3     | Add Liquidity Order. If the order would cross the book, the order will be rejected. |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `LIMIT` | 0 | Limit order |
+| `MARKET` | 1 | Market order |
+| `ALO` | 3 | Add Liquidity Order. If the order would cross the book, the order will be rejected. |
 
-## [OrderDirection](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L17)
+## [OrderDirection](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L21)
 
 This defines the direction of the order.
 
-| Name   | Value | Description |
-| ------ | ----- | ----------- |
-| `BUY`  | 0     | Buy order   |
-| `SELL` | 1     | Sell order  |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `BUY` | 0 | Buy order |
+| `SELL` | 1 | Sell order |
 
-## [OrderTimeInForce](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L23)
+## [OrderTimeInForce](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L27)
 
 This defines the time in force of the order.
 
-| Name  | Value | Description                                                                                                                                                             |
-| ----- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GTC` | 0     | Good till canceled. This order will stay in the book until it is filled or canceled.                                                                                    |
-| `IOC` | 1     | Immediate or cancel. This order will fill as much as possible and then be canceled. If the order cannot be filled immediately, the remaining quantity will be canceled. |
-| `FOK` | 2     | Fill or kill. This order will be canceled if it cannot be filled immediately. If the order cannot be filled immediately, the entire order will be canceled.             |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `GTC` | 0 | Good till canceled. This order will stay in the book until it is filled or canceled. |
+| `IOC` | 1 | Immediate or cancel. This order will fill as much as possible and then be canceled. If the order cannot be filled immediately, the remaining quantity will be canceled. |
+| `FOK` | 2 | Fill or kill. This order will be canceled if it cannot be filled immediately. If the order cannot be filled immediately, the entire order will be canceled. |
 
-## [OrderStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L30)
+## [OrderAction](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L34)
+
+Internal definition of the order action.
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `NEW` | 0 | Order was added |
+| `MODIFY` | 1 | Order was modified |
+| `CANCEL` | 2 | Order was canceled |
+| `FILL` | 4 | Order was filled |
+
+## [OrderStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L43)
 
 This is returned on any order response. This will indicate the current status of the order.
 
-| Name                                   | Value | Description                                                                                             |
-| -------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------- |
-| `ACK`                                  | 0     | Order accepted.                                                                                         |
-| `FILLED`                               | 2     | Order filled, this could be partially filled.                                                           |
-| `MODIFIED`                             | 20    | Order successfully modified.                                                                            |
-| `CANCELLED`                            | 30    | Order successfully cancelled.                                                                           |
-| `CANCELLED_STP`                        | 31    | Order cancelled by self trade prevention.                                                               |
-| `REJECTED`                             | 50    | Order rejected                                                                                          |
-| `NO_SUCH_ORDER`                        | 52    | Cancel rejected, no such order exists.                                                                  |
-| `INVALID_ORDER_TYPE`                   | 53    | Invalid order type.                                                                                     |
-| `BAD_SYMBOL`                           | 54    | Invalid symbol.                                                                                         |
-| `PRICE_LESS_THAN_MIN_PRICE`            | 55    | Price less than minimum price for this symbol.                                                          |
-| `PRICE_GREATER_THAN_MAX_PRICE`         | 56    | Price greater than maximum price for this symbol.                                                       |
-| `CANNOT_MODIFY_PARTIAL_FILL`           | 58    | Cannot modify partially filled order. Please cancel your current order and place a new order.           |
-| `FAILED_MARGIN_CHECK`                  | 60    | Failed margin check. Please check your available balance.                                               |
-| `INVALID_TICK_SIZE_PRECISION_PRICE`    | 63    | Invalid tick size for this symbol. Check the price tick size in the reference data.                     |
-| `INVALID_TICK_SIZE_PRECISION_QUANTITY` | 64    | Invalid lot size for this symbol. Check the lot size in the reference data.                             |
-| `QUANTITY_LESS_THAN_MIN_QUANTITY`      | 65    | Quantity less than minimum for this symbol. Check the minimum quantity in the reference data.           |
-| `QUANTITY_GREATER_THAN_MAX_QUANTITY`   | 66    | Quantity greater than maximum for this symbol. Check the maximum quantity in the reference data.        |
-| `REJECTED_GREATER_THAN_MAX_PRICE_BAND` | 67    | Price greater than max price. Check the max price in the reference data.                                |
-| `REJECTED_LESS_THAN_MIN_PRICE_BAND`    | 68    | Price less than min price. Check the min price in the reference data.                                   |
-| `INVALID_TIME_IN_FORCE`                | 69    | Invalid time in force for this order type.                                                              |
-| `REJECTED_WOULD_BREACH_MAX_POSITION`   | 70    | Would breach max position. Check the max position for your account in gRPC PortService.GetUserLeverage. |
-| `CANNOT_MODIFY_NO_SUCH_ORDER`          | 71    | Failed to modify this order. Order does not exist.                                                      |
-| `REJECTED_MARKET_CLOSED`               | 72    | QFEX is currently not accepting orders for this symbol.                                                 |
-| `RATE_LIMITED`                         | 97    | You have sent too many requests to trade.pfex.io. Please contact support@qfex.com to raise your limits. |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ACK` | 0 | Order accepted. |
+| `FILLED` | 2 | Order filled, this could be partially filled. |
+| `MODIFIED` | 20 | Order successfully modified. |
+| `CANCELLED` | 30 | Order successfully cancelled. |
+| `CANCELLED_STP` | 31 | Order cancelled by self trade prevention. |
+| `REJECTED` | 50 | Order rejected |
+| `NO_SUCH_ORDER` | 52 | Cancel rejected, no such order exists. |
+| `INVALID_ORDER_TYPE` | 53 | Invalid order type. |
+| `BAD_SYMBOL` | 54 | Invalid symbol. |
+| `PRICE_LESS_THAN_MIN_PRICE` | 55 | Price less than minimum price for this symbol. |
+| `PRICE_GREATER_THAN_MAX_PRICE` | 56 | Price greater than maximum price for this symbol. |
+| `CANNOT_MODIFY_PARTIAL_FILL` | 58 | Cannot modify partially filled order. Please cancel your current order and place a new order. |
+| `FAILED_MARGIN_CHECK` | 60 | Failed margin check. Please check your available balance. |
+| `INVALID_TICK_SIZE_PRECISION_PRICE` | 63 | Invalid tick size for this symbol. Check the price tick size in the reference data. |
+| `INVALID_TICK_SIZE_PRECISION_QUANTITY` | 64 | Invalid lot size for this symbol. Check the lot size in the reference data. |
+| `QUANTITY_LESS_THAN_MIN_QUANTITY` | 65 | Quantity less than minimum for this symbol. Check the minimum quantity in the reference data. |
+| `QUANTITY_GREATER_THAN_MAX_QUANTITY` | 66 | Quantity greater than maximum for this symbol. Check the maximum quantity in the reference data. |
+| `REJECTED_GREATER_THAN_MAX_PRICE_BAND` | 67 | Price greater than max price. Check the max price in the reference data. |
+| `REJECTED_LESS_THAN_MIN_PRICE_BAND` | 68 | Price less than min price. Check the min price in the reference data. |
+| `INVALID_TIME_IN_FORCE` | 69 | Invalid time in force for this order type. |
+| `REJECTED_WOULD_BREACH_MAX_POSITION` | 70 | Would breach max position. Check the max position for your account in gRPC PortService.GetUserLeverage. |
+| `CANNOT_MODIFY_NO_SUCH_ORDER` | 71 | Failed to modify this order. Order does not exist. |
+| `REJECTED_MARKET_CLOSED` | 72 | QFEX is currently not accepting orders for this symbol. |
+| `RATE_LIMITED` | 97 | You have sent too many requests to trade.pfex.io. Please contact support@qfex.com to raise your limits. |
 
-## [SymbolStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L183)
+## [SymbolStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L196)
 
-| Name       | Value | Description                      |
-| ---------- | ----- | -------------------------------- |
-| `ACTIVE`   | 0     | Symbol is active.                |
-| `INACTIVE` | 1     | Symbol is temporarily suspended. |
-| `DELISTED` | 2     | Symbol is permanently suspended. |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ACTIVE` | 0 | Symbol is active. |
+| `INACTIVE` | 1 | Symbol is temporarily suspended. |
+| `DELISTED` | 2 | Symbol is permanently suspended. |
 
-## [CandlesInterval](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L206)
+## [CandlesInterval](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L219)
 
-| Name              | Value | Description       |
-| ----------------- | ----- | ----------------- |
-| `ONE_MINUTE`      | 0     | 1 minute candle.  |
-| `FIVE_MINUTES`    | 2     | 5 minute candle.  |
-| `FIFTEEN_MINUTES` | 3     | 15 minute candle. |
-| `THIRTY_MINUTES`  | 4     | 30 minute candle. |
-| `ONE_HOUR`        | 5     | 1 hour candle.    |
-| `FOUR_HOURS`      | 6     | 4 hour candle.    |
-| `ONE_DAY`         | 7     | 1 day candle.     |
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| `ONE_MINUTE` | 0 | 1 minute candle. |
+| `FIVE_MINUTES` | 2 | 5 minute candle. |
+| `FIFTEEN_MINUTES` | 3 | 15 minute candle. |
+| `THIRTY_MINUTES` | 4 | 30 minute candle. |
+| `ONE_HOUR` | 5 | 1 hour candle. |
+| `FOUR_HOURS` | 6 | 4 hour candle. |
+| `ONE_DAY` | 7 | 1 day candle. |

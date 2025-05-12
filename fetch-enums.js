@@ -21,19 +21,20 @@ const PROTO_SPECS = [
   {
     name: "common.proto",
     rawUrl:
-      "https://raw.githubusercontent.com/QFEX-org/proto/main/common.proto",
+      "https://raw.githubusercontent.com/QFEX-org/proto/main/proto/common.proto",
     repoUrl: "https://github.com/QFEX-org/proto/blob/main/proto/common.proto",
   },
   {
     name: "market_data.proto",
     rawUrl:
-      "https://raw.githubusercontent.com/QFEX-org/proto/main/market_data.proto",
+      "https://raw.githubusercontent.com/QFEX-org/proto/main/proto/market_data.proto",
     repoUrl:
       "https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto",
   },
   {
     name: "port.proto",
-    rawUrl: "https://raw.githubusercontent.com/QFEX-org/proto/main/port.proto",
+    rawUrl:
+      "https://raw.githubusercontent.com/QFEX-org/proto/main/proto/port.proto",
     repoUrl: "https://github.com/QFEX-org/proto/blob/main/proto/port.proto",
   },
 ];
