@@ -13,16 +13,16 @@ import market_data_pb2
 import market_data_pb2_grpc
 
 def stream_orderbook(symbol: str):
-channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
-request = market_data_pb2.GetSymbol(symbol=symbol)
-for book in stub.GetOrderBook(request):
-print(book)
+    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+    request = market_data_pb2.GetSymbol(symbol=symbol)
+    for book in stub.GetOrderBook(request):
+        print(book)
 
-if **name** == '**main**':
-stream_orderbook('SP500-USD')
+if __name__ == '__main__':
+    stream_orderbook('SP500-USD')
 
-````
+```
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -46,7 +46,7 @@ public class OrderBookStreamer {
         channel.shutdown();
     }
 }
-````
+```
 
 ```go go
 package main

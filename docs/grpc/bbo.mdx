@@ -13,16 +13,16 @@ import common_pb2
 import market_data_pb2_grpc
 
 def stream_bbo():
-channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for bbo in stub.GetBbo(common_pb2.Empty()):
         print(bbo)
 
-if **name** == '**main**':
-stream_bbo()
+if __name__ == '__main__':
+    stream_bbo()
 
-````
+```
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -47,7 +47,7 @@ public class BboStreamer {
         channel.shutdown();
     }
 }
-````
+```
 
 ```go go
 package main

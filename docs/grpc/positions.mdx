@@ -17,16 +17,16 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_positions():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
-for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
-print(pos)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+    for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
+        print(pos)
 
-if **name** == '**main**':
-stream_positions()
+if __name__ == '__main__':
+    stream_positions()
 
-````
+```
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

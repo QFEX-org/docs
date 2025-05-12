@@ -18,16 +18,16 @@ import common_pb2
 import market_data_pb2_grpc
 
 def stream_funding_rate():
-channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for funding_rate in stub.GetFundingRate(common_pb2.GetSymbol(symbol="SP500-USD")):
         print(funding_rate)
 
-if **name** == '**main**':
-stream_funding_rate()
+if __name__ == '__main__':
+    stream_funding_rate()
 
-````
+```
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -49,7 +49,7 @@ public class FundingRateStreamer {
         channel.shutdown();
     }
 }
-````
+```
 
 ```go go
 package main

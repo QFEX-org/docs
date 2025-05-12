@@ -17,16 +17,16 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_balance():
-metadata = (('api-key', API_KEY),)
-channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-stub = port_pb2_grpc.PortServiceStub(channel)
-for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
-print(bal)
+    metadata = (('api-key', API_KEY),)
+    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = port_pb2_grpc.PortServiceStub(channel)
+    for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
+        print(bal)
 
-if **name** == '**main**':
-stream_balance()
+if __name__ == '__main__':
+    stream_balance()
 
-````
+```
 ```java java
 package com.qfex;
 import io.grpc.ManagedChannel;
@@ -66,7 +66,7 @@ public class BalanceStreamer {
     }
 }
 
-````
+```
 
 ```go go
 package main

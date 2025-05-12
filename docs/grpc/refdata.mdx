@@ -13,15 +13,15 @@ import common_pb2
 import market_data_pb2_grpc
 
 def fetch_refdata():
-channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
-response = stub.GetRefData(common_pb2.Empty())
-print(response)
+    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+    response = stub.GetRefData(common_pb2.Empty())
+        print(response)
 
-if **name** == '**main**':
-fetch_refdata()
+if __name__ == '__main__':
+    fetch_refdata()
 
-````
+```
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -46,7 +46,7 @@ public class RefDataFetcher {
         channel.shutdown();
     }
 }
-````
+```
 
 ```go go
 package main
