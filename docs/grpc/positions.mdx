@@ -2,7 +2,7 @@
 title: "User Positions"
 ---
 
-[Positions RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L18) provides a pulsed stream of user positions and symbol-wise trading statistics.
+[Positions RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L18) provides a pulsed stream of user positions and symbol-wise trading statistics.
 
 ## Sample Code
 
@@ -17,14 +17,14 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_positions():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
-        print(pos)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+for pos in stub.GetUserPositions(common_pb2.Empty(), metadata=metadata):
+print(pos)
 
-if __name__ == '__main__':
-    stream_positions()
+if **name** == '**main**':
+stream_positions()
 
 ````
 ```java java
@@ -165,7 +165,7 @@ streamUserPositions();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L146)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L146)
 
 ```proto
 data {

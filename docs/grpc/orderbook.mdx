@@ -2,7 +2,7 @@
 title: "Pulsed Order Book"
 ---
 
-[Order Book RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L10) provides a 50ms pulsed stream of the order book up to 20 levels.
+[Order Book RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L10) provides a 50ms pulsed stream of the order book up to 20 levels.
 
 ## Sample Code
 
@@ -13,14 +13,14 @@ import market_data_pb2
 import market_data_pb2_grpc
 
 def stream_orderbook(symbol: str):
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
-    request = market_data_pb2.GetSymbol(symbol=symbol)
-    for book in stub.GetOrderBook(request):
-        print(book)
+channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+request = market_data_pb2.GetSymbol(symbol=symbol)
+for book in stub.GetOrderBook(request):
+print(book)
 
-if __name__ == '__main__':
-    stream_orderbook('SP500-USD')
+if **name** == '**main**':
+stream_orderbook('SP500-USD')
 
 ````
 ```java java
@@ -120,7 +120,7 @@ streamOrderBook("SP500-USD");
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L35)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L35)
 
 ```proto
 symbol: "SP500-USD"

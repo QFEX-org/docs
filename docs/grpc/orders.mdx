@@ -2,11 +2,11 @@
 title: "Order Entry"
 ---
 
-[StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L9) provides a bidirectional streaming interface for sending Add, Modify, and Cancel order requests and receiving responses.
+[StreamOrders RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L9) provides a bidirectional streaming interface for sending Add, Modify, and Cancel order requests and receiving responses.
 
-## Example Requests 
+## Example Requests
 
-### [Add Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L27)
+### [Add Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L27)
 
 <CodeGroup>
 ```python python
@@ -19,11 +19,10 @@ from common import common_pb2
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-
-def stream_orders():  # Attach API key metadata
-    metadata = (("api-key", API_KEY),)
-    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
+def stream_orders(): # Attach API key metadata
+metadata = (("api-key", API_KEY),)
+channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
@@ -45,9 +44,8 @@ def stream_orders():  # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-
-if __name__ == "__main__":
-    stream_orders()
+if **name** == "**main**":
+stream_orders()
 
 ````
 ```java java
@@ -259,17 +257,13 @@ streamOrders();
 
 </CodeGroup>
 
-### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L38)
+### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L38)
 
 <Note>
-  You can cancel an order in two ways: 
-  
-  1. **By `order_id`**: Cancels the single
-  order matching that unique identifier. 
-  
-  2. **By `client_order_id`**: Cancels _all_ orders 
-  for your account that share the same client_order_id. Uniqueness is
-  not enforced, so multiple orders may be cancelled at once.
+  You can cancel an order in two ways: 1. **By `order_id`**: Cancels the single
+  order matching that unique identifier. 2. **By `client_order_id`**: Cancels
+  _all_ orders for your account that share the same client_order_id. Uniqueness
+  is not enforced, so multiple orders may be cancelled at once.
 </Note>
 
 <CodeGroup>
@@ -283,11 +277,10 @@ from common import common_pb2
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-
-def stream_orders():  # Attach API key metadata
-    metadata = (("api-key", API_KEY),)
-    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
+def stream_orders(): # Attach API key metadata
+metadata = (("api-key", API_KEY),)
+channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
@@ -304,9 +297,8 @@ def stream_orders():  # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-
-if __name__ == "__main__":
-    stream_orders()
+if **name** == "**main**":
+stream_orders()
 
 ````
 ```java java
@@ -500,14 +492,16 @@ streamOrders();
 
 </CodeGroup>
 
-### [Modify Order](https://github.com/QFEX-org/proto/blob/main/port.proto#L46)
+### [Modify Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L46)
+
 <Note>
   You can only modify orders by **`orderId`**. 
   
   This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
   cancel the order and re-add it.
 
-  You cannot modify an order that has been partially filled.
+You cannot modify an order that has been partially filled.
+
 </Note>
 
 <CodeGroup>
@@ -521,11 +515,10 @@ from common import common_pb2
 
 API_KEY = os.getenv("QFEX_API_KEY")
 
-
-def stream_orders():  # Attach API key metadata
-    metadata = (("api-key", API_KEY),)
-    channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
+def stream_orders(): # Attach API key metadata
+metadata = (("api-key", API_KEY),)
+channel = grpc.secure_channel("trade.pfex.io:443", grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
@@ -544,9 +537,8 @@ def stream_orders():  # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-
-if __name__ == "__main__":
-    stream_orders()
+if **name** == "**main**":
+stream_orders()
 
 ````
 ```java java
@@ -748,7 +740,6 @@ streamOrders();
 
 </CodeGroup>
 
-
 ## Full Example Code
 
 <CodeGroup>
@@ -763,9 +754,9 @@ import common_pb2
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_orders(): # Attach API key metadata
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
 
     # Generator for sending requests
     def request_generator():
@@ -803,8 +794,8 @@ def stream_orders(): # Attach API key metadata
     for response in responses:
         print("Response:", response)
 
-if __name__ == '__main__':
-    stream_orders()
+if **name** == '**main**':
+stream_orders()
 
 ````
 ```java java
@@ -1080,7 +1071,8 @@ streamOrders();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L84)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L84)
+
 This response is for an Add Order request. For Modify and Cancel requests, the response will be the same but with the `status` field set to `MODIFIED` or `CANCELLED` respectively. If any field returns the default value, it will not be printed to console
 
 ```proto

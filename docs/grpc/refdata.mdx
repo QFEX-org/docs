@@ -2,7 +2,7 @@
 title: "Reference Data"
 ---
 
-[Reference Data RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L15) returns a list of all available symbols and their reference data.
+[Reference Data RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L15) returns a list of all available symbols and their reference data.
 
 ## Sample Code
 
@@ -13,13 +13,13 @@ import common_pb2
 import market_data_pb2_grpc
 
 def fetch_refdata():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
-    response = stub.GetRefData(common_pb2.Empty())
-    print(response)
+channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+response = stub.GetRefData(common_pb2.Empty())
+print(response)
 
-if __name__ == '__main__':
-    fetch_refdata()
+if **name** == '**main**':
+fetch_refdata()
 
 ````
 ```java java
@@ -123,7 +123,7 @@ fetchRefData();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L85)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L85)
 
 ```proto
 clobPairId: "4"

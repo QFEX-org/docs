@@ -9,8 +9,8 @@ title: "gRPC Overview"
 
 QFEX provides 2 endpoints for gRPC:
 
-- [mds.pfex.io](https://github.com/QFEX-org/proto/blob/main/market_data.proto) for public market and reference data.
-- [trade.pfex.io](https://github.com/QFEX-org/proto/blob/main/port.proto) for order entry and private data.
+- [mds.pfex.io](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto) for public market and reference data.
+- [trade.pfex.io](https://github.com/QFEX-org/proto/blob/main/proto/port.proto) for order entry and private data.
 
 These endpoints have a common set of [enums](/docs/api-reference/enums).
 
@@ -33,7 +33,10 @@ Clone the proto definitions and generate client code for your preferred language
   <Accordion icon="node" title="Setup Node">
     ```bash 
     npm install @grpc/grpc-js @grpc/proto-loader 
+    git clone https://github.com/QFEX-org/proto.git
+
     ```
+
   </Accordion>
   <Accordion icon="golang" title="Setup Go">
     ```bash 

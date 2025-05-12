@@ -2,9 +2,11 @@
 title: "Underlier Price"
 ---
 
-[Underlier RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12) provides a pulsed underlier price stream, aggregated over multiple exchanges. It is used in the funding calculation.
+[Underlier RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L12) provides a pulsed underlier price stream, aggregated over multiple exchanges. It is used in the funding calculation.
 
-<Note>Outside of extended market hours, the underlier price will not be returned.</Note>
+<Note>
+  Outside of extended market hours, the underlier price will not be returned.
+</Note>
 
 ## Sample Code
 
@@ -15,14 +17,14 @@ import common_pb2
 import market_data_pb2_grpc
 
 def stream_underlier():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for underlier in stub.GetUnderlier(common_pb2.GetSymbol(symbol="SP500-USD")):
         print(underlier)
 
-if __name__ == '__main__':
-    stream_underlier()
+if **name** == '**main**':
+stream_underlier()
 
 ````
 ```java java
@@ -133,7 +135,7 @@ streamBbo();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L12)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L12)
 
 ```proto
 symbol: "SP500-USD"

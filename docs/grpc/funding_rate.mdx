@@ -2,9 +2,12 @@
 title: "Funding Rate"
 ---
 
-[Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L13) provides a stream of the current funding rate for a symbol, if the funding window were to end now. The funding rate value at the end of a funding window is used to compute funding payments.
+[Funding Rate RPC](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L13) provides a stream of the current funding rate for a symbol, if the funding window were to end now. The funding rate value at the end of a funding window is used to compute funding payments.
 
-<Note>Outside of extended market hours, the funding rate is 0 and will not be returned.</Note>
+<Note>
+  Outside of extended market hours, the funding rate is 0 and will not be
+  returned.
+</Note>
 
 ## Sample Code
 
@@ -15,14 +18,14 @@ import common_pb2
 import market_data_pb2_grpc
 
 def stream_funding_rate():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for funding_rate in stub.GetFundingRate(common_pb2.GetSymbol(symbol="SP500-USD")):
         print(funding_rate)
 
-if __name__ == '__main__':
-  stream_funding_rate()
+if **name** == '**main**':
+stream_funding_rate()
 
 ````
 ```java java
@@ -133,7 +136,7 @@ streamBbo();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/market_data.proto#L60)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto#L60)
 
 ```proto
 symbol: "SP500-USD"

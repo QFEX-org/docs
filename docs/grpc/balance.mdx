@@ -2,7 +2,7 @@
 title: "User Balance"
 ---
 
-[Balance RPC](https://github.com/QFEX-org/proto/blob/main/port.proto#L19) provides a pulsed stream of user balance updates.
+[Balance RPC](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L19) provides a pulsed stream of user balance updates.
 
 ## Sample Code
 
@@ -17,14 +17,14 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_balance():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
-      print(bal)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
+print(bal)
 
-if __name__ == '__main__':
-    stream_balance()
+if **name** == '**main**':
+stream_balance()
 
 ````
 ```java java
@@ -164,7 +164,7 @@ streamBalances();
 
 </CodeGroup>
 
-## [Example Response](https://github.com/QFEX-org/proto/blob/main/port.proto#L152)
+## [Example Response](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L152)
 
 ```proto
 balances id: "abc12345-6e54-48c4-82e9-641e64bf185d"
