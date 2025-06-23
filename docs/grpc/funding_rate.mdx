@@ -18,16 +18,16 @@ import common_pb2
 import market_data_pb2_grpc
 
 def stream_funding_rate():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+channel = grpc.secure_channel('mds.qfex.com:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
 
     for funding_rate in stub.GetFundingRate(common_pb2.GetSymbol(symbol="SP500-USD")):
         print(funding_rate)
 
-if __name__ == '__main__':
-    stream_funding_rate()
+if **name** == '**main**':
+stream_funding_rate()
 
-```
+````
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -36,7 +36,7 @@ import com.qfex.market_data.MarketDataServiceGrpc;
 
 public class FundingRateStreamer {
     public static void main(String[] args) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.qfex.com", 443)
             .useTransportSecurity()
             .build();
 
@@ -49,7 +49,7 @@ public class FundingRateStreamer {
         channel.shutdown();
     }
 }
-```
+````
 
 ```go go
 package main
@@ -68,7 +68,7 @@ import (
 
 func main() {
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("mds.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("mds.qfex.com:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -118,7 +118,7 @@ const marketDataProto = grpc.loadPackageDefinition(marketDef).market_data;
 
 function streamBbo() {
   const client = new marketDataProto.MarketDataService(
-    "mds.pfex.io:443",
+    "mds.qfex.com:443",
     grpc.credentials.createSsl()
   );
 

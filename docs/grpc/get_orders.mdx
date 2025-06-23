@@ -17,18 +17,18 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def fetch_user_orders(limit: int = 50):
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    request = ListRequest(limit=limit)
-    response = stub.GetUserOrders(request, metadata=metadata)
-    for order in response.orders:
-        print(order)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.qfex.com:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+request = ListRequest(limit=limit)
+response = stub.GetUserOrders(request, metadata=metadata)
+for order in response.orders:
+print(order)
 
-if __name__ == '__main__':
-    fetch_user_orders()
+if **name** == '**main**':
+fetch_user_orders()
 
-```
+````
 
 ```java java
 import io.grpc.ManagedChannel;
@@ -48,7 +48,7 @@ public class UserOrdersFetcher {
             System.exit(1);
         }
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.qfex.com", 443)
                 .useTransportSecurity()
                 .build();
 
@@ -72,7 +72,7 @@ public class UserOrdersFetcher {
         channel.shutdown();
     }
 }
-```
+````
 
 ```go go
 package main
@@ -96,7 +96,7 @@ func main() {
     }
 
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("trade.qfex.com:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -141,7 +141,7 @@ const portProto = grpc.loadPackageDefinition(portDef).port;
 
 function fetchUserOrders(limit = 50) {
   const client = new portProto.PortService(
-    "trade.pfex.io:443",
+    "trade.qfex.com:443",
     grpc.credentials.createSsl()
   );
 

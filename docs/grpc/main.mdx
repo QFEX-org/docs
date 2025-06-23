@@ -9,8 +9,8 @@ title: "gRPC Overview"
 
 QFEX provides 2 endpoints for gRPC:
 
-- [mds.pfex.io](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto) for public market and reference data.
-- [trade.pfex.io](https://github.com/QFEX-org/proto/blob/main/proto/port.proto) for order entry and private data.
+- [mds.qfex.com](https://github.com/QFEX-org/proto/blob/main/proto/market_data.proto) for public market and reference data.
+- [trade.qfex.com](https://github.com/QFEX-org/proto/blob/main/proto/port.proto) for order entry and private data.
 
 These endpoints have a common set of [enums](/docs/api-reference/enums).
 
@@ -49,7 +49,7 @@ Clone the proto definitions and generate client code for your preferred language
 
 ## Authentication
 
-All gRPC calls to `trade.pfex.io` require an **API Key** sent as metadata.
+All gRPC calls to `trade.qfex.com` require an **API Key** sent as metadata.
 Read the [introduction](docs/api-reference/introduction) to learn how to get an API key.
 Then add it to the `api-key` metadata field in your gRPC client.
 

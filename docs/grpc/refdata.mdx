@@ -13,15 +13,15 @@ import common_pb2
 import market_data_pb2_grpc
 
 def fetch_refdata():
-    channel = grpc.secure_channel('mds.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
-    response = stub.GetRefData(common_pb2.Empty())
-        print(response)
+channel = grpc.secure_channel('mds.qfex.com:443', grpc.ssl_channel_credentials())
+stub = market_data_pb2_grpc.MarketDataServiceStub(channel)
+response = stub.GetRefData(common_pb2.Empty())
+print(response)
 
-if __name__ == '__main__':
-    fetch_refdata()
+if **name** == '**main**':
+fetch_refdata()
 
-```
+````
 ```java java
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -33,7 +33,7 @@ import com.qfex.market_data.RefData;
 
 public class RefDataFetcher {
     public static void main(String[] args) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("mds.qfex.com", 443)
             .useTransportSecurity()
             .build();
 
@@ -46,7 +46,7 @@ public class RefDataFetcher {
         channel.shutdown();
     }
 }
-```
+````
 
 ```go go
 package main
@@ -64,7 +64,7 @@ import (
 
 func main() {
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("mds.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("mds.qfex.com:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -105,7 +105,7 @@ const marketDataProto = grpc.loadPackageDefinition(marketDef).market_data;
 
 function fetchRefData() {
   const client = new marketDataProto.MarketDataService(
-    "mds.pfex.io:443",
+    "mds.qfex.com:443",
     grpc.credentials.createSsl()
   );
 

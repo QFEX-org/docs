@@ -18,17 +18,17 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def cancel_all_orders():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    request = CancelAllOrdersRequest(symbols=['AAPL-USD'])
-    response = stub.CancelAllOrders(request, metadata=metadata)
-    print(response)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.qfex.com:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+request = CancelAllOrdersRequest(symbols=['AAPL-USD'])
+response = stub.CancelAllOrders(request, metadata=metadata)
+print(response)
 
-if __name__ == '__main__':
-    cancel_all_orders()
+if **name** == '**main**':
+cancel_all_orders()
 
-```
+````
 
 ```java java
 import io.grpc.ManagedChannel;
@@ -48,7 +48,7 @@ public class UserOrdersFetcher {
             System.exit(1);
         }
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.qfex.com", 443)
                 .useTransportSecurity()
                 .build();
 
@@ -70,7 +70,7 @@ public class UserOrdersFetcher {
         channel.shutdown();
     }
 }
-```
+````
 
 ```go go
 package main
@@ -93,7 +93,7 @@ func main() {
     }
 
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("trade.qfex.com:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -136,7 +136,7 @@ const portProto = grpc.loadPackageDefinition(portDef).port;
 
 function cancelAllOrders(symbols = []) {
   const client = new portProto.PortService(
-    "trade.pfex.io:443",
+    "trade.qfex.com:443",
     grpc.credentials.createSsl()
   );
 

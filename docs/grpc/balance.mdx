@@ -17,16 +17,16 @@ import port_pb2_grpc
 API_KEY = os.getenv("QFEX_API_KEY")
 
 def stream_balance():
-    metadata = (('api-key', API_KEY),)
-    channel = grpc.secure_channel('trade.pfex.io:443', grpc.ssl_channel_credentials())
-    stub = port_pb2_grpc.PortServiceStub(channel)
-    for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
-        print(bal)
+metadata = (('api-key', API_KEY),)
+channel = grpc.secure_channel('trade.qfex.com:443', grpc.ssl_channel_credentials())
+stub = port_pb2_grpc.PortServiceStub(channel)
+for bal in stub.GetUserBalance(common_pb2.Empty(), metadata=metadata):
+print(bal)
 
-if __name__ == '__main__':
-    stream_balance()
+if **name** == '**main**':
+stream_balance()
 
-```
+````
 ```java java
 package com.qfex;
 import io.grpc.ManagedChannel;
@@ -47,7 +47,7 @@ public class BalanceStreamer {
             System.exit(1);
         }
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.pfex.io", 443)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("trade.qfex.com", 443)
                 .useTransportSecurity()
                 .build();
 
@@ -66,7 +66,7 @@ public class BalanceStreamer {
     }
 }
 
-```
+````
 
 ```go go
 package main
@@ -91,7 +91,7 @@ func main() {
     }
 
     creds := credentials.NewClientTLSFromCert(nil, "")
-    conn, err := grpc.Dial("trade.pfex.io:443", grpc.WithTransportCredentials(creds))
+    conn, err := grpc.Dial("trade.qfex.com:443", grpc.WithTransportCredentials(creds))
     if err != nil {
         log.Fatalf("did not connect: %v", err)
     }
@@ -143,7 +143,7 @@ const portProto = grpc.loadPackageDefinition(portDef).port;
 
 function streamBalances() {
   const client = new portProto.PortService(
-    "trade.pfex.io:443",
+    "trade.qfex.com:443",
     grpc.credentials.createSsl()
   );
 
