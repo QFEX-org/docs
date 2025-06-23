@@ -9,7 +9,7 @@ info:
 defaultContentType: application/json
 servers:
   production:
-    host: ws.pfex.io
+    host: ws.qfex.com
     protocol: wss
     description: Production WebSocket gateway
 

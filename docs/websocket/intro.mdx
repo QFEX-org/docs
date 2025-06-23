@@ -9,13 +9,12 @@ description: "Stream prices and account updates over a single multiplexed socket
 ```python python
 import asyncio, json, websockets, os
 
-WS_URL = "wss://ws.pfex.io/v4/ws"
+WS_URL = "wss://ws.qfex.com/v4/ws"
 API_KEY = os.getenv("QFEX_API_KEY")
 
-
 async def main():
-    async with websockets.connect(WS_URL, ping_interval=20) as ws:  # connected msg
-        print(json.loads(await ws.recv()))
+async with websockets.connect(WS_URL, ping_interval=20) as ws: # connected msg
+print(json.loads(await ws.recv()))
 
         # subscribe to public BBO
         await ws.send(
@@ -34,16 +33,15 @@ async def main():
             elif msg["channel"] == "v4_balances":
                 print("Balance", msg["contents"])
 
-
 asyncio.run(main())
 
-```
+````
 
 ```js node
 // save this file as `index.mjs` and run `node index.mjs`
 import WebSocket from "isomorphic-ws";
 
-const ws = new WebSocket("wss://ws.pfex.io/v4/ws");
+const ws = new WebSocket("wss://ws.qfex.com/v4/ws");
 
 ws.onopen = () => {
   ws.send(JSON.stringify({ type: "subscribe", channel: "v4_bbo", id: "bbo" }));
@@ -55,7 +53,7 @@ ws.onmessage = (ev) => {
     console.log("BBO", msg.contents[0]);
   }
 };
-```
+````
 
 </CodeGroup>
 

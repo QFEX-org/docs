@@ -4,9 +4,9 @@ title: "WebSocket Reference"
 
 ## Endpoint
 
-| URL                          | Notes                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| **`wss://ws.pfex.io/v4/ws`** | One socket. All channels (BBO, orders, balances …) are multiplexed here. |
+| URL                           | Notes                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| **`wss://ws.qfex.com/v4/ws`** | One socket. All channels (BBO, orders, balances …) are multiplexed here. |
 
 ---
 
@@ -31,7 +31,7 @@ title: "WebSocket Reference"
 ```python python
 import asyncio, json, websockets, os
 
-WS_URL = "wss://ws.pfex.io/v4/ws"
+WS_URL = "wss://ws.qfex.com/v4/ws"
 API_KEY = os.getenv("PFEX_API_KEY")
 
 async def main():
@@ -62,7 +62,7 @@ asyncio.run(main())
 ```js node
 import WebSocket from "isomorphic-ws";
 
-const ws = new WebSocket("wss://ws.pfex.io/v4/ws");
+const ws = new WebSocket("wss://ws.qfex.com/v4/ws");
 
 ws.onopen = () => {
   ws.send(JSON.stringify({ type: "subscribe", channel: "v4_bbo", id: "bbo" }));
