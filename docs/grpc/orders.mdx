@@ -495,9 +495,9 @@ streamOrders();
 ### [Modify Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L49)
 
 <Note>
-  You can only modify orders by **`orderId`**. 
+  You may only modify an order's **`price`** and **`quantity`**.
   
-  This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
+  You must specify the order's **`order_id`** and **`side`**. This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
   cancel the order and re-add it.
 
 You cannot modify an order that has been partially filled.
@@ -529,6 +529,7 @@ stub = port_pb2_grpc.PortServiceStub(channel)
                 price=530.60,
                 quantity=0.2,
                 order_id="abc12345-12345-12345-12345",
+                side=common_pb2.OrderDirection.BUY,
             )
         )
 
@@ -592,12 +593,13 @@ public class OrderStreamer {
                 }
         );
 
-        // Send add order
+        // Send modify order
         ModifyOrderRequest modify = ModifyOrderRequest.newBuilder()
                 .setSymbol("SP500-USD")
                 .setPrice(530.50)
                 .setQuantity(0.1)
                 .setOrderId("abc12345-12345-12345-12345")
+                .setSide(OrderDirection.BUY)
                 .build();
         requestObserver.onNext(
                 OrdersStreamRequest.newBuilder().setModifyOrder(modify).build()
@@ -654,7 +656,7 @@ func main() {
 
     // Send commands concurrently
     go func() {
-        // Add a limit buy order
+        // Modify a limit buy order
         stream.Send(&pb.OrdersStreamRequest{
 			RequestType: &pb.OrdersStreamRequest_ModifyOrder{
 				ModifyOrder: &pb.ModifyOrderRequest{
@@ -662,6 +664,7 @@ func main() {
                     Price:          560.60,
                     Quantity:       0.2,
                     OrderId:        "abc12345-12345-12345-12345",
+                    Side:           pbCommon.OrderDirection_BUY,
 				},
 			},
 		})
@@ -719,13 +722,14 @@ function streamOrders() {
         price: 560.6,
         quantity: 0.2,
         orderId: "abc12345-12345-12345-12345",
+        side: "BUY",
       },
     },
     (err) => {
       if (err) {
         console.error("❌ write failed:", err);
       } else {
-        console.log("✅ addOrder sent");
+        console.log("✅ modifyOrder sent");
       }
     }
   );
@@ -779,6 +783,7 @@ stub = port_pb2_grpc.PortServiceStub(channel)
                 symbol="SP500-USD",
                 price=560.60,
                 quantity=0.2
+                side=common_pb2.OrderDirection.BUY,
             )
         )
         # Cancel an existing order
@@ -869,6 +874,7 @@ public class OrderStreamer {
                 .setSymbol("SP500-USD")
                 .setPrice(560.60)
                 .setQuantity(0.2)
+                .setSide(OrderDirection.BUY)
                 .build();
         requestObserver.onNext(
                 OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
@@ -951,6 +957,7 @@ func main() {
                     Price:          560.60,
                     Quantity:       0.2,
                     OrderId:        "abc12345-12345-12345-12345",
+                    Side:           pbCommon.OrderDirection_BUY,
 				},
 			},
         })
@@ -1039,6 +1046,7 @@ function streamOrders() {
         symbol: "SP500-USD",
         price: 560.6,
         quantity: 0.2,
+        side: "BUY",
       },
     },
     (err) => {
