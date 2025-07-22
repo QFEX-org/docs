@@ -260,10 +260,8 @@ streamOrders();
 ### [Cancel Order](https://github.com/QFEX-org/proto/blob/main/proto/port.proto#L41)
 
 <Note>
-  You can cancel an order in two ways: 1. **By `order_id`**: Cancels the single
-  order matching that unique identifier. 2. **By `client_order_id`**: Cancels
-  _all_ orders for your account that share the same client_order_id. Uniqueness
-  is not enforced, so multiple orders may be cancelled at once.
+  You may cancel an order either by `order_id`, or `client_order_id`. Uniqueness
+  of the latter is not enforced, so this may cancel multiple orders at once.
 </Note>
 
 <CodeGroup>
@@ -497,7 +495,7 @@ streamOrders();
 <Note>
   You may only modify an order's **`price`** and **`quantity`**.
   
-  You must specify the order's **`order_id`** and **`side`**. This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
+  You must specify the order's **`order_id`**, **`side`** and **`type`**. This is to prevent modifications of inflight orders. If you must modify an order before receiving an ACK,
   cancel the order and re-add it.
 
 You cannot modify an order that has been partially filled.
@@ -530,6 +528,7 @@ stub = port_pb2_grpc.PortServiceStub(channel)
                 quantity=0.2,
                 order_id="abc12345-12345-12345-12345",
                 side=common_pb2.OrderDirection.BUY,
+                type=common_pb2.OrderType.LIMIT,
             )
         )
 
@@ -600,6 +599,7 @@ public class OrderStreamer {
                 .setQuantity(0.1)
                 .setOrderId("abc12345-12345-12345-12345")
                 .setSide(OrderDirection.BUY)
+                .setType(OrderType.LIMIT)
                 .build();
         requestObserver.onNext(
                 OrdersStreamRequest.newBuilder().setModifyOrder(modify).build()
@@ -665,6 +665,7 @@ func main() {
                     Quantity:       0.2,
                     OrderId:        "abc12345-12345-12345-12345",
                     Side:           pbCommon.OrderDirection_BUY,
+                    Type:           pbCommon.OrderType_LIMIT,
 				},
 			},
 		})
@@ -723,6 +724,7 @@ function streamOrders() {
         quantity: 0.2,
         orderId: "abc12345-12345-12345-12345",
         side: "BUY",
+        type: "LIMIT",
       },
     },
     (err) => {
@@ -783,6 +785,7 @@ stub = port_pb2_grpc.PortServiceStub(channel)
                 symbol="SP500-USD",
                 price=560.60,
                 quantity=0.2
+                type=common_pb2.OrderType.LIMIT,
                 side=common_pb2.OrderDirection.BUY,
             )
         )
@@ -875,6 +878,7 @@ public class OrderStreamer {
                 .setPrice(560.60)
                 .setQuantity(0.2)
                 .setSide(OrderDirection.BUY)
+                .setType(OrderType.LIMIT)
                 .build();
         requestObserver.onNext(
                 OrdersStreamRequest.newBuilder().setModifyOrder(mod).build()
@@ -958,6 +962,7 @@ func main() {
                     Quantity:       0.2,
                     OrderId:        "abc12345-12345-12345-12345",
                     Side:           pbCommon.OrderDirection_BUY,
+                    Type:           pbCommon.OrderType_LIMIT,
 				},
 			},
         })
@@ -1047,6 +1052,7 @@ function streamOrders() {
         price: 560.6,
         quantity: 0.2,
         side: "BUY",
+        type: "LIMIT",
       },
     },
     (err) => {
