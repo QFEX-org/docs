@@ -32,35 +32,6 @@
           {
             "group": "WebSocket",
             "pages": ["docs/websocket/asyncapi", "docs/websocket/intro"]
-          },
-          {
-            "group": "gRPC",
-            "pages": [
-              "docs/grpc/main",
-              {
-                "group": "Market Data",
-                "pages": [
-                  "docs/grpc/refdata",
-                  "docs/grpc/orderbook",
-                  "docs/grpc/trades",
-                  "docs/grpc/bbo",
-                  "docs/grpc/underlier",
-                  "docs/grpc/funding_rate"
-                ]
-              },
-              {
-                "group": "Trade",
-                "pages": [
-                  "docs/grpc/orders",
-                  "docs/grpc/positions",
-                  "docs/grpc/balance",
-                  "docs/grpc/get_orders",
-                  "docs/grpc/cancel_all_orders",
-                  "docs/grpc/get_available_leverage_levels",
-                  "docs/grpc/set_leverage"
-                ]
-              }
-            ]
           }
         ]
       }
