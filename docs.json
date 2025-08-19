@@ -31,7 +31,21 @@
           },
           {
             "group": "WebSocket",
-            "pages": ["docs/websocket/asyncapi", "docs/websocket/intro"]
+            "pages": [
+              "docs/websocket/main",
+              "docs/websocket/asyncapi",
+              {
+                "group": "Market Data",
+                "pages": [
+                  "docs/websocket/channels/refdata",
+                  "docs/websocket/channels/orderbook",
+                  "docs/websocket/channels/trades",
+                  "docs/websocket/channels/bbo",
+                  "docs/websocket/channels/underlier",
+                  "docs/websocket/channels/funding_rate"
+                ]
+              }
+            ]
           }
         ]
       }

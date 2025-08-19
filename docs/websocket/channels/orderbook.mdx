@@ -1,0 +1,211 @@
+---
+title: "Pulsed Order Book"
+---
+
+QFEX provides a **50ms pulsed stream** of the order book up to 20 levels deep via websocket.  
+
+## How it works
+
+Connect to the public websocket:
+
+- URL: **wss://mds.qfex.com**
+
+Then send a subscribe message:
+
+```json
+{"type": "subscribe", "channels": ["level2"], "symbols": ["AAPL-USD","SP500-USD"]}
+```
+
+You can also use a wildcard to subscribe to **all** symbols:
+
+```json
+{"type": "subscribe", "channels": ["level2"], "symbols": ["*"]}
+```
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+# pip install websocket-client
+import json
+import websocket
+
+def on_open(ws):
+    sub = {
+        "type": "subscribe",
+        "channels": ["level2"],
+        "symbols": ["SP500-USD"]  # or ["*"]
+    }
+    ws.send(json.dumps(sub))
+
+def on_message(ws, message):
+    data = json.loads(message)
+    print("OrderBook update:", json.dumps(data, indent=2))
+
+def on_error(ws, error):
+    print("Error:", error)
+
+def on_close(ws, close_status_code, close_msg):
+    print("Closed:", close_status_code, close_msg)
+
+if __name__ == "__main__":
+    ws = websocket.WebSocketApp(
+        "wss://mds.qfex.com",
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close,
+    )
+    ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+// npm i ws
+import WebSocket from "ws";
+
+const ws = new WebSocket("wss://mds.qfex.com");
+
+ws.on("open", () => {
+  const sub = {
+    type: "subscribe",
+    channels: ["level2"],
+    symbols: ["SP500-USD"], // or ["*"]
+  };
+  ws.send(JSON.stringify(sub));
+});
+
+ws.on("message", (msg) => {
+  try {
+    const data = JSON.parse(msg.toString());
+    console.log("OrderBook update:", data);
+  } catch (e) {
+    console.error("Parse error:", e);
+  }
+});
+
+ws.on("error", (err) => console.error("WS error:", err));
+ws.on("close", (code, reason) => console.log("Closed:", code, reason?.toString()));
+```
+
+```go go
+// Go (gorilla/websocket)
+// go get github.com/gorilla/websocket
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+
+	"github.com/gorilla/websocket"
+)
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://mds.qfex.com", nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+	defer c.Close()
+
+	sub := map[string]interface{}{
+		"type":     "subscribe",
+		"channels": []string{"level2"},
+		"symbols":  []string{"SP500-USD"}, // or []string{"*"}
+	}
+	if err := c.WriteJSON(sub); err != nil {
+		log.Fatal("write:", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for {
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				log.Println("read:", err)
+				return
+			}
+			fmt.Printf("OrderBook update: %s\n", message)
+		}
+	}()
+
+	// keep running until Ctrl+C
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	<-interrupt
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+// Gradle: implementation("com.squareup.okhttp3:okhttp:4.12.0")
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class OrderBookWs {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS)
+        .build();
+
+    Request request = new Request.Builder()
+        .url("wss://mds.qfex.com")
+        .build();
+
+    WebSocketListener listener = new WebSocketListener() {
+      @Override public void onOpen(WebSocket webSocket, Response response) {
+        String sub = "{\"type\":\"subscribe\",\"channels\":[\"level2\"],\"symbols\":[\"SP500-USD\"]}";
+        webSocket.send(sub);
+      }
+      @Override public void onMessage(WebSocket webSocket, String text) {
+        System.out.println("OrderBook update: " + text);
+      }
+      @Override public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        System.err.println("WS error: " + t.getMessage());
+      }
+    };
+
+    client.newWebSocket(request, listener);
+
+    // Keep JVM alive
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Response
+
+```json
+{
+  "type": "level2",
+  "symbol": "AAPL-USD",
+  "bid": [
+    ["10101.10", "0.45054140"],
+    ["10101.00", "0.55054140"]
+  ],
+  "ask": [
+    ["10102.55", "0.57753524"],
+    ["10102.65", "0.57753524"]
+  ]
+}
+```
+
+### Unsubscribe (optional)
+
+```json
+{"type":"unsubscribe","channels":["level2"],"symbols":["SP500-USD"]}
+```
+
+---
+
+**Notes**
+
+- Pulsed at 50ms intervals.  
+- Depth: up to 20 levels.  
+- `symbols` accepts a wildcard `*` to stream all symbols.
