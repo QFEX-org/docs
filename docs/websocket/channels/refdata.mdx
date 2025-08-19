@@ -1,0 +1,237 @@
+---
+title: "Reference Data"
+---
+
+Reference Data returns a list of all available symbols and their reference data.
+
+<Note>
+  This is also available via REST at https://http.qfex.com/v4/perpetualMarkets.
+</Note>
+
+## How it works
+
+Connect to the public websocket:
+
+- URL: **wss://mds.qfex.com**
+
+Then send a subscribe message:
+
+```json
+{"type": "subscribe", "channels": ["refdata"], "symbols": ["AAPL-USD", "SP500-USD"]}
+```
+
+You can also subscribe to **all** symbols with a wildcard:
+
+```json
+{"type": "subscribe", "channels": ["refdata"], "symbols": ["*"]}
+```
+
+You’ll receive streaming messages containing reference data snapshots/updates for the requested symbols.
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+# pip install websocket-client
+import json
+import websocket
+
+def on_open(ws):
+    sub = {
+        "type": "subscribe",
+        "channels": ["refdata"],
+        "symbols": ["AAPL-USD", "SP500-USD"]  # or ["*"]
+    }
+    ws.send(json.dumps(sub))
+
+def on_message(ws, message):
+    data = json.loads(message)
+    print("RefData message:", json.dumps(data, indent=2))
+
+def on_error(ws, error):
+    print("Error:", error)
+
+def on_close(ws, close_status_code, close_msg):
+    print("Closed:", close_status_code, close_msg)
+
+if __name__ == "__main__":
+    ws = websocket.WebSocketApp(
+        "wss://mds.qfex.com",
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close,
+    )
+    ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+// npm i ws
+import WebSocket from "ws";
+
+const ws = new WebSocket("wss://mds.qfex.com");
+
+ws.on("open", () => {
+  const sub = {
+    type: "subscribe",
+    channels: ["refdata"],
+    symbols: ["AAPL-USD", "SP500-USD"], // or ["*"]
+  };
+  ws.send(JSON.stringify(sub));
+});
+
+ws.on("message", (msg) => {
+  try {
+    const data = JSON.parse(msg.toString());
+    console.log("RefData message:", data);
+  } catch (e) {
+    console.error("Parse error:", e);
+  }
+});
+
+ws.on("error", (err) => console.error("WS error:", err));
+ws.on("close", (code, reason) => console.log("Closed:", code, reason?.toString()));
+```
+
+```go go
+// Go (gorilla/websocket)
+// go get github.com/gorilla/websocket
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+
+	"github.com/gorilla/websocket"
+)
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://mds.qfex.com", nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+	defer c.Close()
+
+	sub := map[string]interface{}{
+		"type":     "subscribe",
+		"channels": []string{"refdata"},
+		"symbols":  []string{"AAPL-USD", "SP500-USD"}, // or []string{"*"}
+	}
+	if err := c.WriteJSON(sub); err != nil {
+		log.Fatal("write:", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for {
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				log.Println("read:", err)
+				return
+			}
+			fmt.Printf("RefData message: %s\n", message)
+		}
+	}()
+
+	// keep running until Ctrl+C
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	<-interrupt
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+// Gradle: implementation("com.squareup.okhttp3:okhttp:4.12.0")
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class RefDataWs {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS)
+        .build();
+
+    Request request = new Request.Builder()
+        .url("wss://mds.qfex.com")
+        .build();
+
+    WebSocketListener listener = new WebSocketListener() {
+      @Override public void onOpen(WebSocket webSocket, Response response) {
+        String sub = "{\"type\":\"subscribe\",\"channels\":[\"refdata\"],\"symbols\":[\"AAPL-USD\",\"SP500-USD\"]}";
+        webSocket.send(sub);
+      }
+      @Override public void onMessage(WebSocket webSocket, String text) {
+        System.out.println("RefData message: " + text);
+      }
+      @Override public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        System.err.println("WS error: " + t.getMessage());
+      }
+    };
+
+    client.newWebSocket(request, listener);
+
+    // Keep JVM alive
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Response Shape
+
+> The websocket payloads mirror the REST fields. A single message may include one or more symbols.
+
+```json
+{
+  "type": "refdata",
+  "data": [
+    {
+      "clobPairId": "4",
+      "symbol": "GOOG-USD",
+      "underlier_price": "154.16",
+      "price_change_24h": "-2.1",
+      "tick_size": "0.05",
+      "lot_size": "0.001",
+      "min_price": "112",
+      "max_price": "209",
+      "min_quantity": "0.001",
+      "max_quantity": "100000000",
+      "base_asset": "GOOG",
+      "quote_asset": "USD",
+      "margin_asset": "USD",
+      "order_time_in_force": ["GTC", "IOC", "FOK"],
+      "order_types": ["LIMIT", "MARKET", "ALO"],
+      "market_hours": {
+        "tz": "America/New_York",
+        "monday": {"open": "04:00:00", "close": "20:00:00"},
+        "tuesday": {"open": "04:00:00", "close": "20:00:00"},
+        "wednesday": {"open": "04:00:00", "close": "20:00:00"},
+        "thursday": {"open": "04:00:00", "close": "20:00:00"},
+        "friday": {"open": "04:00:00", "close": "20:00:00"}
+      }
+    }
+  ]
+}
+```
+
+### Unsubscribe (optional)
+
+```json
+{"type":"unsubscribe","channels":["refdata"],"symbols":["AAPL-USD"]}
+```
+
+---
+
+**Notes**
+
+- `wss://mds.qfex.com` is public—no API key required.  
+- For private data and trading, use `wss://trade.qfex.com` and include `api-key` in the connection headers.
+- The `symbols` array accepts `*` to receive refdata for all symbols.

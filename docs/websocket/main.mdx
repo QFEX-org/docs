@@ -1,0 +1,105 @@
+---
+title: "Websocket Overview"
+---
+
+QFEX provides 2 endpoints for websocket:
+
+- [mds.qfex.com](wss://mds.qfex.com) for public market and reference data.
+- [trade.qfex.com](wss://trade.qfex.com) for order entry and private data.
+
+These endpoints have a common set of [enums](/docs/api-reference/enums).
+
+## Getting Started
+
+You can connect to our websocket endpoints directly using your preferred language or websocket client library.
+
+<AccordionGroup>
+  <Accordion icon="python" title="Setup Python">
+    ```python
+    import websocket
+    import json
+
+    def on_message(ws, message):
+        data = json.loads(message)
+        print("Received:", data)
+
+    ws = websocket.WebSocketApp(
+        "wss://mds.qfex.com",
+        on_message=on_message
+    )
+
+    ws.run_forever()
+    ```
+
+  </Accordion>
+
+  <Accordion icon="node" title="Setup Node">
+    ```javascript
+    import WebSocket from "ws";
+
+    const ws = new WebSocket("wss://mds.qfex.com");
+
+    ws.on("open", () => {
+      console.log("Connected");
+      // Example: subscribe to trades
+      ws.send(JSON.stringify({
+        type: "subscribe",
+        channel: "trades",
+        symbol: "BTC-USD"
+      }));
+    });
+
+    ws.on("message", (message) => {
+      console.log("Received:", message.toString());
+    });
+    ```
+
+  </Accordion>
+
+  <Accordion icon="golang" title="Setup Go">
+    ```go
+    package main
+
+    import (
+      "fmt"
+      "log"
+      "github.com/gorilla/websocket"
+    )
+
+    func main() {
+      c, _, err := websocket.DefaultDialer.Dial("wss://mds.qfex.com", nil)
+      if err != nil {
+        log.Fatal("dial:", err)
+      }
+      defer c.Close()
+
+      // Example: subscribe to order book
+      sub := map[string]interface{}{
+        "type": "subscribe",
+        "channel": "book",
+        "symbol": "BTC-USD",
+      }
+      c.WriteJSON(sub)
+
+      for {
+        _, message, err := c.ReadMessage()
+        if err != nil {
+          log.Println("read:", err)
+          return
+        }
+        fmt.Printf("recv: %s\n", message)
+      }
+    }
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+## Authentication
+
+All websocket connections to `trade.qfex.com` require an **API Key**.  
+You must include it in the connection headers:
+
+```http
+X-QFEX-API-KEY: YOUR_API_KEY_HERE
+```
