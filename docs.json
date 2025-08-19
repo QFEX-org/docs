@@ -3,14 +3,14 @@
   "theme": "mint",
   "name": "QFEX API Documentation",
   "colors": {
-    "primary": "#01bf81",
-    "light": "#01cafe",
-    "dark": "#07363e"
+    "primary": "#8B5CF6",
+    "light": "#8B5CF6",
+    "dark": "#8B5CF6"
   },
   "background": {
     "color": {
-      "light": "#f5fffc",
-      "dark": "#07363e"
+      "light": "#F9FAFB",
+      "dark": "#172027"
     }
   },
   "fonts": {
