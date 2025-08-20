@@ -21,14 +21,6 @@ channels:
     #   apiKey:
     #     $ref: "#/components/parameters/apiKey"
     messages:
-      subscribeOrderBook:
-        $ref: "#/components/messages/SubscribeOrderBookCommand"
-      subscribeMarkets:
-        $ref: "#/components/messages/SubscribeMarketsCommand"
-      subscribeTrades:
-        $ref: "#/components/messages/SubscribeTradesCommand"
-      subscribeCandles:
-        $ref: "#/components/messages/SubscribeCandlesCommand"
       subscribePositions:
         $ref: "#/components/messages/SubscribePositionsCommand"
       subscribeBalance:
@@ -53,36 +45,6 @@ channels:
         $ref: "#/components/messages/PositionUpdate"
 
 operations:
-  subscribeOrderBookStream:
-    action: receive
-    channel:
-      $ref: "#/channels/qfex"
-    summary: Subscribe to a data stream
-    # traits:
-    #   - $ref: "#/components/operationTraits/websocket"
-    messages:
-      - $ref: "#/channels/qfex/messages/subscribeOrderBook"
-
-  subscribeTradesStream:
-    action: receive
-    channel:
-      $ref: "#/channels/qfex"
-    summary: Subscribe to a data stream
-    # traits:
-    #   - $ref: "#/components/operationTraits/websocket"
-    messages:
-      - $ref: "#/channels/qfex/messages/subscribeTrades"
-
-  subscribeCandlesStream:
-    action: receive
-    channel:
-      $ref: "#/channels/qfex"
-    summary: Subscribe to a data stream
-    # traits:
-    #   - $ref: "#/components/operationTraits/websocket"
-    messages:
-      - $ref: "#/channels/qfex/messages/subscribeCandles"
-
   subscribePositionsStream:
     action: receive
     channel:
@@ -112,16 +74,6 @@ operations:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
       - $ref: "#/channels/qfex/messages/subscribeOrders"
-
-  subscribeMarketsStream:
-    action: receive
-    channel:
-      $ref: "#/channels/qfex"
-    summary: Subscribe to a data stream
-    # traits:
-    #   - $ref: "#/components/operationTraits/websocket"
-    messages:
-      - $ref: "#/channels/qfex/messages/subscribeMarkets"
 
   placeOrder:
     action: receive
@@ -178,33 +130,6 @@ components:
         ws: {}
 
   messages:
-    SubscribeOrderBookCommand:
-      name: subscribe_orderbook
-      title: v4_orderbook
-      summary: Subscribe to order book
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/SubscribeOrderBookCommand"
-    SubscribeTradesCommand:
-      name: subscribe_trades
-      title: v4_trades
-      summary: Subscribe to public trades
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/SubscribeTradesCommand"
-    SubscribeCandlesCommand:
-      name: subscribe_candles
-      title: v4_candles
-      summary: Subscribe to candles
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/SubscribeCandlesCommand"
     SubscribePositionsCommand:
       name: subscribe_positions
       title: v4_positions
@@ -232,15 +157,6 @@ components:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
         $ref: "#/components/schemas/SubscribeOrdersCommand"
-    SubscribeMarketsCommand:
-      name: subscribe_markets
-      title: v4_markets
-      summary: Subscribe to product reference data
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/SubscribeMarketsCommand"
 
     AddOrderCommand:
       name: add_order

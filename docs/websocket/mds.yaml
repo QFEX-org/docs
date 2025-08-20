@@ -1,0 +1,787 @@
+asyncapi: 3.0.0
+info:
+  title: QFEX Multiplexed WebSocket API
+  version: 1.0.0
+  description: |-
+    Single WebSocket gateway for all QFEX real‑time streams.  
+    Clients publish subscription and order commands here,  
+    and receive all updates over the same endpoint.
+defaultContentType: application/json
+servers:
+  production:
+    host: mds.qfex.com
+    protocol: wss
+    description: Production WebSocket gateway
+
+channels:
+  qfex:
+    address: /
+    description: Single channel for orderbook, trades, candles
+    # parameters:
+    #   apiKey:
+    #     $ref: "#/components/parameters/apiKey"
+    messages:
+      subscribeOrderBook:
+        $ref: "#/components/messages/SubscribeOrderBookCommand"
+      subscribeTrades:
+        $ref: "#/components/messages/SubscribeTradesCommand"
+      subscribeCandles:
+        $ref: "#/components/messages/SubscribeCandlesCommand"
+      subscribeBbo:
+        $ref: "#/components/messages/SubscribeBboCommand"
+      subscribeUnderlier:
+        $ref: "#/components/messages/SubscribeUnderlierCommand"
+      subscribeMarkPrice:
+        $ref: "#/components/messages/SubscribeMarkPriceCommand"
+      subscribeFundingRate:
+        $ref: "#/components/messages/SubscribeFundingRateCommand"
+      orderBookUpdate:
+        $ref: "#/components/messages/OrderBookUpdate"
+      tradeUpdate:
+        $ref: "#/components/messages/TradeUpdate"
+      candleUpdate:
+        $ref: "#/components/messages/CandleUpdate"
+      bboUpdate:
+        $ref: "#/components/messages/BboUpdate"
+      underlierUpdate:
+        $ref: "#/components/messages/UnderlierUpdate"
+      markPriceUpdate:
+        $ref: "#/components/messages/MarkPriceUpdate"
+      fundingRateUpdate:
+        $ref: "#/components/messages/FundingRateUpdate"
+
+operations:
+  subscribeOrderBookStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeOrderBook"
+
+  subscribeTradesStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeTrades"
+
+  subscribeBboStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeBbo"
+
+  subscribeUnderlierStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeUnderlier"
+
+  subscribeMarkPriceStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeMarkPrice"
+
+  subscribeFundingRateStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeFundingRate"
+
+  subscribeCandlesStream:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Subscribe to a data stream
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/subscribeCandles"
+
+  receiveUpdates:
+    action: send
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Receive all update messages and events
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/orderBookUpdate"
+      - $ref: "#/channels/qfex/messages/tradeUpdate"
+      - $ref: "#/channels/qfex/messages/candleUpdate"
+      - $ref: "#/channels/qfex/messages/bboUpdate"
+      - $ref: "#/channels/qfex/messages/underlierUpdate"
+      - $ref: "#/channels/qfex/messages/markPriceUpdate"
+      - $ref: "#/channels/qfex/messages/fundingRateUpdate"
+
+components:
+  parameters:
+    apiKey:
+      description: Your QFEx API key
+
+  messageTraits:
+    commonHeaders:
+      headers:
+        type: object
+        properties:
+          x-qfex-client:
+            type: string
+            description: Client identifier
+
+  operationTraits:
+    websocket:
+      bindings:
+        ws: {}
+
+  messages:
+    SubscribeOrderBookCommand:
+      name: subscribe_orderbook
+      title: level2
+      summary: Subscribe to the order book
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeOrderBookCommand"
+    SubscribeTradesCommand:
+      name: subscribe_trades
+      title: trade
+      summary: Subscribe to public trades
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeTradesCommand"
+    SubscribeCandlesCommand:
+      name: subscribe_candles
+      title: candle
+      summary: Subscribe to candles
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeCandlesCommand"
+    SubscribeBboCommand:
+      name: subscribe_bbo
+      title: bbo
+      summary: Subscribe to best bid and offer
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeBboCommand"
+    SubscribeUnderlierCommand:
+      name: subscribe_underlier
+      title: underlier
+      summary: Subscribe to underlier
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeUnderlierCommand"
+    SubscribeMarkPriceCommand:
+      name: subscribe_mark_price
+      title: mark_price
+      summary: Subscribe to mark price
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeMarkPriceCommand"
+    SubscribeFundingRateCommand:
+      name: subscribe_funding_rate
+      title: funding_rate
+      summary: Subscribe to funding rate
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SubscribeFundingRateCommand"
+
+    OrderBookUpdate:
+      name: orderbook_update
+      title: orderbook
+      summary: Changes in the L2 order book
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/OrderBookUpdate"
+    TradeUpdate:
+      name: trade_update
+      title: trades
+      summary: Public trades
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/TradeUpdate"
+    CandleUpdate:
+      name: candle_update
+      title: candles
+      summary: Candle updates over various intervals
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/CandleUpdate"
+    BboUpdate:
+      name: bbo_update
+      title: bbo
+      summary: Best bid and offer updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/BboUpdate"
+    UnderlierUpdate:
+      name: underlier_update
+      title: underlier
+      summary: Underlier updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/UnderlierUpdate"
+    MarkPriceUpdate:
+      name: mark_price_update
+      title: mark_price
+      summary: Mark price updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/MarkPriceUpdate"
+    FundingRateUpdate:
+      name: funding_rate_update
+      title: funding_rate
+      summary: Funding rate updates
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/FundingRateUpdate"
+
+  schemas:
+    MessageEnvelope:
+      type: object
+      properties:
+        type:
+          type: string
+        connection_id:
+          type: string
+        message_id:
+          type: integer
+        channel:
+          type: string
+        id:
+          type: string
+      required:
+        - type
+        - connection_id
+        - message_id
+
+    SubscribeOrderBookCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - level2
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD", can also use "*" for all symbols
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [level2]
+          symbols: [AAPL-USD]
+
+    SubscribeTradesCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - trade
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD", can also use "*" for all symbols
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [trade]
+          symbols: [AAPL-USD]
+
+    SubscribeCandlesCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - candle
+          description: candle
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Symbol/Interval, e.g. "AAPL-USD/1MIN"
+        intervals:
+          type: array
+          items:
+            type: string
+            enum:
+              - 1MIN
+              - 5MINS
+              - 15MINS
+              - 1HOUR
+              - 4HOURS
+              - 1DAY
+          description: Candle intervals, e.g. "1MIN"
+      required:
+        - type
+        - channels
+        - symbols
+        - intervals
+      examples:
+        - type: subscribe
+          channels: [candle]
+          symbols: [AAPL-USD]
+          intervals: [1MIN]
+
+    SubscribeBboCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - bbo
+          description: bbo
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD"
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [bbo]
+          symbols: [AAPL-USD]
+
+    SubscribeUnderlierCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - underlier
+          description: underlier
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD"
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [underlier]
+          symbols: [AAPL-USD]
+
+    SubscribeMarkPriceCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - mark_price
+          description: mark_price
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD"
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [mark_price]
+          symbols: [AAPL-USD]
+
+    SubscribeFundingRateCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - unsubscribe
+            - subscribe
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+              - funding_rate
+          description: funding_rate
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Trading pairs, e.g. "AAPL-USD"
+      required:
+        - type
+        - channels
+        - symbols
+      examples:
+        - type: subscribe
+          channels: [funding_rate]
+          symbols: [AAPL-USD]
+
+    OrderBookUpdate:
+      examples:
+        - type: level2
+          symbol: AAPL-USD
+          sequence: 256948
+          bids: [["564.1", "0.1"], ["560.3", "0.001"]]
+          asks: [["566.2", "2.118"], ["566.3", "2.119"]]
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderBookPayload"
+
+    TradeUpdate:
+      examples:
+        - type: trade
+          trade_id: ab59768f-f81e-4535-80c0-7b35f6709704
+          sequence: 256948
+          time: "2025-08-20T09:26:36.861195808Z"
+          symbol: "PLTR-USD"
+          size: "0.100000"
+          price: "157.025000"
+          side: "SELL"
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/TradePayload"
+
+    CandleUpdate:
+      examples:
+        - type: candle
+          symbol: PLTR-USD
+          start: "2025-08-20T09:27:00Z"
+          resolution: "1MIN"
+          low: "155.700000"
+          high: "157.225000"
+          open: "156.475000"
+          close: "156.900000"
+          usdVolume: "16700.000000"
+          trades: "16.700000"
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/CandlePayload"
+
+    BboUpdate:
+      examples:
+        - type: bbo
+          symbol: AAPL-USD
+          sequence: 256948
+          bids: ["564.1", "2.126"]
+          asks: ["566.2", "2.118"]
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/BboPayload"
+    UnderlierUpdate:
+      examples:
+        - type: underlier
+          symbol: AAPL-USD
+          sequence: 256948
+          price: "437.45"
+          time: "2025-05-08T20:52:48.000Z"
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/UnderlierPayload"
+    MarkPriceUpdate:
+      examples:
+        - type: mark_price
+          symbol: AAPL-USD
+          sequence: 256948
+          price: "437.45"
+          time: "2025-05-08T20:52:48.000Z"
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/MarkPricePayload"
+    FundingRateUpdate:
+      examples:
+        - type: funding_rate
+          symbol: AAPL-USD
+          sequence: 256948
+          rate: "0.21"
+          timeRemaining: 32
+          time: "2025-05-08T20:52:48.000Z"
+      allOf:
+        - $ref: "#/components/schemas/MessageEnvelope"
+        - type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: "#/components/schemas/FundingRatePayload"
+
+    BboPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bids:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        asks:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+
+    UnderlierPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bidPrice:
+          type: string
+        bidSize:
+          type: string
+        askPrice:
+          type: string
+        askSize:
+          type: string
+
+    FundingRatePayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bidPrice:
+          type: string
+        bidSize:
+          type: string
+        askPrice:
+          type: string
+        askSize:
+          type: string
+
+    MarkPricePayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bidPrice:
+          type: string
+        bidSize:
+          type: string
+        askPrice:
+          type: string
+        askSize:
+          type: string
+
+    OrderBookPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        bids:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        asks:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+
+    TradePayload:
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        side:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CandlePayload:
+      type: object
+      properties:
+        startedAt:
+          type: string
+        ticker:
+          type: string
+        resolution:
+          type: string
+        open:
+          type: string
+        high:
+          type: string
+        low:
+          type: string
+        close:
+          type: string
+        usdVolume:
+          type: string
+
+    BalancePayload:
+      type: object
+      properties:
+        deposit:
+          type: number
+        realised_pnl:
+          type: number
+        unrealised_pnl:
+          type: number
+        order_margin:
+          type: number
+        position_margin:
+          type: number
+        available_balance:
+          type: number
+
+    PositionPayload:
+      type: object
+      properties:
+        symbol:
+          type: string
+        position:
+          type: number
+        average_price:
+          type: number
+
+    PnlEntryPayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        available_balance:
+          type: number
+        realised_pnl:
+          type: number
