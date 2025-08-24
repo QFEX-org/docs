@@ -1,16 +1,20 @@
 ---
-title: "Cancel All Orders"
+title: "Subscribe — Positions"
 ---
 
-You can cancel **all active orders** for your account over **WebSocket** using the `cancel_all_orders` message.  
+Subscribe to the **positions** channel to receive pulsed position updates for all symbols.  
+Messages are pushed every **1 second**.
 
-## Example Request
+## 1) Authenticate
 
 ```json
-{
-  "type": "cancel_all_orders",
-  "params": {}
-}
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
+```
+
+## 2) Subscribe
+
+```json
+{ "type": "subscribe", "params": { "channels": ["positions"] } }
 ```
 
 ## Sample Code
@@ -26,15 +30,13 @@ API_KEY = "YOUR_API_KEY"
 def send(ws, obj): ws.send(json.dumps(obj))
 
 def on_open(ws):
-    # Authenticate
     send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
-    # Cancel all orders
-    send(ws, {"type": "cancel_all_orders", "params": {}})
+    send(ws, {"type": "subscribe", "params": {"channels": ["positions"]}})
 
 ws = websocket.WebSocketApp(
     "wss://trade.psex.io",
     on_open=on_open,
-    on_message=lambda _, m: print("Message:", m)
+    on_message=lambda _, m: print("Message:", m),
 )
 ws.run_forever()
 ```
@@ -42,14 +44,14 @@ ws.run_forever()
 ```javascript node
 // Node.js (ws)
 import WebSocket from "ws";
-const ws = new WebSocket("wss://trade.psex.io");
 const API_KEY = "YOUR_API_KEY";
+const ws = new WebSocket("wss://trade.psex.io");
 
 ws.on("open", () => {
-  // Authenticate
   ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
-  // Cancel all orders
-  ws.send(JSON.stringify({ type: "cancel_all_orders", params: {} }));
+  ws.send(
+    JSON.stringify({ type: "subscribe", params: { channels: ["positions"] } })
+  );
 });
 
 ws.on("message", (msg) => console.log("Message:", msg.toString()));
@@ -73,17 +75,21 @@ func main() {
 	if err != nil { log.Fatal("dial:", err) }
 	defer c.Close()
 
-	// Authenticate
 	mustWriteJSON(c, map[string]any{
 		"type": "auth",
 		"params": map[string]any{"api_key": "YOUR_API_KEY"},
 	})
 
-	// Cancel all orders
 	mustWriteJSON(c, map[string]any{
-		"type": "cancel_all_orders",
-		"params": map[string]any{},
+		"type": "subscribe",
+		"params": map[string]any{"channels": []string{"positions"}},
 	})
+
+	for {
+		_, data, err := c.ReadMessage()
+		if err != nil { log.Fatal("read:", err) }
+		log.Println(string(data))
+	}
 }
 ```
 
@@ -92,20 +98,17 @@ func main() {
 import java.util.concurrent.TimeUnit;
 import okhttp3.*;
 
-public class CancelAllOrdersWs {
+public class PositionsSub {
   public static void main(String[] args) {
     OkHttpClient client = new OkHttpClient.Builder()
         .pingInterval(20, TimeUnit.SECONDS).build();
 
-    Request req = new Request.Builder()
-        .url("wss://trade.psex.io").build();
+    Request req = new Request.Builder().url("wss://trade.psex.io").build();
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {
-        // Authenticate
         ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
-        // Cancel all orders
-        ws.send("{\"type\":\"cancel_all_orders\",\"params\":{}}");
+        ws.send("{\"type\":\"subscribe\",\"params\":{\"channels\":[\"positions\"]}}");
       }
       @Override public void onMessage(WebSocket ws, String text) {
         System.out.println(text);
@@ -120,29 +123,30 @@ public class CancelAllOrdersWs {
 
 </CodeGroup>
 
-## Example Response
+## Example Responses
 
-Every cancelled order will generate an **order_response** with status `CANCELLED`.  
+```json
+{ "subscribed": "positions" }
+```
 
 ```json
 {
-  "order_response": {
-    "order_id": "5b309929-206f-40ec-804d-cbe46e81afc1",
+  "position_response": {
+    "id": "c003ad60-ded4-401b-9b4c-e255a53d32ea",
     "symbol": "AAPL-USD",
-    "status": "CANCELLED",
-    "quantity": 1.0,
-    "price": 200.0,
-    "side": "BUY",
-    "type": "LIMIT",
-    "time_in_force": "GFD",
-    "user_id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
-    "client_order_id": "my-client-oid",
-    "quantity_remaining": 1.0
+    "position": 0.0,
+    "margin_alloc": 0.0,
+    "realised_pnl": 0.0,
+    "unrealised_pnl": 0.0,
+    "net_funding": 0.0,
+    "open_orders": 0.0,
+    "open_quantity": 0.0,
+    "leverage": 20.0,
+    "initial_margin": 0.05,
+    "maintenance_margin": 0.03333333333333333,
+    "average_price": 0.0
   }
 }
 ```
 
-<Note>
-  This cancels **all open orders across all symbols** for the authenticated account.  
-  If you only want to cancel specific orders, use the [Cancel Order](/docs/order-entry/cancel-order) endpoint instead.
-</Note>
+<Note>Position updates are **pulsed every second**.</Note>

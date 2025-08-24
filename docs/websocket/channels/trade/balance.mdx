@@ -1,0 +1,166 @@
+---
+title: "Subscribe — Balances"
+---
+
+Subscribe to the **balances** channel to receive pulsed account balance updates.  
+Messages are pushed every **1 second**.
+
+## 1) Authenticate
+
+Send this immediately after connecting to `wss://trade.psex.io`:
+
+```json
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
+```
+
+## 2) Subscribe
+
+```json
+{ "type": "subscribe", "params": { "channels": ["balances"] } }
+```
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+# pip install websocket-client
+import json, websocket
+
+API_KEY = "YOUR_API_KEY"
+
+def send(ws, obj): ws.send(json.dumps(obj))
+
+def on_open(ws):
+    # 1) Authenticate
+    send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
+    # 2) Subscribe to balances
+    send(ws, {"type": "subscribe", "params": {"channels": ["balances"]}})
+
+ws = websocket.WebSocketApp(
+    "wss://trade.psex.io",
+    on_open=on_open,
+    on_message=lambda _, m: print("Message:", m),
+    on_error=lambda _, e: print("Error:", e),
+    on_close=lambda *_: print("Closed"),
+)
+ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+// npm i ws
+import WebSocket from "ws";
+
+const API_KEY = "YOUR_API_KEY";
+const ws = new WebSocket("wss://trade.psex.io");
+
+ws.on("open", () => {
+  ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
+  ws.send(JSON.stringify({ type: "subscribe", params: { channels: ["balances"] } }));
+});
+
+ws.on("message", (msg) => console.log("Message:", msg.toString()));
+ws.on("error", (e) => console.error("WS error:", e));
+```
+
+```go go
+// Go (gorilla/websocket)
+// go get github.com/gorilla/websocket
+package main
+
+import (
+	"log"
+	"github.com/gorilla/websocket"
+)
+
+func mustWriteJSON(c *websocket.Conn, v any) {
+	if err := c.WriteJSON(v); err != nil { log.Fatal("write:", err) }
+}
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	if err != nil { log.Fatal("dial:", err) }
+	defer c.Close()
+
+	// 1) Authenticate
+	mustWriteJSON(c, map[string]any{
+		"type": "auth",
+		"params": map[string]any{"api_key": "YOUR_API_KEY"},
+	})
+
+	// 2) Subscribe to balances
+	mustWriteJSON(c, map[string]any{
+		"type": "subscribe",
+		"params": map[string]any{"channels": []string{"balances"}},
+	})
+
+	// Read messages (optional)
+	for {
+		_, data, err := c.ReadMessage()
+		if err != nil { log.Fatal("read:", err) }
+		log.Println(string(data))
+	}
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+// Gradle: implementation("com.squareup.okhttp3:okhttp:4.12.0")
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class BalancesSub {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS).build();
+
+    Request req = new Request.Builder().url("wss://trade.psex.io").build();
+
+    WebSocketListener li = new WebSocketListener() {
+      @Override public void onOpen(WebSocket ws, Response r) {
+        ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
+        ws.send("{\"type\":\"subscribe\",\"params\":{\"channels\":[\"balances\"]}}");
+      }
+      @Override public void onMessage(WebSocket ws, String text) {
+        System.out.println(text);
+      }
+      @Override public void onFailure(WebSocket ws, Throwable t, Response r) {
+        System.err.println("WS error: " + t.getMessage());
+      }
+    };
+
+    client.newWebSocket(req, li);
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Responses
+
+```json
+{ "subscribed": "balances" }
+```
+
+```json
+{
+  "balance_response": {
+    "id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
+    "user_id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
+    "deposit": 9990000000.0,
+    "realised_pnl": 0.0,
+    "order_margin": 0.0,
+    "position_margin": 0.0,
+    "unrealised_pnl": 0.0,
+    "net_funding": 0.0,
+    "available_balance": 9990000000.0
+  }
+}
+```
+
+<Note>
+  Balance updates are **pulsed every second**.
+</Note>

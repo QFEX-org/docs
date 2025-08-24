@@ -1,17 +1,23 @@
 ---
-title: "Cancel All Orders"
+title: "Get User Trades"
 ---
 
-You can cancel **all active orders** for your account over **WebSocket** using the `cancel_all_orders` message.  
+You can request the most recent **executed trades** (fills) for the authenticated account.  
 
 ## Example Request
 
 ```json
 {
-  "type": "cancel_all_orders",
-  "params": {}
+  "type": "get_user_trades",
+  "params": {
+    "limit": 10,
+    "offset": 0
+  }
 }
 ```
+
+- `limit` *(optional)* — maximum number of trades to return (default **1000**)  
+- `offset` *(optional)* — pagination offset (default **0**)  
 
 ## Sample Code
 
@@ -28,8 +34,8 @@ def send(ws, obj): ws.send(json.dumps(obj))
 def on_open(ws):
     # Authenticate
     send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
-    # Cancel all orders
-    send(ws, {"type": "cancel_all_orders", "params": {}})
+    # Request user trades
+    send(ws, {"type": "get_user_trades", "params": {"limit": 10, "offset": 0}})
 
 ws = websocket.WebSocketApp(
     "wss://trade.psex.io",
@@ -46,10 +52,8 @@ const ws = new WebSocket("wss://trade.psex.io");
 const API_KEY = "YOUR_API_KEY";
 
 ws.on("open", () => {
-  // Authenticate
   ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
-  // Cancel all orders
-  ws.send(JSON.stringify({ type: "cancel_all_orders", params: {} }));
+  ws.send(JSON.stringify({ type: "get_user_trades", params: { limit: 10, offset: 0 } }));
 });
 
 ws.on("message", (msg) => console.log("Message:", msg.toString()));
@@ -79,10 +83,10 @@ func main() {
 		"params": map[string]any{"api_key": "YOUR_API_KEY"},
 	})
 
-	// Cancel all orders
+	// Get user trades
 	mustWriteJSON(c, map[string]any{
-		"type": "cancel_all_orders",
-		"params": map[string]any{},
+		"type": "get_user_trades",
+		"params": map[string]any{"limit": 10, "offset": 0},
 	})
 }
 ```
@@ -92,7 +96,7 @@ func main() {
 import java.util.concurrent.TimeUnit;
 import okhttp3.*;
 
-public class CancelAllOrdersWs {
+public class GetUserTradesWs {
   public static void main(String[] args) {
     OkHttpClient client = new OkHttpClient.Builder()
         .pingInterval(20, TimeUnit.SECONDS).build();
@@ -102,10 +106,8 @@ public class CancelAllOrdersWs {
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {
-        // Authenticate
         ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
-        // Cancel all orders
-        ws.send("{\"type\":\"cancel_all_orders\",\"params\":{}}");
+        ws.send("{\"type\":\"get_user_trades\",\"params\":{\"limit\":10,\"offset\":0}}");
       }
       @Override public void onMessage(WebSocket ws, String text) {
         System.out.println(text);
@@ -122,27 +124,26 @@ public class CancelAllOrdersWs {
 
 ## Example Response
 
-Every cancelled order will generate an **order_response** with status `CANCELLED`.  
-
 ```json
 {
-  "order_response": {
-    "order_id": "5b309929-206f-40ec-804d-cbe46e81afc1",
-    "symbol": "AAPL-USD",
-    "status": "CANCELLED",
-    "quantity": 1.0,
-    "price": 200.0,
-    "side": "BUY",
-    "type": "LIMIT",
-    "time_in_force": "GFD",
-    "user_id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
-    "client_order_id": "my-client-oid",
-    "quantity_remaining": 1.0
-  }
+  "user_trades": [
+    {
+      "trade_id": "92adf4db-1e48-40cf-9e2a-b0ecf079a16a",
+      "symbol": "AAPL-USD",
+      "price": 200.0,
+      "quantity": 1.0,
+      "aggressor_side": "BUY",
+      "order_id": "5b309929-206f-40ec-804d-cbe46e81afc1",
+      "client_order_id": "my-client-oid",
+      "fee": 0.002,
+      "timestamp": 1746908400
+    }
+  ],
+  "count": 1
 }
 ```
 
 <Note>
-  This cancels **all open orders across all symbols** for the authenticated account.  
-  If you only want to cancel specific orders, use the [Cancel Order](/docs/order-entry/cancel-order) endpoint instead.
+  Only **executed trades (fills)** are returned.  
+  Open orders that have not filled are excluded.
 </Note>

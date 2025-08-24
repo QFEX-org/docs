@@ -53,7 +53,11 @@
                   "docs/websocket/channels/trade/add_order",
                   "docs/websocket/channels/trade/cancel_order",
                   "docs/websocket/channels/trade/modify_order",
-                  "docs/websocket/channels/trade/cancel_all_orders"
+                  "docs/websocket/channels/trade/cancel_all_orders",
+                  "docs/websocket/channels/trade/get_user_orders",
+                  "docs/websocket/channels/trade/get_user_trades",
+                  "docs/websocket/channels/trade/balance",
+                  "docs/websocket/channels/trade/positions"
                 ]
               }
             ]
