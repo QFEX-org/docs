@@ -7,7 +7,8 @@ QFEX provides 2 endpoints for websocket:
 - [mds.qfex.com](wss://mds.qfex.com) for public market and reference data.
 - [trade.qfex.com](wss://trade.qfex.com) for order entry and private data.
 
-These endpoints have a common set of [enums](/docs/api-reference/enums).
+MDS is publically accessible, and does not require authentication.  
+Trade requires an API key and a connection must [authenticate](/docs/websocket/trade/authenticate) within 1 minute of connecting.
 
 ## Getting Started
 

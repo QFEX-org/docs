@@ -9,42 +9,47 @@ info:
 defaultContentType: application/json
 servers:
   production:
-    host: ws.qfex.com
+    host: trade.qfex.com
     protocol: wss
     description: Production WebSocket gateway
 
 channels:
   qfex:
-    address: /v4/ws
-    description: Single channel for subscriptions, order commands, and all updates
+    address: /
+    description: Single channel for order commands, positions, balances
     # parameters:
     #   apiKey:
     #     $ref: "#/components/parameters/apiKey"
     messages:
+      authenticate:
+        $ref: "#/components/messages/AuthenticateCommand"
       subscribePositions:
         $ref: "#/components/messages/SubscribePositionsCommand"
       subscribeBalance:
         $ref: "#/components/messages/SubscribeBalanceCommand"
-      subscribeOrders:
-        $ref: "#/components/messages/SubscribeOrdersCommand"
       addOrder:
         $ref: "#/components/messages/AddOrderCommand"
       cancelOrder:
         $ref: "#/components/messages/CancelOrderCommand"
-      bboUpdate:
-        $ref: "#/components/messages/BboUpdate"
-      orderBookUpdate:
-        $ref: "#/components/messages/OrderBookUpdate"
-      tradeUpdate:
-        $ref: "#/components/messages/TradeUpdate"
-      candleUpdate:
-        $ref: "#/components/messages/CandleUpdate"
+      modifyOrder:
+        $ref: "#/components/messages/ModifyOrderCommand"
+      cancelAllOrders:
+        $ref: "#/components/messages/CancelAllOrdersCommand"
       balanceUpdate:
         $ref: "#/components/messages/BalanceUpdate"
       positionUpdate:
         $ref: "#/components/messages/PositionUpdate"
 
 operations:
+  authenticate:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Authenticate with the WebSocket gateway
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/authenticate"
   subscribePositionsStream:
     action: receive
     channel:
@@ -64,16 +69,6 @@ operations:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
       - $ref: "#/channels/qfex/messages/subscribeBalance"
-
-  subscribeOrdersStream:
-    action: receive
-    channel:
-      $ref: "#/channels/qfex"
-    summary: Subscribe to a data stream
-    # traits:
-    #   - $ref: "#/components/operationTraits/websocket"
-    messages:
-      - $ref: "#/channels/qfex/messages/subscribeOrders"
 
   placeOrder:
     action: receive
@@ -95,6 +90,16 @@ operations:
     messages:
       - $ref: "#/channels/qfex/messages/cancelOrder"
 
+  modifyOrder:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Cancel an existing order
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/cancelOrder"
+
   receiveUpdates:
     action: send
     channel:
@@ -103,10 +108,6 @@ operations:
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfex/messages/bboUpdate"
-      - $ref: "#/channels/qfex/messages/orderBookUpdate"
-      - $ref: "#/channels/qfex/messages/tradeUpdate"
-      - $ref: "#/channels/qfex/messages/candleUpdate"
       - $ref: "#/channels/qfex/messages/balanceUpdate"
       - $ref: "#/channels/qfex/messages/positionUpdate"
 
@@ -130,10 +131,19 @@ components:
         ws: {}
 
   messages:
+    AuthenticateCommand:
+      name: authenticate
+      title: Authenticate
+      summary: Authenticate to the WebSocket gateway. Required before any other commands.
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/AuthenticateCommand"
     SubscribePositionsCommand:
       name: subscribe_positions
-      title: v4_positions
-      summary: Subscribe to user positions
+      title: Subscribe to Positions
+      summary: Subscribe to user positions. Receive 1s pulsed updates on current positions.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -141,27 +151,18 @@ components:
         $ref: "#/components/schemas/SubscribePositionsCommand"
     SubscribeBalanceCommand:
       name: subscribe_balance
-      title: v4_balances
-      summary: Subscribe to user balance
+      title: Subscribe to Balance
+      summary: Subscribe to user balance. Receive 1s pulsed updates on current balance.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
         $ref: "#/components/schemas/SubscribeBalanceCommand"
-    SubscribeOrdersCommand:
-      name: subscribe_orders
-      title: v4_orders
-      summary: Subscribe to user orders
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/SubscribeOrdersCommand"
 
     AddOrderCommand:
       name: add_order
-      title: v4_orders/Add Order
-      summary: Add order. Ensure you have subscribed to the v4_orders channel first
+      title: Add Order
+      summary: Add order.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
@@ -170,57 +171,37 @@ components:
 
     CancelOrderCommand:
       name: cancel_order
-      title: v4_orders/Cancel Order
-      summary: Cancel order. Ensure you have subscribed to the v4_orders channel first
+      title: Cancel Order
+      summary: Cancel order.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
         $ref: "#/components/schemas/CancelOrderCommand"
 
-    BboUpdate:
-      name: bbo_update
-      title: v4_bbo
-      summary: Best bid and offer updates
+    ModifyOrderCommand:
+      name: modify_order
+      title: Modify Order
+      summary: Modify order.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
-        $ref: "#/components/schemas/BboUpdate"
+        $ref: "#/components/schemas/ModifyOrderCommand"
 
-    OrderBookUpdate:
-      name: orderbook_update
-      title: v4_orderbook
-      summary: Changes in the L2 order book
+    CancelAllOrdersCommand:
+      name: cancel_all_orders
+      title: Cancel All Orders
+      summary: Cancel all orders.
       contentType: application/json
       traits:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
-        $ref: "#/components/schemas/OrderBookUpdate"
-
-    TradeUpdate:
-      name: trade_update
-      title: v4_trades
-      summary: Public trades
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/TradeUpdate"
-
-    CandleUpdate:
-      name: candle_update
-      title: v4_candles
-      summary: Candle updates over various intervals
-      contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
-      payload:
-        $ref: "#/components/schemas/CandleUpdate"
+        $ref: "#/components/schemas/CancelAllOrdersCommand"
 
     BalanceUpdate:
       name: balance_update
-      title: v4_balances
+      title: Balance Update
       summary: User balance updates
       contentType: application/json
       traits:
@@ -230,7 +211,7 @@ components:
 
     PositionUpdate:
       name: position_update
-      title: v4_positions
+      title: Position Update
       summary: User position updates
       contentType: application/json
       traits:
@@ -257,7 +238,7 @@ components:
         - connection_id
         - message_id
 
-    SubscribeOrderBookCommand:
+    SubscribePositionsCommand:
       type: object
       properties:
         type:
@@ -265,77 +246,17 @@ components:
           enum:
             - unsubscribe
             - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_orderbook
-          description: v4_orderbook
-        id:
-          type: string
-          description: Trading pair, e.g. "AAPL-USD"
+        params:
+          type: object
+          properties:
+            channel:
+              type: string
+              enum:
+                - positions
+              description: positions
       required:
         - type
-        - channel
-        - id
-
-    SubscribeTradesCommand:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - unsubscribe
-            - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_trades
-          description: v4_trades
-        id:
-          type: string
-          description: Trading pair, e.g. "AAPL-USD"
-      required:
-        - type
-        - channel
-        - id
-
-    SubscribeCandlesCommand:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - unsubscribe
-            - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_candles
-          description: v4_candles
-        id:
-          type: string
-          description: Symbol/Interval, e.g. "AAPL-USD/1MIN"
-      required:
-        - type
-        - channel
-        - id
-
-    SubscribeMarketsCommand:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - unsubscribe
-            - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_markets
-          description: v4_markets
-      required:
-        - type
-        - channel
+        - params
 
     SubscribeBalanceCommand:
       type: object
@@ -345,239 +266,149 @@ components:
           enum:
             - unsubscribe
             - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_balances
-          description: v4_balances
-        id:
-          type: string
-          description: API Key
+        params:
+          type: object
+          properties:
+            channel:
+              type: string
+              enum:
+                - balances
+              description: balances
       required:
         - type
-        - channel
-        - id
+        - params
 
-    SubscribeOrdersCommand:
+    AuthenticateCommand:
       type: object
       properties:
         type:
           type: string
           enum:
-            - unsubscribe
-            - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_orders
-          description: v4_orders
-        id:
-          type: string
-          description: API Key
+            - authenticate
+        params:
+          type: object
+          properties:
+            apiKey:
+              type: string
       required:
         - type
-        - channel
-        - id
-
-    SubscribePositionsCommand:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - unsubscribe
-            - subscribe
-        channel:
-          type: string
-          enum:
-            - v4_positions
-          description: v4_positions
-        id:
-          type: string
-          description: API Key
-      required:
-        - type
-        - channel
-        - id
+        - params
 
     AddOrderCommand:
       type: object
       properties:
-        channel:
+        type:
           type: string
           enum:
-            - v4_orders
-        id:
-          type: string
-          description: API Key
-        order:
+            - add_order
+        params:
           type: object
           properties:
-            action:
+            symbol:
               type: string
-              enum:
-                - ADD
-            marketId:
-              type: string
-              description: Symbol, e.g. "AAPL-USD"
             side:
               type: string
               enum:
                 - BUY
                 - SELL
-            type:
+            order_type:
               type: string
               enum:
                 - LIMIT
                 - MARKET
-            timeInForce:
+                - ALO
+            order_time_in_force:
               type: string
               enum:
                 - GTC
                 - IOC
                 - FOK
-            size:
-              type: string
+            quantity:
+              type: number
             price:
-              type: string
-              description: This is only required for LIMIT orders
+              type: number
+              description: This is only required for LIMIT or ALO orders
+            take_profit:
+              type: number
+            stop_loss:
+              type: number
           required:
             - action
-            - marketId
+            - symbol
             - side
-            - type
-            - timeInForce
-            - size
+            - order_type
+            - order_time_in_force
+            - quantity
       required:
-        - channel
-        - id
-        - order
-
+        - type
+        - params
     CancelOrderCommand:
       type: object
       properties:
-        channel:
+        type:
           type: string
           enum:
-            - v4_orders
-        id:
-          type: string
-          description: API Key
-        order:
+            - cancel_order
+        params:
           type: object
           properties:
-            action:
+            symbol:
+              type: string
+            order_id:
+              type: string
+            cancel_order_id_type:
               type: string
               enum:
-                - CANCEL
-            orderId:
-              type: string
-            marketId:
-              type: string
-              description: Symbol, e.g. "AAPL-USD"
+                - order_id
+                - client_order_id
           required:
-            - action
-            - orderId
-            - marketId
+            - symbol
+            - order_id
+            - cancel_order_id_type
       required:
-        - channel
-        - id
-        - order
-
-    BboUpdate:
-      examples:
-        - type: subscribed
-          connection_id: "ee987ddf-822c-4356-b0d1-9cbb14859b00"
-          message_id: 1
-          id: null
-          channel: v4_bbo
-          contents:
-            bbo:
-              - MSFT-USD:
-                  symbol: MSFT-USD
-                  bidPrice: "437.45"
-                  bidSize: "2.741"
-                  askPrice: "439.05"
-                  askSize: "2.731"
-      allOf:
-        - $ref: "#/components/schemas/MessageEnvelope"
-        - type: object
+        - type
+        - params
+    ModifyOrderCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - modify_order
+        params:
+          type: object
           properties:
-            contents:
-              type: array
-              items:
-                $ref: "#/components/schemas/BboPayload"
-
-    OrderBookUpdate:
-      examples:
-        - type: subscribed
-          connection_id: "bfbbeb78-c95d-43c4-8a0f-833fab5a3f39"
-          message_id: 1
-          id: "SP500-USD"
-          channel: v4_orderbook
-          contents:
-            bids:
-              - price: "564.1"
-                size: "2.126"
-              - price: "560.3"
-                size: "0.001"
-            asks:
-              - price: "566.2"
-                size: "2.118"
-      allOf:
-        - $ref: "#/components/schemas/MessageEnvelope"
-        - type: object
-          properties:
-            contents:
-              type: array
-              items:
-                $ref: "#/components/schemas/OrderBookPayload"
-
-    TradeUpdate:
-      examples:
-        - type: subscribed
-          connection_id: "bfbbeb78-c95d-43c4-8a0f-833fab5a3f39"
-          message_id: 1
-          id: "SP500-USD"
-          channel: v4_trades
-          contents:
-            - price: "564.1"
-              size: "2.126"
-              side: "BUY"
-              createdAt: "2025-05-08T20:52:48.000Z"
-      allOf:
-        - $ref: "#/components/schemas/MessageEnvelope"
-        - type: object
-          properties:
-            contents:
-              type: array
-              items:
-                $ref: "#/components/schemas/TradePayload"
-
-    CandleUpdate:
-      examples:
-        - type: subscribed
-          connection_id: "ee987ddf-822c-4356-b0d1-012314859b00"
-          message_id: 1
-          id: "AAPL-USD/1MIN"
-          channel: v4_candles
-          contents:
-            - startedAt: "2025-05-08T19:00:00Z"
-              ticker: "AAPL-USD"
-              resolution: "1MIN"
-              open: "173.00"
-              high: "174.00"
-              low: "172.50"
-              close: "173.50"
-              usdVolume: "100000"
-      allOf:
-        - $ref: "#/components/schemas/MessageEnvelope"
-        - type: object
-          properties:
-            contents:
-              type: array
-              items:
-                $ref: "#/components/schemas/CandlePayload"
+            symbol:
+              type: string
+            order_id:
+              type: string
+            price:
+              type: number
+            quantity:
+              type: number
+            take_profit:
+              type: number
+            stop_loss:
+              type: number
+          required:
+            - symbol
+            - order_id
+      required:
+        - type
+        - params
+    CancelAllOrdersCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - cancel_all_orders
+        params:
+          type: object
+          properties: {}
+      required:
+        - type
+        - params
 
     BalanceUpdate:
       examples:

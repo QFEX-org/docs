@@ -33,17 +33,27 @@
             "group": "WebSocket",
             "pages": [
               "docs/websocket/main",
-              "docs/websocket/asyncapi",
+              "docs/websocket/trade",
               "docs/websocket/mds",
               {
                 "group": "Market Data",
                 "pages": [
-                  "docs/websocket/channels/refdata",
-                  "docs/websocket/channels/orderbook",
-                  "docs/websocket/channels/trades",
-                  "docs/websocket/channels/bbo",
-                  "docs/websocket/channels/underlier",
-                  "docs/websocket/channels/funding_rate"
+                  "docs/websocket/channels/mds/refdata",
+                  "docs/websocket/channels/mds/orderbook",
+                  "docs/websocket/channels/mds/trades",
+                  "docs/websocket/channels/mds/bbo",
+                  "docs/websocket/channels/mds/underlier",
+                  "docs/websocket/channels/mds/funding_rate"
+                ]
+              },
+              {
+                "group": "Trade",
+                "pages": [
+                  "docs/websocket/channels/trade/authenticate",
+                  "docs/websocket/add_order",
+                  "docs/websocket/cancel_order",
+                  "docs/websocket/modify_order",
+                  "docs/websocket/cancel_all_orders"
                 ]
               }
             ]
