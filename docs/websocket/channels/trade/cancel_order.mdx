@@ -1,0 +1,268 @@
+---
+title: "Order Entry — Cancel Order"
+---
+
+Order cancellation is performed over **WebSocket**.
+
+- **Endpoint:** `wss://trade.psex.io`
+- **Authenticate within 1 minute of connecting.**
+
+## 1) Authenticate
+
+Send this immediately after you connect:
+
+```json
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
+```
+
+## 2) Cancel Order
+
+You can cancel by either **`order_id`** or **`client_order_id`**:
+
+- `order_id` — always a **UUID v4** and **unique**. Cancels exactly one order.
+- `client_order_id` — **not guaranteed unique**. Cancels **all orders for that symbol** that share this client order id.
+
+> Use the `cancel_order_id_type` field to specify which one you’re sending: `"order_id"` or `"client_order_id"`.
+
+### Cancel by `order_id` (single order)
+
+```json
+{
+  "type": "cancel_order",
+  "params": {
+    "order_id": "REPLACE_WITH_ORDER_UUID_V4",
+    "symbol": "AAPL-USD",
+    "cancel_order_id_type": "order_id"
+  }
+}
+```
+
+### Cancel by `client_order_id` (may cancel multiple)
+
+```json
+{
+  "type": "cancel_order",
+  "params": {
+    "client_order_id": "my-client-oid-123",
+    "symbol": "AAPL-USD",
+    "cancel_order_id_type": "client_order_id"
+  }
+}
+```
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+# pip install websocket-client
+import json
+import websocket
+
+API_KEY = "YOUR_API_KEY"
+ORDER_ID = "REPLACE_WITH_ORDER_UUID_V4"          # for order_id flow
+CLIENT_OID = "my-client-oid-123"                 # for client_order_id flow
+
+def send(ws, obj):
+    ws.send(json.dumps(obj))
+
+def on_open(ws):
+    # 1) Authenticate
+    send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
+
+    # 2a) Cancel by order_id (exactly one order)
+    send(ws, {
+        "type": "cancel_order",
+        "params": {
+            "order_id": ORDER_ID,
+            "symbol": "AAPL-USD",
+            "cancel_order_id_type": "order_id"
+        }
+    })
+
+    # 2b) Cancel by client_order_id (may cancel multiple)
+    # send(ws, {
+    #     "type": "cancel_order",
+    #     "params": {
+    #         "client_order_id": CLIENT_OID,
+    #         "symbol": "AAPL-USD",
+    #         "cancel_order_id_type": "client_order_id"
+    #     }
+    # })
+
+ws = websocket.WebSocketApp(
+    "wss://trade.psex.io",
+    on_open=on_open,
+    on_message=lambda _, m: print(m),
+    on_error=lambda _, e: print("Error:", e),
+    on_close=lambda *_: print("Closed"),
+)
+ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+// npm i ws
+const WebSocket = require("ws");
+
+const API_KEY = "YOUR_API_KEY";
+const ORDER_ID = "REPLACE_WITH_ORDER_UUID_V4"; // for order_id flow
+const CLIENT_OID = "my-client-oid-123"; // for client_order_id flow
+
+const ws = new WebSocket("wss://trade.psex.io");
+
+ws.on("open", () => {
+  // 1) Authenticate
+  ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
+
+  // 2a) Cancel by order_id (exactly one order)
+  ws.send(
+    JSON.stringify({
+      type: "cancel_order",
+      params: {
+        order_id: ORDER_ID,
+        symbol: "AAPL-USD",
+        cancel_order_id_type: "order_id",
+      },
+    })
+  );
+
+  // 2b) Cancel by client_order_id (may cancel multiple)
+  // ws.send(JSON.stringify({
+  //   type: "cancel_order",
+  //   params: {
+  //     client_order_id: CLIENT_OID,
+  //     symbol: "AAPL-USD",
+  //     cancel_order_id_type: "client_order_id"
+  //   }
+  // }));
+});
+
+ws.on("message", (m) => console.log(m.toString()));
+ws.on("error", (e) => console.error("WS error:", e));
+ws.on("close", (code, reason) =>
+  console.log("Closed:", code, reason?.toString())
+);
+```
+
+```go go
+// Go (gorilla/websocket)
+// go get github.com/gorilla/websocket
+package main
+
+import (
+	"log"
+
+	"github.com/gorilla/websocket"
+)
+
+func mustWriteJSON(c *websocket.Conn, v any) {
+	if err := c.WriteJSON(v); err != nil {
+		log.Fatal("write:", err)
+	}
+}
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+	defer c.Close()
+
+	// 1) Authenticate
+	mustWriteJSON(c, map[string]any{
+		"type": "auth",
+		"params": map[string]any{"api_key": "YOUR_API_KEY"},
+	})
+
+	// 2a) Cancel by order_id (exactly one order)
+	mustWriteJSON(c, map[string]any{
+		"type": "cancel_order",
+		"params": map[string]any{
+			"order_id":             "REPLACE_WITH_ORDER_UUID_V4",
+			"symbol":               "AAPL-USD",
+			"cancel_order_id_type": "order_id",
+		},
+	})
+
+	// 2b) Cancel by client_order_id (may cancel multiple)
+	// mustWriteJSON(c, map[string]any{
+	// 	"type": "cancel_order",
+	// 	"params": map[string]any{
+	// 		"client_order_id":      "my-client-oid-123",
+	// 		"symbol":               "AAPL-USD",
+	// 		"cancel_order_id_type": "client_order_id",
+	// 	},
+	// })
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+// Gradle: implementation("com.squareup.okhttp3:okhttp:4.12.0")
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class CancelOrderWs {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS)
+        .build();
+
+    Request req = new Request.Builder()
+        .url("wss://trade.psex.io")
+        .build();
+
+    WebSocketListener li = new WebSocketListener() {
+      @Override public void onOpen(WebSocket ws, Response r) {
+        // 1) Authenticate
+        ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
+
+        // 2a) Cancel by order_id (exactly one order)
+        ws.send("{\"type\":\"cancel_order\",\"params\":{\"order_id\":\"REPLACE_WITH_ORDER_UUID_V4\",\"symbol\":\"AAPL-USD\",\"cancel_order_id_type\":\"order_id\"}}");
+
+        // 2b) Cancel by client_order_id (may cancel multiple)
+        // ws.send("{\"type\":\"cancel_order\",\"params\":{\"client_order_id\":\"my-client-oid-123\",\"symbol\":\"AAPL-USD\",\"cancel_order_id_type\":\"client_order_id\"}}");
+      }
+
+      @Override public void onMessage(WebSocket ws, String text) {
+        System.out.println(text);
+      }
+      @Override public void onFailure(WebSocket ws, Throwable t, Response r) {
+        System.err.println("WS error: " + t.getMessage());
+      }
+    };
+
+    client.newWebSocket(req, li);
+
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Response
+
+Placing an order returns `ACK`. Cancelling it returns the same structure but with status `CANCELLED`.
+
+```json
+{
+  "order_response": {
+    "order_id": "5b309929-206f-40ec-804d-cbe46e81afc1",
+    "symbol": "AAPL-USD",
+    "status": "CANCELLED",
+    "quantity": 1.0,
+    "price": 200.0,
+    "take_profit": 0.0,
+    "stop_loss": 0.0,
+    "side": "BUY",
+    "type": "LIMIT",
+    "time_in_force": "GFD",
+    "user_id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
+    "client_order_id": "",
+    "quantity_remaining": 1.0
+  }
+}
+```

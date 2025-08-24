@@ -50,10 +50,10 @@
                 "group": "Trade",
                 "pages": [
                   "docs/websocket/channels/trade/authenticate",
-                  "docs/websocket/add_order",
-                  "docs/websocket/cancel_order",
-                  "docs/websocket/modify_order",
-                  "docs/websocket/cancel_all_orders"
+                  "docs/websocket/channels/trade/add_order",
+                  "docs/websocket/channels/trade/cancel_order",
+                  "docs/websocket/channels/trade/modify_order",
+                  "docs/websocket/channels/trade/cancel_all_orders"
                 ]
               }
             ]
@@ -93,7 +93,7 @@
     "socials": {
       "x": "https://x.com/TradeQFEX",
       "github": "https://github.com/QFEX-org",
-      "linkedin": "https://linkedin.com/company/entimox"
+      "linkedin": "https://linkedin.com/company/qfex"
     }
   }
 }

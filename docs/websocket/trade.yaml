@@ -94,11 +94,11 @@ operations:
     action: receive
     channel:
       $ref: "#/channels/qfex"
-    summary: Cancel an existing order
+    summary: Modify an existing order
     # traits:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
-      - $ref: "#/channels/qfex/messages/cancelOrder"
+      - $ref: "#/channels/qfex/messages/modifyOrder"
 
   receiveUpdates:
     action: send

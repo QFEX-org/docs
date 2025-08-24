@@ -1,0 +1,200 @@
+---
+title: "Order Entry — Modify Order"
+---
+
+Orders can be modified over **WebSocket**.  
+Only **`price`**, **`quantity`**, **`take_profit`**, and **`stop_loss`** may be changed.
+
+- You **must** specify the order’s **`order_id`** (UUID v4).
+- You **must** specify the **`symbol`**.
+- You **must** specify the **`side`**.
+- `client_order_id` cannot be used for modifies.
+
+## 1) Authenticate
+
+Send this immediately after you connect:
+
+```json
+{"type": "auth", "params": {"api_key": "YOUR_API_KEY"}}
+```
+
+## 2) Modify Order
+
+```json
+{
+  "type": "modify_order",
+  "params": {
+    "order_id": "510333ac-3f7b-4d88-934a-4396d48824cc",
+    "symbol": "AAPL-USD",
+    "side": "BUY",
+    "quantity": 2,
+    "price": 200,
+    "take_profit": 200,
+    "stop_loss": 150
+  }
+}
+```
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+import json, websocket
+
+API_KEY = "YOUR_API_KEY"
+
+def send(ws, obj): ws.send(json.dumps(obj))
+
+def on_open(ws):
+    # Authenticate
+    send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
+    # Modify order
+    send(ws, {
+        "type": "modify_order",
+        "params": {
+            "order_id": "510333ac-3f7b-4d88-934a-4396d48824cc",
+            "symbol": "AAPL-USD",
+            "side": "BUY",
+            "quantity": 2,
+            "price": 200,
+            "take_profit": 200,
+            "stop_loss": 150
+        }
+    })
+
+ws = websocket.WebSocketApp(
+    "wss://trade.psex.io",
+    on_open=on_open,
+    on_message=lambda _, m: print("Message:", m)
+)
+ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+import WebSocket from "ws";
+const ws = new WebSocket("wss://trade.psex.io");
+const API_KEY = "YOUR_API_KEY";
+
+ws.on("open", () => {
+  // Authenticate
+  ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
+  // Modify order
+  ws.send(
+    JSON.stringify({
+      type: "modify_order",
+      params: {
+        order_id: "510333ac-3f7b-4d88-934a-4396d48824cc",
+        symbol: "AAPL-USD",
+        side: "BUY",
+        quantity: 2,
+        price: 200,
+        take_profit: 200,
+        stop_loss: 150,
+      },
+    })
+  );
+});
+
+ws.on("message", (msg) => console.log("Message:", msg.toString()));
+```
+
+```go go
+// Go (gorilla/websocket)
+package main
+
+import (
+	"log"
+	"github.com/gorilla/websocket"
+)
+
+func mustWriteJSON(c *websocket.Conn, v any) {
+	if err := c.WriteJSON(v); err != nil { log.Fatal("write:", err) }
+}
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	if err != nil { log.Fatal("dial:", err) }
+	defer c.Close()
+
+	// Authenticate
+	mustWriteJSON(c, map[string]any{
+		"type": "auth",
+		"params": map[string]any{"api_key": "YOUR_API_KEY"},
+	})
+
+	// Modify order
+	mustWriteJSON(c, map[string]any{
+		"type": "modify_order",
+		"params": map[string]any{
+			"order_id":           "510333ac-3f7b-4d88-934a-4396d48824cc",
+			"symbol":             "AAPL-USD",
+			"side":               "BUY",
+			"quantity":           2,
+			"price":              200,
+			"take_profit":        200,
+			"stop_loss":          150,
+		},
+	})
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class ModifyOrderWs {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS).build();
+
+    Request req = new Request.Builder()
+        .url("wss://trade.psex.io").build();
+
+    WebSocketListener li = new WebSocketListener() {
+      @Override public void onOpen(WebSocket ws, Response r) {
+        // Authenticate
+        ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
+
+        // Modify order
+        ws.send("{\"type\":\"modify_order\",\"params\":{\"order_id\":\"510333ac-3f7b-4d88-934a-4396d48824cc\",\"symbol\":\"AAPL-USD\",\"side\":\"BUY\",\"original_quantity\":1,\"quantity\":2,\"price\":200,\"take_profit\":200,\"stop_loss\":150}}");
+      }
+      @Override public void onMessage(WebSocket ws, String text) {
+        System.out.println(text);
+      }
+    };
+
+    client.newWebSocket(req, li);
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Response
+
+When an order is successfully modified, you receive the same `order_response` object as with add, but with status **`MODIFIED`**:
+
+```json
+{
+  "order_response": {
+    "order_id": "510333ac-3f7b-4d88-934a-4396d48824cc",
+    "symbol": "AAPL-USD",
+    "status": "MODIFIED",
+    "quantity": 2.0,
+    "price": 200.0,
+    "take_profit": 200.0,
+    "stop_loss": 150.0,
+    "side": "BUY",
+    "type": "LIMIT",
+    "time_in_force": "GFD",
+    "user_id": "0020ce8e-eaee-480e-8d7f-b9241d756ee5",
+    "client_order_id": "",
+    "quantity_remaining": 2.0
+  }
+}
+```
