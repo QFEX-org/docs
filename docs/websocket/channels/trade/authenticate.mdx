@@ -8,7 +8,7 @@ Connections to `trade.qfex.com` require authentication. You must authenticate **
 
 Connect to the private websocket:
 
-- URL: **wss://trade.psex.io?api_key=YOUR_API_KEY**
+- URL: **wss://trade.qfex.com?api_key=YOUR_API_KEY**
 
 Then send an authentication message:
 
@@ -39,7 +39,7 @@ def on_close(ws, code, reason):
     print("Closed:", code, reason)
 
 ws = websocket.WebSocketApp(
-    "wss://trade.qfex.com",
+    "wss://trade.qfex.com?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=on_message,
     on_error=on_error,
@@ -53,7 +53,7 @@ ws.run_forever()
 // npm i ws
 import WebSocket from "ws";
 
-const ws = new WebSocket("wss://trade.qfex.com");
+const ws = new WebSocket("wss://trade.qfex.com?api_key=YOUR_API_KEY");
 
 ws.on("open", () => {
   ws.send(
@@ -86,7 +86,7 @@ import (
 )
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.qfex.com", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.qfex.com?api_key=YOUR_API_KEY", nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
@@ -134,7 +134,7 @@ public class AuthWs {
         .build();
 
     Request request = new Request.Builder()
-        .url("wss://trade.qfex.com")
+        .url("wss://trade.qfex.com?api_key=YOUR_API_KEY")
         .build();
 
     WebSocketListener listener = new WebSocketListener() {

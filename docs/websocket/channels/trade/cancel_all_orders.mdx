@@ -32,7 +32,7 @@ def on_open(ws):
     send(ws, {"type": "cancel_all_orders", "params": {}})
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io?api_key=YOUR_API_KEY",
+    "wss://trade.qfex.com?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print("Message:", m)
 )
@@ -42,7 +42,7 @@ ws.run_forever()
 ```javascript node
 // Node.js (ws)
 import WebSocket from "ws";
-const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
+const ws = new WebSocket("wss://trade.qfex.com?api_key=YOUR_API_KEY");
 const API_KEY = "YOUR_API_KEY";
 
 ws.on("open", () => {
@@ -69,7 +69,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.qfex.com?api_key=YOUR_API_KEY", nil)
 	if err != nil { log.Fatal("dial:", err) }
 	defer c.Close()
 
@@ -98,7 +98,7 @@ public class CancelAllOrdersWs {
         .pingInterval(20, TimeUnit.SECONDS).build();
 
     Request req = new Request.Builder()
-        .url("wss://trade.psex.io?api_key=YOUR_API_KEY").build();
+        .url("wss://trade.qfex.com?api_key=YOUR_API_KEY").build();
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {

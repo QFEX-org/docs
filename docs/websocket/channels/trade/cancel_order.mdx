@@ -4,7 +4,7 @@ title: "Order Entry — Cancel Order"
 
 Order cancellation is performed over **WebSocket**.
 
-- **Endpoint:** `wss://trade.psex.io?api_key=YOUR_API_KEY`
+- **Endpoint:** `wss://trade.qfex.com?api_key=YOUR_API_KEY`
 - **Authenticate within 1 minute of connecting.**
 
 ## 1) Authenticate
@@ -92,7 +92,7 @@ def on_open(ws):
     # })
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io?api_key=YOUR_API_KEY",
+    "wss://trade.qfex.com?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print(m),
     on_error=lambda _, e: print("Error:", e),
@@ -110,7 +110,7 @@ const API_KEY = "YOUR_API_KEY";
 const ORDER_ID = "REPLACE_WITH_ORDER_UUID_V4"; // for order_id flow
 const CLIENT_OID = "my-client-oid-123"; // for client_order_id flow
 
-const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
+const ws = new WebSocket("wss://trade.qfex.com?api_key=YOUR_API_KEY");
 
 ws.on("open", () => {
   // 1) Authenticate
@@ -164,7 +164,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.qfex.com?api_key=YOUR_API_KEY", nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
@@ -211,7 +211,7 @@ public class CancelOrderWs {
         .build();
 
     Request req = new Request.Builder()
-        .url("wss://trade.psex.io?api_key=YOUR_API_KEY")
+        .url("wss://trade.qfex.com?api_key=YOUR_API_KEY")
         .build();
 
     WebSocketListener li = new WebSocketListener() {
