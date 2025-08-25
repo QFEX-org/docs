@@ -7,7 +7,7 @@ Messages are pushed every **1 second**.
 
 ## 1) Authenticate
 
-Send this immediately after connecting to `wss://trade.psex.io`:
+Send this immediately after connecting to `wss://trade.psex.io?api_key=YOUR_API_KEY`:
 
 ```json
 { "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
@@ -39,7 +39,7 @@ def on_open(ws):
     send(ws, {"type": "subscribe", "params": {"channels": ["balances"]}})
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io",
+    "wss://trade.psex.io?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print("Message:", m),
     on_error=lambda _, e: print("Error:", e),
@@ -54,11 +54,13 @@ ws.run_forever()
 import WebSocket from "ws";
 
 const API_KEY = "YOUR_API_KEY";
-const ws = new WebSocket("wss://trade.psex.io");
+const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
 
 ws.on("open", () => {
   ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
-  ws.send(JSON.stringify({ type: "subscribe", params: { channels: ["balances"] } }));
+  ws.send(
+    JSON.stringify({ type: "subscribe", params: { channels: ["balances"] } })
+  );
 });
 
 ws.on("message", (msg) => console.log("Message:", msg.toString()));
@@ -80,7 +82,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
 	if err != nil { log.Fatal("dial:", err) }
 	defer c.Close()
 
@@ -116,7 +118,7 @@ public class BalancesSub {
     OkHttpClient client = new OkHttpClient.Builder()
         .pingInterval(20, TimeUnit.SECONDS).build();
 
-    Request req = new Request.Builder().url("wss://trade.psex.io").build();
+    Request req = new Request.Builder().url("wss://trade.psex.io?api_key=YOUR_API_KEY").build();
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {
@@ -161,6 +163,4 @@ public class BalancesSub {
 }
 ```
 
-<Note>
-  Balance updates are **pulsed every second**.
-</Note>
+<Note>Balance updates are **pulsed every second**.</Note>

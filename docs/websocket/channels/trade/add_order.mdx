@@ -4,7 +4,7 @@ title: "Order Entry — Add Order"
 
 Order entry is performed over **WebSocket**.
 
-- **Endpoint:** `wss://trade.psex.io`
+- **Endpoint:** `wss://trade.psex.io?api_key=YOUR_API_KEY`
 - **Authenticate within 1 minute of connecting.**
 
 ## 1) Authenticate
@@ -12,7 +12,7 @@ Order entry is performed over **WebSocket**.
 Send this immediately after you connect:
 
 ```json
-{"type": "auth", "params": {"api_key": "YOUR_API_KEY"}}
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
 ```
 
 ## 2) Add Order
@@ -27,8 +27,8 @@ Send this immediately after you connect:
     "order_time_in_force": "GFD",
     "quantity": 1,
     "price": 200,
-    "take_profit": 0,   // Optional
-    "stop_loss": 0      // Optional
+    "take_profit": 0, // Optional
+    "stop_loss": 0 // Optional
   }
 }
 ```
@@ -67,7 +67,7 @@ def on_open(ws):
     })
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io",
+    "wss://trade.psex.io?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print(m),
     on_error=lambda _, e: print("Error:", e),
@@ -81,7 +81,7 @@ ws.run_forever()
 // npm i ws
 const WebSocket = require("ws");
 
-const ws = new WebSocket("wss://trade.psex.io");
+const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
 
 ws.on("open", () => {
   // 1) Authenticate
@@ -127,7 +127,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
@@ -171,7 +171,7 @@ public class AddOrderWs {
         .build();
 
     Request req = new Request.Builder()
-        .url("wss://trade.psex.io")
+        .url("wss://trade.psex.io?api_key=YOUR_API_KEY")
         .build();
 
     WebSocketListener li = new WebSocketListener() {

@@ -8,12 +8,12 @@ Connections to `trade.qfex.com` require authentication. You must authenticate **
 
 Connect to the private websocket:
 
-- URL: **wss://trade.qfex.com**
+- URL: **wss://trade.psex.io?api_key=YOUR_API_KEY**
 
 Then send an authentication message:
 
 ```json
-{"type": "auth", "params": {"api_key": "YOUR_API_KEY"}}
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
 ```
 
 ## Sample Code

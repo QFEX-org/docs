@@ -15,7 +15,7 @@ Only **`price`**, **`quantity`**, **`take_profit`**, and **`stop_loss`** may be 
 Send this immediately after you connect:
 
 ```json
-{"type": "auth", "params": {"api_key": "YOUR_API_KEY"}}
+{ "type": "auth", "params": { "api_key": "YOUR_API_KEY" } }
 ```
 
 ## 2) Modify Order
@@ -65,7 +65,7 @@ def on_open(ws):
     })
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io",
+    "wss://trade.psex.io?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print("Message:", m)
 )
@@ -75,7 +75,7 @@ ws.run_forever()
 ```javascript node
 // Node.js (ws)
 import WebSocket from "ws";
-const ws = new WebSocket("wss://trade.psex.io");
+const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
 const API_KEY = "YOUR_API_KEY";
 
 ws.on("open", () => {
@@ -115,7 +115,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
 	if err != nil { log.Fatal("dial:", err) }
 	defer c.Close()
 
@@ -152,7 +152,7 @@ public class ModifyOrderWs {
         .pingInterval(20, TimeUnit.SECONDS).build();
 
     Request req = new Request.Builder()
-        .url("wss://trade.psex.io").build();
+        .url("wss://trade.psex.io?api_key=YOUR_API_KEY").build();
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {

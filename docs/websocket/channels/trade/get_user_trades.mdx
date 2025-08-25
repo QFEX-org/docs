@@ -2,7 +2,7 @@
 title: "Get User Trades"
 ---
 
-You can request the most recent **executed trades** (fills) for the authenticated account.  
+You can request the most recent **executed trades** (fills) for the authenticated account.
 
 ## Example Request
 
@@ -16,8 +16,8 @@ You can request the most recent **executed trades** (fills) for the authenticate
 }
 ```
 
-- `limit` *(optional)* — maximum number of trades to return (default **1000**)  
-- `offset` *(optional)* — pagination offset (default **0**)  
+- `limit` _(optional)_ — maximum number of trades to return (default **1000**)
+- `offset` _(optional)_ — pagination offset (default **0**)
 
 ## Sample Code
 
@@ -38,7 +38,7 @@ def on_open(ws):
     send(ws, {"type": "get_user_trades", "params": {"limit": 10, "offset": 0}})
 
 ws = websocket.WebSocketApp(
-    "wss://trade.psex.io",
+    "wss://trade.psex.io?api_key=YOUR_API_KEY",
     on_open=on_open,
     on_message=lambda _, m: print("Message:", m)
 )
@@ -48,12 +48,17 @@ ws.run_forever()
 ```javascript node
 // Node.js (ws)
 import WebSocket from "ws";
-const ws = new WebSocket("wss://trade.psex.io");
+const ws = new WebSocket("wss://trade.psex.io?api_key=YOUR_API_KEY");
 const API_KEY = "YOUR_API_KEY";
 
 ws.on("open", () => {
   ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
-  ws.send(JSON.stringify({ type: "get_user_trades", params: { limit: 10, offset: 0 } }));
+  ws.send(
+    JSON.stringify({
+      type: "get_user_trades",
+      params: { limit: 10, offset: 0 },
+    })
+  );
 });
 
 ws.on("message", (msg) => console.log("Message:", msg.toString()));
@@ -73,7 +78,7 @@ func mustWriteJSON(c *websocket.Conn, v any) {
 }
 
 func main() {
-	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io", nil)
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.psex.io?api_key=YOUR_API_KEY", nil)
 	if err != nil { log.Fatal("dial:", err) }
 	defer c.Close()
 
@@ -102,7 +107,7 @@ public class GetUserTradesWs {
         .pingInterval(20, TimeUnit.SECONDS).build();
 
     Request req = new Request.Builder()
-        .url("wss://trade.psex.io").build();
+        .url("wss://trade.psex.io?api_key=YOUR_API_KEY").build();
 
     WebSocketListener li = new WebSocketListener() {
       @Override public void onOpen(WebSocket ws, Response r) {
@@ -144,6 +149,6 @@ public class GetUserTradesWs {
 ```
 
 <Note>
-  Only **executed trades (fills)** are returned.  
-  Open orders that have not filled are excluded.
+  Only **executed trades (fills)** are returned. Open orders that have not
+  filled are excluded.
 </Note>
