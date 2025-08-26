@@ -116,6 +116,13 @@ components:
     apiKey:
       description: Your QFEx API key
 
+  securitySchemes:
+    ApiKeyQuery:
+      type: httpApiKey
+      name: api_key # ?api_key=YOUR_KEY
+      in: query
+      description: "Provide your API key as a query parameter (?api_key=...)."
+
   messageTraits:
     commonHeaders:
       headers:
