@@ -99,8 +99,10 @@ You can connect to our websocket endpoints directly using your preferred languag
 ## Authentication
 
 All websocket connections to `trade.qfex.com` require an **API Key**.  
-You must include it in the connection headers:
+You must include it as a query parameter:
 
 ```http
-X-QFEX-API-KEY: YOUR_API_KEY_HERE
+wss://trade.qfex.com?api_key=YOUR_API_KEY
 ```
+
+and [authenticate within 1 minute of connecting](/docs/websocket/channels/trade/authenticate).
