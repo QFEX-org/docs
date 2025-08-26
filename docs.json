@@ -57,7 +57,10 @@
                   "docs/websocket/channels/trade/get_user_orders",
                   "docs/websocket/channels/trade/get_user_trades",
                   "docs/websocket/channels/trade/balance",
-                  "docs/websocket/channels/trade/positions"
+                  "docs/websocket/channels/trade/positions",
+                  "docs/websocket/channels/trade/get_leverage",
+                  "docs/websocket/channels/trade/get_available_leverage",
+                  "docs/websocket/channels/trade/set_leverage"
                 ]
               }
             ]

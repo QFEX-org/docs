@@ -1,0 +1,144 @@
+---
+title: "Set Leverage"
+---
+
+You can set the leverage level for each symbol for your account.
+
+<Note>
+  You cannot change the leverage level if you have any open orders or a non zero
+  position.
+</Note>
+
+Leverage management is performed over **WebSocket**.
+
+- **Endpoint:** `wss://trade.qfex.com?api_key=YOUR_API_KEY`
+- **Authenticate within 1 minute of connecting.**
+
+## Example Request
+
+```json
+{
+  "type": "set_user_leverage",
+  "params": {
+    "symbol": "AAPL-USD",
+    "leverage": 20.0
+  }
+}
+```
+
+- `symbol` — the symbol to set the leverage for
+- `leverage` — the leverage level to set
+
+## Sample Code
+
+<CodeGroup>
+
+```python python
+# Python (websocket-client)
+import json, websocket
+
+API_KEY = "YOUR_API_KEY"
+
+def send(ws, obj): ws.send(json.dumps(obj))
+
+def on_open(ws):
+    # Authenticate
+    send(ws, {"type": "auth", "params": {"api_key": API_KEY}})
+    # Set leverage
+    send(ws, {"type": "set_user_leverage", "params": {"symbol": "AAPL-USD", "leverage": 20.0}})
+
+ws = websocket.WebSocketApp(
+    "wss://trade.qfex.com?api_key=YOUR_API_KEY",
+    on_open=on_open,
+    on_message=lambda _, m: print("Message:", m)
+)
+ws.run_forever()
+```
+
+```javascript node
+// Node.js (ws)
+import WebSocket from "ws";
+const ws = new WebSocket("wss://trade.qfex.com?api_key=YOUR_API_KEY");
+const API_KEY = "YOUR_API_KEY";
+
+ws.on("open", () => {
+  ws.send(JSON.stringify({ type: "auth", params: { api_key: API_KEY } }));
+  ws.send(
+    JSON.stringify({
+      type: "set_user_leverage",
+      params: { symbol: "AAPL-USD", leverage: 20.0 },
+    })
+  );
+});
+
+ws.on("message", (msg) => console.log("Message:", msg.toString()));
+```
+
+```go go
+// Go (gorilla/websocket)
+package main
+
+import (
+	"log"
+	"github.com/gorilla/websocket"
+)
+
+func mustWriteJSON(c *websocket.Conn, v any) {
+	if err := c.WriteJSON(v); err != nil { log.Fatal("write:", err) }
+}
+
+func main() {
+	c, _, err := websocket.DefaultDialer.Dial("wss://trade.qfex.com?api_key=YOUR_API_KEY", nil)
+	if err != nil { log.Fatal("dial:", err) }
+	defer c.Close()
+
+	// Authenticate
+	mustWriteJSON(c, map[string]any{
+		"type": "auth",
+		"params": map[string]any{"api_key": "YOUR_API_KEY"},
+	})
+
+	// Set leverage
+	mustWriteJSON(c, map[string]any{
+		"type": "set_user_leverage",
+		"params": map[string]any{"symbol": "AAPL-USD", "leverage": 20.0},
+	})
+}
+```
+
+```java java
+// Java (OkHttp WebSocket)
+import java.util.concurrent.TimeUnit;
+import okhttp3.*;
+
+public class GetUserTradesWs {
+  public static void main(String[] args) {
+    OkHttpClient client = new OkHttpClient.Builder()
+        .pingInterval(20, TimeUnit.SECONDS).build();
+
+    Request req = new Request.Builder()
+        .url("wss://trade.qfex.com?api_key=YOUR_API_KEY").build();
+
+    WebSocketListener li = new WebSocketListener() {
+      @Override public void onOpen(WebSocket ws, Response r) {
+        ws.send("{\"type\":\"auth\",\"params\":{\"api_key\":\"YOUR_API_KEY\"}}");
+        ws.send("{\"type\":\"set_user_leverage\",\"params\":{\"symbol\":\"AAPL-USD\",\"leverage\":20.0}}");
+      }
+      @Override public void onMessage(WebSocket ws, String text) {
+        System.out.println(text);
+      }
+    };
+
+    client.newWebSocket(req, li);
+    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException ignored) {}
+  }
+}
+```
+
+</CodeGroup>
+
+## Example Response
+
+```json
+{ "ack_response": true }
+```

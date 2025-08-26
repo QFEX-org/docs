@@ -256,10 +256,12 @@ components:
         params:
           type: object
           properties:
-            channel:
-              type: string
-              enum:
-                - positions
+            channels:
+              type: array
+              items:
+                type: string
+                enum:
+                  - positions
               description: positions
       required:
         - type
@@ -276,10 +278,12 @@ components:
         params:
           type: object
           properties:
-            channel:
-              type: string
-              enum:
-                - balances
+            channels:
+              type: array
+              items:
+                type: string
+                enum:
+                  - balances
               description: balances
       required:
         - type
@@ -291,12 +295,14 @@ components:
         type:
           type: string
           enum:
-            - authenticate
+            - auth
         params:
           type: object
           properties:
-            apiKey:
+            api_key:
               type: string
+          required:
+            - api_key
       required:
         - type
         - params
