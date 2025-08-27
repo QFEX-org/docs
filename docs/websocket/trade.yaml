@@ -154,10 +154,10 @@ components:
 
   securitySchemes:
     ApiKeyQuery:
-      type: httpApiKey
-      name: api_key # ?api_key=YOUR_KEY
+      type: apiKey
       in: query
-      description: "Provide your API key as a query parameter (?api_key=...)."
+      name: api_key
+      description: Provide your API key as a query parameter (?api_key=...).
 
   messageTraits:
     commonHeaders:
@@ -428,8 +428,7 @@ components:
       properties:
         type:
           type: string
-          enum:
-            - add_order
+          enum: [add_order]
         params:
           type: object
           properties:
@@ -437,26 +436,18 @@ components:
               type: string
             side:
               type: string
-              enum:
-                - BUY
-                - SELL
+              enum: [BUY, SELL]
             order_type:
               type: string
-              enum:
-                - LIMIT
-                - MARKET
-                - ALO
+              enum: [LIMIT, MARKET, ALO]
             order_time_in_force:
               type: string
-              enum:
-                - GTC
-                - IOC
-                - FOK
+              enum: [GTC, IOC, FOK]
             quantity:
               type: number
             price:
               type: number
-              description: This is only required for LIMIT or ALO orders
+              description: Only required for LIMIT or ALO orders
             take_profit:
               type: number
             stop_loss:
