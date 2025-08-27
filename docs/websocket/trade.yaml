@@ -462,7 +462,6 @@ components:
             stop_loss:
               type: number
           required:
-            - action
             - symbol
             - side
             - order_type
