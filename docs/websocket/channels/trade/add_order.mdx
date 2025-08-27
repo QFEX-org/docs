@@ -33,6 +33,26 @@ Send this immediately after you connect:
 }
 ```
 
+## Parameters
+
+| Field                 | Type   | Required       | Description                                                                                    |
+| --------------------- | ------ | -------------- | ---------------------------------------------------------------------------------------------- |
+| `symbol`              | string | ✅             | The market symbol (e.g. `AAPL-USD`).                                                           |
+| `side`                | enum   | ✅             | Order direction. See [OrderDirection](/docs/api-reference/enums#orderdirection).               |
+| `order_type`          | enum   | ✅             | Type of order. See [OrderType](/docs/api-reference/enums#ordertype).                           |
+| `order_time_in_force` | enum   | ✅             | Time in force policy. See [OrderTimeInForce](/docs/api-reference/enums#ordertimeinforce).      |
+| `quantity`            | number | ✅             | Quantity of the order. Must respect lot size and min/max limits (see reference data).          |
+| `price`               | number | ⚠️ (Limit/ALO) | Price for limit/ALO orders. Ignored for market orders. Must respect tick size and price bands. |
+| `take_profit`         | number | Optional       | Optional take-profit price. Set `0` if unused.                                                 |
+| `stop_loss`           | number | Optional       | Optional stop-loss price. Set `0` if unused.                                                   |
+| `client_order_id`     | string | Optional       | Optional client-assigned ID for tracking orders. If empty, one is generated.                   |
+
+> ⚠️ Notes:
+>
+> - `price` is required for `LIMIT` and `ALO` orders, but ignored for `MARKET`.
+> - Tick size, lot size, and min/max order quantity are symbol-specific. See **Reference Data API**.
+> - An order may be rejected with [OrderStatus](/docs/api-reference/enums#orderstatus) codes if parameters are invalid.
+
 ## Sample Code
 
 <CodeGroup>

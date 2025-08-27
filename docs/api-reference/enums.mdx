@@ -2,7 +2,7 @@
 title: "Enums"
 ---
 
-## [OrderType](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L14)
+## OrderType
 
 This defines how the order is executed by the engine.
 
@@ -12,7 +12,7 @@ This defines how the order is executed by the engine.
 | `MARKET` | 1     | Market order                                                                        |
 | `ALO`    | 2     | Add Liquidity Order. If the order would cross the book, the order will be rejected. |
 
-## [OrderDirection](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L21)
+## OrderDirection
 
 This defines the direction of the order.
 
@@ -21,7 +21,7 @@ This defines the direction of the order.
 | `BUY`  | 0     | Buy order   |
 | `SELL` | 1     | Sell order  |
 
-## [OrderTimeInForce](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L27)
+## OrderTimeInForce
 
 This defines the time in force of the order.
 
@@ -31,7 +31,7 @@ This defines the time in force of the order.
 | `IOC` | 1     | Immediate or cancel. This order will fill as much as possible and then be canceled. If the order cannot be filled immediately, the remaining quantity will be canceled. |
 | `FOK` | 2     | Fill or kill. This order will be canceled if it cannot be filled immediately. If the order cannot be filled immediately, the entire order will be canceled.             |
 
-## [OrderAction](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L34)
+## OrderAction
 
 Internal definition of the order action.
 
@@ -42,7 +42,7 @@ Internal definition of the order action.
 | `CANCEL` | 2     | Order was canceled |
 | `FILL`   | 4     | Order was filled   |
 
-## [OrderStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L43)
+## OrderStatus
 
 This is returned on any order response. This will indicate the current status of the order.
 
@@ -73,7 +73,7 @@ This is returned on any order response. This will indicate the current status of
 | `REJECTED_MARKET_CLOSED`               | 72    | QFEX is currently not accepting orders for this symbol.                                                  |
 | `RATE_LIMITED`                         | 97    | You have sent too many requests to trade.qfex.com. Please contact support@qfex.com to raise your limits. |
 
-## [SymbolStatus](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L196)
+## SymbolStatus
 
 | Name       | Value | Description                      |
 | ---------- | ----- | -------------------------------- |
@@ -81,7 +81,7 @@ This is returned on any order response. This will indicate the current status of
 | `INACTIVE` | 1     | Symbol is temporarily suspended. |
 | `DELISTED` | 2     | Symbol is permanently suspended. |
 
-## [CandlesInterval](https://github.com/QFEX-org/proto/blob/main/proto/common.proto#L219)
+## CandlesInterval
 
 | Name              | Value | Description       |
 | ----------------- | ----- | ----------------- |
@@ -92,3 +92,4 @@ This is returned on any order response. This will indicate the current status of
 | `ONE_HOUR`        | 5     | 1 hour candle.    |
 | `FOUR_HOURS`      | 6     | 4 hour candle.    |
 | `ONE_DAY`         | 7     | 1 day candle.     |
+ 

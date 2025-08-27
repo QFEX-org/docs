@@ -50,6 +50,22 @@ You can cancel by either **`order_id`** or **`client_order_id`**:
 }
 ```
 
+## Parameters
+
+| Field                  | Type   | Required | Description                                                                                                                 |
+| ---------------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `order_id`             | string | Optional | UUID v4 of the order to cancel. Required if `cancel_order_id_type` = `"order_id"`. Cancels exactly one order.               |
+| `client_order_id`      | string | Optional | Client-specified ID to cancel orders. Required if `cancel_order_id_type` = `"client_order_id"`. May cancel multiple orders. |
+| `symbol`               | string | ✅       | Market symbol of the order(s) (e.g. `AAPL-USD`).                                                                            |
+| `cancel_order_id_type` | enum   | ✅       | Must be `"order_id"` or `"client_order_id"`. Tells the engine how to interpret the ID.                                      |
+
+> ⚠️ Notes:
+>
+> - You must provide **either** `order_id` or `client_order_id`, depending on `cancel_order_id_type`.
+> - `order_id` is always unique (UUID v4).
+> - `client_order_id` is not guaranteed unique and may cancel multiple orders for the same symbol.
+> - Responses will include [OrderStatus](/docs/api-reference/enums#orderstatus) codes, e.g. `CANCELLED`, `NO_SUCH_ORDER`, or `REJECTED`.
+
 ## Sample Code
 
 <CodeGroup>

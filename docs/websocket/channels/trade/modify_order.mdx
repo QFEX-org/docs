@@ -35,6 +35,24 @@ Send this immediately after you connect:
 }
 ```
 
+## Parameters
+
+| Field         | Type   | Required | Description                                                                                           |
+| ------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `order_id`    | string | ✅       | UUID v4 of the order to modify.                                                                       |
+| `symbol`      | string | ✅       | The market symbol (e.g. `AAPL-USD`).                                                                  |
+| `side`        | enum   | ✅       | Must match the original order’s side. See [OrderDirection](/docs/api-reference/enums#orderdirection). |
+| `quantity`    | number | Optional | New order quantity. Must respect symbol lot size, min, and max constraints.                           |
+| `price`       | number | Optional | New price for limit/ALO orders. Ignored for market orders. Must respect tick size and price bands.    |
+| `take_profit` | number | Optional | Updated take-profit price. Set `0` if unused.                                                         |
+| `stop_loss`   | number | Optional | Updated stop-loss price. Set `0` if unused.                                                           |
+
+> ⚠️ Notes:
+>
+> - Only `price`, `quantity`, `take_profit`, and `stop_loss` may be modified.
+> - `client_order_id` cannot be used for modifies.
+> - Modifications that would cause an invalid state (e.g. reducing below partially filled quantity) will be rejected with [OrderStatus](/docs/api-reference/enums#orderstatus) codes such as `CANNOT_MODIFY_PARTIAL_FILL` or `CANNOT_MODIFY_NO_SUCH_ORDER`.
+
 ## Sample Code
 
 <CodeGroup>
