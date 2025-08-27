@@ -27,6 +27,12 @@ channels:
         $ref: "#/components/messages/SubscribePositionsCommand"
       subscribeBalance:
         $ref: "#/components/messages/SubscribeBalanceCommand"
+      getLeverage:
+        $ref: "#/components/messages/GetLeverageCommand"
+      setLeverage:
+        $ref: "#/components/messages/SetLeverageCommand"
+      getAvailableLeverage:
+        $ref: "#/components/messages/GetAvailableLeverageCommand"
       addOrder:
         $ref: "#/components/messages/AddOrderCommand"
       cancelOrder:
@@ -69,6 +75,36 @@ operations:
     #   - $ref: "#/components/operationTraits/websocket"
     messages:
       - $ref: "#/channels/qfex/messages/subscribeBalance"
+
+  getLeverageLevels:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Get user leverage levels
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/getLeverage"
+
+  setLeverageLevels:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Set user leverage levels
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/setLeverage"
+
+  getAvailableLeverageLevels:
+    action: receive
+    channel:
+      $ref: "#/channels/qfex"
+    summary: Get available leverage levels
+    # traits:
+    #   - $ref: "#/components/operationTraits/websocket"
+    messages:
+      - $ref: "#/channels/qfex/messages/getAvailableLeverage"
 
   placeOrder:
     action: receive
@@ -165,6 +201,34 @@ components:
         - $ref: "#/components/messageTraits/commonHeaders"
       payload:
         $ref: "#/components/schemas/SubscribeBalanceCommand"
+
+    SetLeverageCommand:
+      name: set_leverage
+      title: Set Leverage
+      summary: Set leverage level for a symbol
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/SetLeverageCommand"
+    GetLeverageCommand:
+      name: get_leverage
+      title: Get Leverage
+      summary: Get current leverage levels per symbol
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/GetLeverageCommand"
+    GetAvailableLeverageCommand:
+      name: get_available_leverage
+      title: Get Available Leverage
+      summary: Get available leverage levels per symbol
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/GetAvailableLeverageCommand"
 
     AddOrderCommand:
       name: add_order
@@ -285,6 +349,58 @@ components:
                 enum:
                   - balances
               description: balances
+      required:
+        - type
+        - params
+
+    SetLeverageCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - set_user_leverage
+        params:
+          type: object
+          properties:
+            symbol:
+              type: string
+            leverage:
+              type: number
+      required:
+        - type
+        - params
+    GetLeverageCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - get_user_leverage
+        params:
+          type: object
+          properties:
+            limit:
+              type: number
+            offset:
+              type: number
+      required:
+        - type
+        - params
+    GetAvailableLeverageCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - get_available_leverage_levels
+        params:
+          type: object
+          properties:
+            limit:
+              type: number
+            offset:
+              type: number
       required:
         - type
         - params
