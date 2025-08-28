@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "QFEX API Documentation",
   "colors": {
-    "primary": "#8B5CF6",
-    "light": "#8B5CF6",
-    "dark": "#8B5CF6"
+    "primary": "#00B8B1",
+    "light": "#00B8B1",
+    "dark": "#00B8B1"
   },
   "background": {
     "color": {
