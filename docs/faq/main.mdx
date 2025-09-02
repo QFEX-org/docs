@@ -1,0 +1,24 @@
+---
+title: FAQ
+description: "Frequently asked questions"
+---
+
+## Do you have historical data?
+
+Historical data will be available for download soon after launch.
+
+## How do you get underlier prices to compute funding?
+
+We use polygon.io’s real-time data service as the official index data.
+
+## What kinds of market maker protections do you offer?
+
+- A 50ms speed bump on limit orders to prevent latency arbitrage (cancels and liquidity-adding orders are not affected).
+- A sensible tick-size regime for our products, designed to keep the market ungapped 50% of the time during liquid hours.
+
+## How are your funding rates computed?
+
+Our funding formula is modelled on Binance’s, with two notable differences:
+
+- Funding is computed and paid every 10 minutes, not 8 hours.
+- There is no 1 basis point bias in the formula.

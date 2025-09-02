@@ -20,6 +20,10 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "FAQ",
+        "pages": ["docs/faq/main"]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {
