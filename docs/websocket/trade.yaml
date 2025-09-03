@@ -452,6 +452,8 @@ components:
               type: number
             stop_loss:
               type: number
+            client_order_id:
+              type: string
           required:
             - symbol
             - side
