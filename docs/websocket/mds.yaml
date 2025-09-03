@@ -158,7 +158,7 @@ components:
 
   messages:
     SubscribeOrderBookCommand:
-      name: subscribe_orderbook
+      name: subscribe_level2
       title: level2
       summary: Subscribe to the order book
       contentType: application/json
@@ -222,8 +222,8 @@ components:
         $ref: "#/components/schemas/SubscribeFundingRateCommand"
 
     OrderBookUpdate:
-      name: orderbook_update
-      title: orderbook
+      name: level2_update
+      title: level2
       summary: Changes in the L2 order book
       contentType: application/json
       traits:
@@ -241,7 +241,7 @@ components:
         $ref: "#/components/schemas/TradeUpdate"
     CandleUpdate:
       name: candle_update
-      title: candles
+      title: candle
       summary: Candle updates over various intervals
       contentType: application/json
       traits:
