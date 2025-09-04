@@ -2,7 +2,7 @@
 title: "Realtime BBO"
 ---
 
-QFEX provides a **realtime best bid/offer (BBO) stream** for all symbols via websocket.  
+QFEX provides a **realtime best bid/offer (BBO) stream** for all symbols via websocket.
 
 ## How it works
 
@@ -13,13 +13,17 @@ Connect to the public websocket:
 Then send a subscribe message:
 
 ```json
-{"type": "subscribe","channels": ["bbo"],"symbols": ["AAPL-USD","SP500-USD"]}
+{
+  "type": "subscribe",
+  "channels": ["bbo"],
+  "symbols": ["AAPL-USD", "SP500-USD"]
+}
 ```
 
 Or subscribe to all symbols with a wildcard:
 
 ```json
-{"type": "subscribe","channels": ["bbo"],"symbols": ["*"]}
+{ "type": "subscribe", "channels": ["bbo"], "symbols": ["*"] }
 ```
 
 ## Sample Code
@@ -87,7 +91,9 @@ ws.on("message", (msg) => {
 });
 
 ws.on("error", (err) => console.error("WS error:", err));
-ws.on("close", (code, reason) => console.log("Closed:", code, reason?.toString()));
+ws.on("close", (code, reason) =>
+  console.log("Closed:", code, reason?.toString())
+);
 ```
 
 ```go go
@@ -186,20 +192,22 @@ public class BboWs {
   "type": "bbo",
   "symbol": "AAPL-USD",
   "bid": [["10101.10", "0.45054140"]],
-  "ask": [["10102.55", "0.57753524"]]
+  "ask": [["10102.55", "0.57753524"]],
+  "sequence": 30272539,
+  "time": "2025-09-04T09:26:39.545268322Z"
 }
 ```
 
 ### Unsubscribe (optional)
 
 ```json
-{"type":"unsubscribe","channels":["bbo"],"symbols":["SP500-USD"]}
+{ "type": "unsubscribe", "channels": ["bbo"], "symbols": ["SP500-USD"] }
 ```
 
 ---
 
 **Notes**
 
-- Similar to Level 2 but only contains **top-of-book** (best bid/ask).  
-- Updates are **realtime** (not pulsed).  
+- Similar to Level 2 but only contains **top-of-book** (best bid/ask).
+- Updates are **realtime** (not pulsed).
 - Supports wildcard `*` to receive BBO for all symbols.
