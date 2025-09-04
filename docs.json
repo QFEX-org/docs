@@ -20,10 +20,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "FAQ",
-        "pages": ["docs/faq/main"]
-      },
-      {
         "tab": "API Reference",
         "groups": [
           {
@@ -69,6 +65,22 @@
               }
             ]
           }
+        ]
+      },
+      {
+        "tab": "FAQ",
+        "pages": ["docs/faq/main"]
+      },
+      {
+        "tab": "Terms & Conditions",
+        "pages": [
+          "docs/terms/complaints",
+          "docs/terms/communications",
+          "docs/terms/cookies",
+          "docs/terms/insurance",
+          "docs/terms/prohibited",
+          "docs/terms/privacy",
+          "docs/terms/waitlist"
         ]
       }
     ],
